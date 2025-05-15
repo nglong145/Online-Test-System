@@ -1,0 +1,86 @@
+/* login.component.scss */
+$primary-color: #a3c7f5; // Màu xanh dương nhạt
+$secondary-color: #0077b6; // Màu xanh dương đậm
+
+.login-container {
+  display: flex;
+  justify-content: space-between;
+  height: 100vh;
+  background-color: $primary-color;
+  padding: 20px;
+
+  .login-box {
+    width: 45%;
+    background-color: #ffffff;
+    padding: 30px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    h2 {
+      color: $secondary-color;
+      margin-bottom: 30px;
+    }
+
+    .input-field {
+      width: 100%;
+      margin-bottom: 20px;
+    }
+
+    .login-actions {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 20px;
+
+      .forgot-password {
+        color: $secondary-color;
+        font-size: 14px;
+      }
+
+      button {
+        width: 100%;
+        background-color: $secondary-color;
+        color: white;
+        font-weight: bold;
+      }
+    }
+
+    .register {
+      margin-top: 15px;
+      font-size: 14px;
+      text-align: center;
+
+      a {
+        color: $secondary-color;
+        font-weight: bold;
+      }
+    }
+  }
+
+  .right-side {
+    width: 45%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .logo-container {
+      text-align: center;
+
+      .logo {
+        width: 150px;
+        height: auto;
+        margin-bottom: 15px;
+      }
+
+      h3 {
+        color: $secondary-color;
+        font-size: 24px;
+        font-weight: bold;
+      }
+    }
+  }
+}

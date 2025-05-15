@@ -1,0 +1,63 @@
+.container {
+  padding: 20px;
+}
+
+.header {
+  margin-bottom: 20px;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+}
+
+.col {
+  width: 48%;
+}
+
+.teacher-info,
+.teacher-groups {
+  margin-bottom: 30px;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+input,
+select {
+  width: 100%;
+  padding: 8px;
+  margin-top: 5px;
+}
+
+.mat-table {
+  width: 100%;
+}
+
+.mat-header-cell,
+.mat-cell {
+  padding: 10px;
+}
+
+a {
+  text-decoration: none;
+  color: blue;
+}
+
+.mat-paginator {
+  margin-top: 20px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+textarea.form-control {
+  resize: vertical;
+  min-height: 80px;
+}

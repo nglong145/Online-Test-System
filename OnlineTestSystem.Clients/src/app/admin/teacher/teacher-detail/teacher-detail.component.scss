@@ -1,0 +1,175 @@
+.container {
+  max-width: 1100px;
+  margin: 20px auto;
+  padding: 25px 30px;
+  background-color: #f9fafb;
+  border-radius: 10px;
+  box-shadow: 0 0 12px rgb(0 0 0 / 0.07);
+  font-family: "Roboto", sans-serif;
+  color: #333;
+}
+
+.header {
+  margin-bottom: 30px;
+
+  h2 {
+    font-weight: 700;
+    font-size: 2rem;
+    color: #2f80ed;
+  }
+}
+
+.row {
+  display: flex;
+  gap: 40px;
+  flex-wrap: wrap;
+
+  .col {
+    flex: 1 1 450px;
+    background: white;
+    border-radius: 8px;
+    padding: 25px 30px;
+    box-shadow: 0 0 8px rgb(0 0 0 / 0.05);
+  }
+}
+
+.teacher-info,
+.teacher-groups {
+  h3 {
+    color: #56cc9d;
+    font-weight: 700;
+    margin-bottom: 20px;
+    font-size: 1.4rem;
+    border-bottom: 2px solid #56cc9d;
+    padding-bottom: 6px;
+  }
+
+  form {
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 18px;
+
+      label {
+        font-weight: 600;
+        color: #2f80ed;
+        margin-bottom: 6px;
+      }
+
+      input.form-control,
+      select.form-control {
+        padding: 8px 12px;
+        border: 1.8px solid #56cc9d;
+        border-radius: 6px;
+        font-size: 1rem;
+        color: #333;
+        transition: border-color 0.3s ease;
+
+        &:focus {
+          outline: none;
+          border-color: #2f80ed;
+          box-shadow: 0 0 6px #2f80edaa;
+        }
+
+        &[readonly] {
+          background-color: #f1f8f7;
+          cursor: not-allowed;
+        }
+      }
+
+      mat-datepicker-toggle {
+        margin-left: 8px;
+        vertical-align: middle;
+
+        .mat-icon-button {
+          color: #2f80ed;
+          cursor: pointer;
+        }
+      }
+    }
+
+    button {
+      background-color: #2f80ed;
+      color: white;
+      font-weight: 700;
+      border: none;
+      border-radius: 6px;
+      padding: 10px 22px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+
+      &:hover {
+        background-color: #1e5bb8;
+      }
+    }
+  }
+
+  p {
+    font-style: italic;
+    color: #999;
+  }
+}
+
+/* Bảng nhóm lớp trong phần teacher-groups */
+mat-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 10px;
+
+  th.mat-header-cell {
+    background-color: #56cc9d;
+    color: white;
+    font-weight: 700;
+    font-size: 1rem;
+    padding: 14px 12px;
+    border-radius: 8px 8px 0 0;
+    user-select: none;
+  }
+
+  td.mat-cell {
+    background-color: white;
+    padding: 12px 10px;
+    font-size: 0.95rem;
+    border-bottom: 10px solid transparent;
+    border-radius: 0 0 8px 8px;
+
+    a {
+      color: #2f80ed;
+      font-weight: 600;
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  mat-header-row,
+  mat-row {
+    box-shadow: 0 0 8px rgb(0 0 0 / 0.05);
+    margin-bottom: 10px;
+    border-radius: 8px;
+    display: table-row;
+  }
+}
+
+/* Paginator */
+mat-paginator {
+  margin-top: 15px;
+  display: flex;
+  justify-content: flex-end;
+
+  .mat-paginator-range-label,
+  .mat-paginator-page-size-label {
+    color: #2f80ed;
+    font-weight: 600;
+  }
+
+  .mat-paginator-icon {
+    color: #2f80ed;
+  }
+
+  button.mat-icon-button {
+    cursor: pointer;
+  }
+}

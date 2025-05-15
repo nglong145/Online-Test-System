@@ -1,0 +1,73 @@
+<div class="container">
+  <div class="header">
+    <h2>Teacher Detail</h2>
+  </div>
+
+  <!-- Hai phần thông tin giáo viên và nhóm lớp -->
+  <div class="row">
+    <!-- Phần thông tin giáo viên -->
+    <div class="col">
+      <div class="category-info">
+        <h3>Category Information</h3>
+        <form>
+          <div class="form-group">
+            <label for="categorySelect">Select Category</label>
+            <mat-form-field appearance="fill" class="full-width">
+              <mat-label>Category</mat-label>
+              <mat-select
+                [(ngModel)]="category.parentId"
+                name="parentId"
+                (openedChange)="onCategorySelectOpen($event)"
+                (selectionChange)="onCategorySelected($event.value)"
+                [compareWith]="compareCategoryIds"
+              >
+                <mat-option>
+                  <ngx-mat-select-search
+                    [formControl]="categoryFilterCtrl"
+                    placeholderLabel="Search categories..."
+                    noEntriesFoundLabel="No categories found"
+                  >
+                  </ngx-mat-select-search>
+                </mat-option>
+                <mat-option
+                  *ngFor="let c of categorySelectFilter"
+                  [value]="c.id"
+                >
+                  {{ c.name }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          <div class="form-group">
+            <label for="name">Category Name</label>
+            <input
+              id="name"
+              [(ngModel)]="category.name"
+              name="name"
+              type="text"
+              class="form-control"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="description">Description</label>
+            <textarea
+              id="description"
+              [(ngModel)]="category.description"
+              name="description"
+              rows="4"
+              class="form-control"
+            ></textarea>
+          </div>
+
+          <button mat-raised-button color="primary" (click)="updateCategory()">
+            Update
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Phần danh sách nhóm lớp -->
+  </div>
+</div>

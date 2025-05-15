@@ -1,0 +1,97 @@
+<!-- list-user.component.html -->
+<div class="container">
+  <div class="header">
+    <h1>Danh sách kỳ thi</h1>
+    <!-- Add New Button -->
+    <button
+      mat-raised-button
+      color="primary"
+      class="add-new-btn"
+      (click)="openAddModal()"
+    >
+      Thêm mới
+    </button>
+  </div>
+
+  <div class="filter-container">
+    <mat-form-field appearance="outline" class="filter-input">
+      <mat-label>Họ và tên</mat-label>
+      <input
+        matInput
+        placeholder="Nhập họ hoặc tên"
+        [(ngModel)]="filter.name"
+        (keyup.enter)="applyFilter()"
+      />
+    </mat-form-field>
+
+    <!-- Nút tìm kiếm và xóa bộ lọc -->
+    <div class="filter-buttons">
+      <button mat-raised-button color="primary" (click)="applyFilter()">
+        Tìm kiếm
+      </button>
+      <button mat-stroked-button color="warn" (click)="clearFilter()">
+        Xóa bộ lọc
+      </button>
+    </div>
+  </div>
+
+  <!-- User List Table for Teachers -->
+  <mat-table [dataSource]="examDataSource" matSort>
+    <ng-container matColumnDef="name">
+      <mat-header-cell *matHeaderCellDef mat-sort-header>
+        Tên kỳ thi
+      </mat-header-cell>
+      <mat-cell *matCellDef="let exam">
+        <!-- Thêm liên kết vào tên -->
+        <a [routerLink]="['/admin/exam', exam.id]">{{ exam.name }}</a>
+      </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="description">
+      <mat-header-cell *matHeaderCellDef mat-sort-header>
+        Mô tả
+      </mat-header-cell>
+      <mat-cell *matCellDef="let exam">{{ exam.description }}</mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="startTime">
+      <mat-header-cell *matHeaderCellDef> Thời gian bắt đầu </mat-header-cell>
+      <mat-cell *matCellDef="let exam">{{
+        exam.startTime | date : "  HH:mm'm' dd/MM/yyyy"
+      }}</mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="endTime">
+      <mat-header-cell *matHeaderCellDef> Thời gian kết thúc </mat-header-cell>
+      <mat-cell *matCellDef="let exam">{{
+        exam.endTime | date : "  HH:mm'm' dd/MM/yyyy"
+      }}</mat-cell>
+    </ng-container>
+
+    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+    <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
+  </mat-table>
+
+  <div
+    class="no-data"
+    *ngIf="examDataSource.length === 0"
+    style="
+      text-align: center;
+      margin: 20px 0;
+      padding: 16px;
+      font-style: italic;
+      color: #999;
+    "
+  >
+    Không có dữ liệu phù hợp
+  </div>
+
+  <!-- Pagination -->
+  <mat-paginator
+    [length]="totalUsers"
+    [pageSize]="pageSize"
+    [pageSizeOptions]="[5, 10, 25, 100]"
+    (page)="pageChanged($event)"
+  >
+  </mat-paginator>
+</div>

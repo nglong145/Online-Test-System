@@ -1,0 +1,219 @@
+/* teacher-list.component.scss */
+
+@use "../../../../styles.scss" as *; // Giả sử bạn đã khai báo biến màu trong styles.scss, import vào đây
+@use "sass:color";
+
+.container {
+  max-width: 960px;
+  margin: 2rem auto;
+  padding: 1.5rem;
+  background-color: $background-color; // từ styles.scss
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  color: $text-color;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.6rem;
+
+  h2 {
+    font-weight: 700;
+    font-size: 1.8rem;
+    color: $primary-color;
+  }
+
+  .add-new-btn {
+    background-color: $primary-color;
+    color: white;
+    padding: 1rem 1.2rem;
+    font-weight: 600;
+    border-radius: 6px;
+    box-shadow: 0 3px 8px rgba($primary-color, 0.4);
+    transition: background-color 0.3s ease;
+
+    &:hover {
+      background-color: darken($primary-color, 10%);
+      box-shadow: 0 5px 15px rgba($primary-color, 0.6);
+    }
+  }
+}
+
+.filter-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem 1.5rem;
+  margin-bottom: 1.8rem;
+
+  .filter-input {
+    flex: 1 1 250px;
+
+    mat-form-field {
+      width: 100%;
+      background-color: white;
+      border-radius: 8px;
+
+      .mat-form-field-outline {
+        border-color: $border-color;
+      }
+
+      .mat-form-field-label {
+        color: $subtext-color;
+        font-weight: 600;
+      }
+
+      input.mat-input-element {
+        color: $text-color;
+      }
+    }
+  }
+
+  .filter-buttons {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+
+    button {
+      min-width: 110px;
+      font-weight: 600;
+      border-radius: 6px;
+      padding: 0.48rem 1.2rem;
+      box-shadow: none;
+
+      &.mat-raised-button {
+        background-color: $primary-color;
+        color: white;
+        transition: background-color 0.3s ease;
+
+        &:hover {
+          background-color: darken($primary-color, 12%);
+        }
+      }
+
+      &.mat-stroked-button {
+        color: $error-color;
+        border-color: $error-color;
+        transition: background-color 0.3s ease, color 0.3s ease;
+
+        &:hover {
+          background-color: $error-color;
+          color: white;
+        }
+      }
+    }
+  }
+}
+
+/* Bảng danh sách */
+mat-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 0.6rem;
+  font-size: 1rem;
+
+  mat-header-row {
+    height: 44px;
+    background-color: $secondary-color;
+    color: white;
+    font-weight: 700;
+    border-radius: 8px;
+  }
+
+  mat-row {
+    background-color: white;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+    border-radius: 8px;
+    transition: background-color 0.25s ease;
+
+    &:hover {
+      background-color: lighten($secondary-color, 40%);
+      cursor: pointer;
+
+      a {
+        color: $primary-color;
+        font-weight: 600;
+      }
+    }
+  }
+
+  mat-cell,
+  mat-header-cell {
+    padding: 0.75rem 1rem;
+    text-align: left;
+
+    a {
+      color: $primary-color;
+      text-decoration: none;
+      transition: color 0.3s ease;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+}
+
+/* Pagination */
+mat-paginator {
+  margin-top: 1.5rem;
+  color: $text-color;
+
+  .mat-paginator-page-size-label,
+  .mat-paginator-range-label {
+    font-weight: 600;
+  }
+
+  button.mat-icon-button {
+    color: $primary-color;
+
+    &:hover {
+      background-color: color.scale($primary-color, $lightness: 60%);
+    }
+  }
+}
+
+.filter-container {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 25px;
+  flex-wrap: wrap;
+
+  .filter-input {
+    flex: 1 1 200px;
+  }
+
+  .filter-buttons {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+
+    button {
+      font-weight: 600;
+      border-radius: 6px;
+      padding: 8px 18px;
+    }
+
+    button[color="primary"] {
+      background-color: #2f80ed;
+      color: white;
+
+      &:hover {
+        background-color: #1f5bb8;
+      }
+    }
+
+    button[color="warn"] {
+      border: 1.8px solid #eb5757;
+      color: #eb5757;
+      background-color: transparent;
+
+      &:hover {
+        background-color: #eb5757;
+        color: white;
+      }
+    }
+  }
+}

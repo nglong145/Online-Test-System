@@ -1,0 +1,19 @@
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.modal-actions button {
+  font-weight: bold;
+}
+
+mat-form-field {
+  width: 100%;
+  margin-bottom: 15px; /* Đảm bảo khoảng cách giữa các trường */
+}
+
+.mat-datepicker-toggle {
+  margin-top: 8px; /* Đảm bảo toggle icon không bị chồng lên nhau */
+}

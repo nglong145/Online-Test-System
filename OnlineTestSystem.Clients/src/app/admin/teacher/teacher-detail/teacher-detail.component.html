@@ -1,0 +1,166 @@
+<div class="container">
+  <div class="header">
+    <h2>
+      Thông tin chi tiết GV {{ teacher.lastName }} {{ teacher.firstName }}
+    </h2>
+  </div>
+
+  <div class="row">
+    <div class="col">
+      <div class="teacher-info">
+        <form>
+          <div class="form-group">
+            <label for="lastName">Họ</label>
+            <input
+              id="lastName"
+              [(ngModel)]="teacher.lastName"
+              name="lastName"
+              type="text"
+              class="form-control"
+            />
+          </div>
+          <div class="form-group">
+            <label for="firstName">Tên</label>
+            <input
+              id="firstName"
+              [(ngModel)]="teacher.firstName"
+              name="firstName"
+              type="text"
+              class="form-control"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input
+              id="email"
+              [value]="teacher.email"
+              name="email"
+              type="email"
+              class="form-control"
+              readonly
+            />
+          </div>
+          <div class="form-group">
+            <label for="phoneNumber">Số điện thoại</label>
+            <input
+              id="phoneNumber"
+              [(ngModel)]="teacher.phoneNumber"
+              name="phoneNumber"
+              type="text"
+              class="form-control"
+            />
+          </div>
+          <div class="form-group">
+            <label for="address">Địa chỉ</label>
+            <input
+              id="address"
+              [(ngModel)]="teacher.address"
+              name="address"
+              type="text"
+              class="form-control"
+            />
+          </div>
+          <div class="form-group">
+            <label for="dateOfBirth">Ngày sinh</label>
+            <input
+              id="dateOfBirth"
+              [(ngModel)]="teacher.dateOfBirth"
+              name="dateOfBirth"
+              [matDatepicker]="picker"
+              (dateChange)="onDateChange($event)"
+              class="form-control"
+            />
+            <mat-datepicker-toggle
+              matSuffix
+              [for]="picker"
+            ></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+          </div>
+          <div class="form-group">
+            <label for="status">Trạng thái</label>
+            <select
+              id="status"
+              [(ngModel)]="teacher.isActive"
+              name="status"
+              class="form-control"
+              (ngModelChange)="logStatus()"
+            >
+              <option [ngValue]="true">Hoạt động</option>
+              <option [ngValue]="false">Ngừng hoạt động</option>
+            </select>
+          </div>
+          <!-- Nút cập nhật -->
+          <button mat-raised-button color="primary" (click)="updateTeacher()">
+            Cập nhật thông tin
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Phần danh sách nhóm lớp -->
+    <div class="col">
+      <div class="teacher-groups">
+        <h3>Managed Groups</h3>
+
+        <div *ngIf="filteredGroupDataSource.length === 0">
+          <p>Giáo viên chưa quản lý nhóm nào</p>
+        </div>
+
+        <div *ngIf="filteredGroupDataSource.length > 0">
+          <!-- Ô lọc theo tên nhóm -->
+          <div class="form-group">
+            <label for="groupFilter">Filter by Group Name</label>
+            <input
+              id="groupFilter"
+              [(ngModel)]="groupFilter"
+              (input)="applyFilter()"
+              type="text"
+              class="form-control"
+              placeholder="Enter group name to filter"
+            />
+          </div>
+
+          <!-- Bảng danh sách nhóm lớp -->
+          <mat-table [dataSource]="filteredGroupDataSource" matSort>
+            <ng-container matColumnDef="groupName">
+              <mat-header-cell *matHeaderCellDef mat-sort-header>
+                Group Name
+              </mat-header-cell>
+              <mat-cell *matCellDef="let group">
+                <a [routerLink]="['/admin/group', group.id]">{{
+                  group.name
+                }}</a>
+              </mat-cell>
+            </ng-container>
+
+            <ng-container matColumnDef="memberCount">
+              <mat-header-cell *matHeaderCellDef>
+                Member Count
+              </mat-header-cell>
+              <mat-cell *matCellDef="let group">{{
+                group.memeberCount
+              }}</mat-cell>
+            </ng-container>
+
+            <mat-header-row
+              *matHeaderRowDef="groupDisplayedColumns"
+            ></mat-header-row>
+            <mat-row
+              *matRowDef="let row; columns: groupDisplayedColumns"
+            ></mat-row>
+          </mat-table>
+
+          <!-- Phân trang -->
+          <mat-paginator
+            [length]="totalGroups"
+            [pageSize]="pageSize"
+            [pageSizeOptions]="[5, 10, 25, 100]"
+            (page)="pageChanged($event)"
+          >
+          </mat-paginator>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

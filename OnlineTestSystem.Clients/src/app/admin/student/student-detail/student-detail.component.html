@@ -1,0 +1,215 @@
+<div class="container">
+  <div class="header">
+    <h2>Student Detail</h2>
+  </div>
+
+  <!-- Phần thông tin sinh viên -->
+  <div class="student-info">
+    <h3>Student Information</h3>
+    <form>
+      <div class="form-group">
+        <label for="studentCode">Student Code</label>
+        <input
+          id="studentCode"
+          [(ngModel)]="student.studentCode"
+          name="studentCode"
+          type="text"
+          class="form-control"
+        />
+      </div>
+      <div class="form-group">
+        <label for="firstName">First Name</label>
+        <input
+          id="firstName"
+          [(ngModel)]="student.firstName"
+          name="firstName"
+          type="text"
+          class="form-control"
+        />
+      </div>
+      <div class="form-group">
+        <label for="lastName">Last Name</label>
+        <input
+          id="lastName"
+          [(ngModel)]="student.lastName"
+          name="lastName"
+          type="text"
+          class="form-control"
+        />
+      </div>
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input
+          id="email"
+          [value]="student.email"
+          name="email"
+          type="email"
+          class="form-control"
+          readonly
+        />
+      </div>
+      <div class="form-group">
+        <label for="phoneNumber">Phone Number</label>
+        <input
+          id="phoneNumber"
+          [(ngModel)]="student.phoneNumber"
+          name="phoneNumber"
+          type="text"
+          class="form-control"
+        />
+      </div>
+      <div class="form-group">
+        <label for="address">Address</label>
+        <input
+          id="address"
+          [(ngModel)]="student.address"
+          name="address"
+          type="text"
+          class="form-control"
+        />
+      </div>
+      <div class="form-group">
+        <label for="dateOfBirth">Date of Birth</label>
+        <input
+          id="dateOfBirth"
+          [(ngModel)]="student.dateOfBirth"
+          name="dateOfBirth"
+          [matDatepicker]="picker"
+          (dateChange)="onDateChange($event)"
+          class="form-control"
+        />
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+      </div>
+      <div class="form-group">
+        <label for="status">Status</label>
+        <select
+          id="status"
+          [(ngModel)]="student.isActive"
+          name="status"
+          class="form-control"
+        >
+          <option [ngValue]="true">Active</option>
+          <option [ngValue]="false">Inactive</option>
+        </select>
+      </div>
+      <!-- Nút cập nhật -->
+      <button mat-raised-button color="primary" (click)="updateStudent()">
+        Update
+      </button>
+    </form>
+  </div>
+
+  <!-- Phần danh sách bài thi đã làm -->
+  <div class="student-exams">
+    <h3>Exams Taken</h3>
+
+    <!-- Các ô lọc -->
+    <div class="filter-container">
+      <div class="form-group">
+        <label for="examNameFilter">Filter by Exam Name</label>
+        <input
+          id="examNameFilter"
+          [(ngModel)]="examNameFilter"
+          (input)="applyFilter()"
+          type="text"
+          class="form-control"
+          placeholder="Enter exam name"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="examPeriodFilter">Filter by Exam Period</label>
+        <input
+          id="examPeriodFilter"
+          [(ngModel)]="examPeriodFilter"
+          (input)="applyFilter()"
+          type="text"
+          class="form-control"
+          placeholder="Enter exam period"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="startDateFilter">Filter by Start Date</label>
+        <input
+          id="startDateFilter"
+          [(ngModel)]="startDateFilter"
+          (dateChange)="applyFilter()"
+          [matDatepicker]="startDatePicker"
+          class="form-control"
+        />
+        <mat-datepicker #startDatePicker></mat-datepicker>
+      </div>
+
+      <div class="form-group">
+        <label for="endDateFilter">Filter by End Date</label>
+        <input
+          id="endDateFilter"
+          [(ngModel)]="endDateFilter"
+          (dateChange)="applyFilter()"
+          [matDatepicker]="endDatePicker"
+          class="form-control"
+        />
+        <mat-datepicker #endDatePicker></mat-datepicker>
+      </div>
+
+      <div class="form-group">
+        <label for="scoreFilter">Filter by Score</label>
+        <input
+          id="scoreFilter"
+          [(ngModel)]="scoreFilter"
+          (input)="applyFilter()"
+          type="number"
+          class="form-control"
+          placeholder="Enter score"
+        />
+      </div>
+    </div>
+
+    <!-- Bảng danh sách bài thi -->
+    <mat-table [dataSource]="filteredExamDataSource" matSort>
+      <ng-container matColumnDef="examName">
+        <mat-header-cell *matHeaderCellDef mat-sort-header
+          >Exam Name</mat-header-cell
+        >
+        <mat-cell *matCellDef="let exam">{{ exam.examName }}</mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="quizName">
+        <mat-header-cell *matHeaderCellDef>Quiz</mat-header-cell>
+        <mat-cell *matCellDef="let exam">{{ exam.quizName || "N/A" }}</mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="startedAt">
+        <mat-header-cell *matHeaderCellDef>Start Date</mat-header-cell>
+        <mat-cell *matCellDef="let exam">{{
+          exam.startedAt | date : "dd/MM/yyyy HH:mm"
+        }}</mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="finishedAt">
+        <mat-header-cell *matHeaderCellDef>End Date</mat-header-cell>
+        <mat-cell *matCellDef="let exam">{{
+          exam.finishedAt | date : "dd/MM/yyyy HH:mm"
+        }}</mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="score">
+        <mat-header-cell *matHeaderCellDef>Score</mat-header-cell>
+        <mat-cell *matCellDef="let exam">{{ exam.score }}</mat-cell>
+      </ng-container>
+
+      <mat-header-row *matHeaderRowDef="examDisplayedColumns"></mat-header-row>
+      <mat-row *matRowDef="let row; columns: examDisplayedColumns"></mat-row>
+    </mat-table>
+
+    <!-- Phân trang -->
+    <mat-paginator
+      [length]="totalExams"
+      [pageSize]="pageSize"
+      [pageSizeOptions]="[1, 5, 10, 25, 100]"
+      (page)="pageChanged($event)"
+    ></mat-paginator>
+  </div>
+</div>

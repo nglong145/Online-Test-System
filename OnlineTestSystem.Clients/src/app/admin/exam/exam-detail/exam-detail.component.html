@@ -1,0 +1,272 @@
+<div class="container">
+  <div class="header">
+    <h2>Exam Detail</h2>
+  </div>
+
+  <!-- Phần thông tin chi tiết Exam và danh sách bài thi đã thêm -->
+  <div class="row">
+    <!-- Phần thông tin chi tiết Exam -->
+    <div class="col">
+      <div class="exam-info">
+        <h3>Exam Information</h3>
+        <form>
+          <div class="form-group">
+            <label for="name">Exam Name</label>
+            <input
+              id="name"
+              [(ngModel)]="exam.name"
+              name="name"
+              type="text"
+              class="form-control"
+            />
+          </div>
+          <div class="form-group">
+            <label for="accessCode">Access Code</label>
+            <input
+              id="accessCode"
+              [(ngModel)]="exam.accessCode"
+              name="accessCode"
+              type="text"
+              class="form-control"
+            />
+          </div>
+          <div class="form-group">
+            <label for="description">Description</label>
+            <textarea
+              id="description"
+              [(ngModel)]="exam.description"
+              name="description"
+              class="form-control"
+            ></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="startTime">Start Time</label>
+            <input
+              id="startTime"
+              [(ngModel)]="exam.startTime"
+              name="startTime"
+              type="datetime-local"
+              class="form-control"
+              [value]="exam.startTime | date : 'yyyy-MM-ddTHH:mm'"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="endTime">End Time</label>
+            <input
+              id="endTime"
+              [(ngModel)]="exam.endTime"
+              name="endTime"
+              type="datetime-local"
+              class="form-control"
+              [value]="exam.endTime | date : 'yyyy-MM-ddTHH:mm'"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="isActive">Active Status</label>
+            <select
+              id="isActive"
+              [(ngModel)]="exam.isActive"
+              name="isActive"
+              class="form-control"
+            >
+              <option [ngValue]="true">Active</option>
+              <option [ngValue]="false">Inactive</option>
+            </select>
+          </div>
+          <!-- Nút cập nhật -->
+          <button mat-raised-button color="primary" (click)="updateExam()">
+            Update
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Phần danh sách bài thi đã thêm vào Exam -->
+    <div class="col">
+      <div class="exam-questions">
+        <h3>Quiz Added</h3>
+
+        <!-- Ô lọc theo title -->
+        <div class="form-group">
+          <label for="titleFilter">Filter by Title</label>
+          <input
+            id="titleFilter"
+            [(ngModel)]="titleFilter"
+            (input)="applyFilter()"
+            type="text"
+            class="form-control"
+            placeholder="Enter title"
+          />
+        </div>
+
+        <!-- Bảng danh sách các câu hỏi -->
+        <mat-table [dataSource]="filteredExamQuizDataSource" matSort>
+          <ng-container matColumnDef="title">
+            <mat-header-cell *matHeaderCellDef mat-sort-header
+              >Title</mat-header-cell
+            >
+            <mat-cell *matCellDef="let quiz">{{ quiz.title }}</mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="totalQuestion">
+            <mat-header-cell *matHeaderCellDef>Question</mat-header-cell>
+            <mat-cell *matCellDef="let quiz">{{ quiz.totalQuestion }}</mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="duration">
+            <mat-header-cell *matHeaderCellDef>Duration</mat-header-cell>
+            <mat-cell *matCellDef="let quiz"
+              >{{ quiz.duration }} minutes</mat-cell
+            >
+          </ng-container>
+
+          <mat-header-row
+            *matHeaderRowDef="examQuizDisplayedColumns"
+          ></mat-header-row>
+          <mat-row
+            *matRowDef="let row; columns: examQuizDisplayedColumns"
+          ></mat-row>
+        </mat-table>
+
+        <!-- Phân trang -->
+        <mat-paginator
+          [length]="totalExamQuizzes"
+          [pageSize]="pageSizeExamQuiz"
+          [pageSizeOptions]="[5, 10, 25, 100]"
+          (page)="pageChangedExamQuiz($event)"
+        ></mat-paginator>
+      </div>
+    </div>
+  </div>
+
+  <!-- Phần danh sách bài thi đã nộp -->
+  <div class="student-exams">
+    <h3>Exams Submitted</h3>
+
+    <!-- Các ô lọc -->
+    <div class="filter-container">
+      <div class="form-group">
+        <label for="examPeriodFilter">Filter by Exam Period</label>
+        <input
+          id="examPeriodFilter"
+          [(ngModel)]="examPeriodFilter"
+          (input)="applyFilter()"
+          type="text"
+          class="form-control"
+          placeholder="Enter exam period"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="examNameFilter">Filter by Exam Name</label>
+        <input
+          id="examNameFilter"
+          [(ngModel)]="examNameFilter"
+          (input)="applyFilter()"
+          type="text"
+          class="form-control"
+          placeholder="Enter exam name"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="startDateFilter">Filter by Start Date</label>
+        <input
+          id="startDateFilter"
+          [(ngModel)]="startDateFilter"
+          (dateChange)="applyFilter()"
+          class="form-control"
+          type="datetime-local"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="endDateFilter">Filter by End Date</label>
+        <input
+          id="endDateFilter"
+          [(ngModel)]="endDateFilter"
+          (dateChange)="applyFilter()"
+          class="form-control"
+          type="datetime-local"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="scoreFilter">Filter by Score</label>
+        <input
+          id="scoreFilter"
+          [(ngModel)]="scoreFilter"
+          (input)="applyFilter()"
+          type="number"
+          class="form-control"
+          placeholder="Enter score"
+        />
+      </div>
+    </div>
+
+    <!-- Bảng danh sách bài thi đã nộp -->
+    <mat-table [dataSource]="filteredUserQuizDataSource" matSort>
+      <ng-container matColumnDef="studentCode">
+        <mat-header-cell *matHeaderCellDef mat-sort-header
+          >Student Code</mat-header-cell
+        >
+        <mat-cell *matCellDef="let userQuiz">{{
+          userQuiz.studentCode
+        }}</mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="name">
+        <mat-header-cell *matHeaderCellDef mat-sort-header
+          >Full Name</mat-header-cell
+        >
+        <mat-cell *matCellDef="let userQuiz"
+          >{{ userQuiz.firstName }} {{ userQuiz.lastName }}</mat-cell
+        >
+      </ng-container>
+
+      <ng-container matColumnDef="quizName">
+        <mat-header-cell *matHeaderCellDef>Quiz</mat-header-cell>
+        <mat-cell *matCellDef="let userQuiz">{{
+          userQuiz.quizName || "N/A"
+        }}</mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="startedAt">
+        <mat-header-cell *matHeaderCellDef>Start Time</mat-header-cell>
+        <mat-cell *matCellDef="let userQuiz">{{
+          userQuiz.startedAt | date : "dd/MM/yyyy HH:mm"
+        }}</mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="finishedAt">
+        <mat-header-cell *matHeaderCellDef>End Time</mat-header-cell>
+        <mat-cell *matCellDef="let userQuiz">{{
+          userQuiz.finishedAt | date : "dd/MM/yyyy HH:mm"
+        }}</mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="score">
+        <mat-header-cell *matHeaderCellDef>Score</mat-header-cell>
+        <mat-cell *matCellDef="let userQuiz">{{ userQuiz.score }}</mat-cell>
+      </ng-container>
+
+      <mat-header-row
+        *matHeaderRowDef="userQuizDisplayedColumns"
+      ></mat-header-row>
+      <mat-row
+        *matRowDef="let row; columns: userQuizDisplayedColumns"
+      ></mat-row>
+    </mat-table>
+
+    <!-- Phân trang -->
+    <mat-paginator
+      [length]="totalUserQuizzes"
+      [pageSize]="pageSizeUserQuiz"
+      [pageSizeOptions]="[5, 10, 25, 100]"
+      (page)="pageChangedUserQuiz($event)"
+    ></mat-paginator>
+  </div>
+</div>

@@ -1,0 +1,43 @@
+.snackbar-success {
+  .mat-simple-snackbar {
+    color: #fff;
+  }
+  background-color: #4caf50 !important;
+
+  .mat-simple-snackbar-action {
+    color: #fff;
+  }
+}
+
+.snackbar-error {
+  .mat-simple-snackbar {
+    color: #fff;
+  }
+  background-color: #f44336 !important;
+
+  .mat-simple-snackbar-action {
+    color: #fff;
+  }
+}
+
+.snackbar-warning {
+  .mat-simple-snackbar {
+    color: #000;
+  }
+  background-color: #ffc107 !important;
+
+  .mat-simple-snackbar-action {
+    color: #000;
+  }
+}
+
+.snackbar-info {
+  .mat-simple-snackbar {
+    color: #fff;
+  }
+  background-color: #2196f3 !important;
+
+  .mat-simple-snackbar-action {
+    color: #fff;
+  }
+}

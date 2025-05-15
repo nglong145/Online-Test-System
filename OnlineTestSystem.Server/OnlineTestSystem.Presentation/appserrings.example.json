@@ -1,0 +1,18 @@
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "AllowedHosts": "*",
+  "ConnectionStrings": {
+    "DefaultConnection": "Server=your_server;Database=your_db;User Id=your_acc;Password=your_pw;TrustServerCertificate=true;"
+  },
+
+  "JWT": {
+    "Audience": "User",
+    "Issuer": "your_localhost",
+    "Secret": "your_key"
+  }
+}

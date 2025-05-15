@@ -1,0 +1,69 @@
+<div class="group-detail-container">
+  <h2>Group Detail</h2>
+
+  <!-- Thông tin group -->
+  <mat-card>
+    <mat-card-title>Group Information</mat-card-title>
+    <mat-card-content>
+      <form>
+        <mat-form-field appearance="fill" class="full-width">
+          <mat-label>Group Name</mat-label>
+          <input matInput [(ngModel)]="group.name" name="name" />
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" class="full-width">
+          <mat-label>Active Status</mat-label>
+          <mat-select [(ngModel)]="group.isActive" name="isActive">
+            <mat-option [value]="true">Active</mat-option>
+            <mat-option [value]="false">Inactive</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <!-- User Manager -->
+        <mat-form-field appearance="fill" class="full-width">
+          <mat-label>User Manager</mat-label>
+          <mat-select [(ngModel)]="group.userManagerId" name="userManagerId">
+            <mat-option *ngFor="let teacher of teachers" [value]="teacher.id">
+              {{ teacher.lastName }} {{ teacher.firstName }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" class="full-width">
+          <mat-label>Description</mat-label>
+          <textarea
+            matInput
+            [(ngModel)]="group.description"
+            name="description"
+          ></textarea>
+        </mat-form-field>
+
+        <button mat-raised-button color="primary" (click)="updateGroup()">
+          Update Group
+        </button>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Danh sách thành viên -->
+  <h3>Group Members</h3>
+  <mat-table [dataSource]="members" class="mat-elevation-z8">
+    <ng-container matColumnDef="fullName">
+      <mat-header-cell *matHeaderCellDef> Full Name </mat-header-cell>
+      <mat-cell *matCellDef="let member">
+        {{ member.lastName }} {{ member.firstName }}
+      </mat-cell>
+    </ng-container>
+
+    <mat-header-row *matHeaderRowDef="['fullName']"></mat-header-row>
+    <mat-row *matRowDef="let row; columns: ['fullName']"></mat-row>
+  </mat-table>
+
+  <mat-paginator
+    [length]="totalMembers"
+    [pageSize]="pageSize"
+    [pageSizeOptions]="[5, 10, 25]"
+    (page)="pageChanged($event)"
+  >
+  </mat-paginator>
+</div>
