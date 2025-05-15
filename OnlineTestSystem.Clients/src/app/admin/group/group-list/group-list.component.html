@@ -1,0 +1,70 @@
+<div class="container">
+  <div class="header">
+    <h2>Group List</h2>
+    <!-- Add New Button -->
+    <button
+      mat-raised-button
+      color="primary"
+      class="add-new-btn"
+      (click)="openAddGroupModal()"
+    >
+      + Add New Group
+    </button>
+
+    <!-- Search Box for Filtering by Name -->
+  </div>
+
+  <!-- Group List Table -->
+  <mat-table [dataSource]="groupDataSource" matSort>
+    <!-- Name Column -->
+    <ng-container matColumnDef="name">
+      <mat-header-cell *matHeaderCellDef mat-sort-header>
+        Name
+      </mat-header-cell>
+      <mat-cell *matCellDef="let group">
+        <a [routerLink]="['/admin/groups', group.id]" class="group-link">{{
+          group.name
+        }}</a></mat-cell
+      >
+    </ng-container>
+
+    <!-- Description Column -->
+    <ng-container matColumnDef="description">
+      <mat-header-cell *matHeaderCellDef mat-sort-header>
+        Description
+      </mat-header-cell>
+      <mat-cell *matCellDef="let group">{{ group.description }}</mat-cell>
+    </ng-container>
+
+    <!-- Created At Column -->
+    <ng-container matColumnDef="createdAt">
+      <mat-header-cell *matHeaderCellDef mat-sort-header>
+        Created At
+      </mat-header-cell>
+      <mat-cell *matCellDef="let group">{{
+        group.createdAt | date : "dd/MM/yyyy"
+      }}</mat-cell>
+    </ng-container>
+
+    <!-- User Manager Column -->
+    <ng-container matColumnDef="userManager">
+      <mat-header-cell *matHeaderCellDef> User Manager </mat-header-cell>
+      <mat-cell *matCellDef="let group">{{ group.userManager }}</mat-cell>
+    </ng-container>
+
+    <!-- Header Row -->
+    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+
+    <!-- Data Row -->
+    <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
+  </mat-table>
+
+  <!-- Pagination -->
+  <mat-paginator
+    [length]="totalGroups"
+    [pageSize]="pageSize"
+    [pageSizeOptions]="[1, 5, 10, 25, 100]"
+    (page)="pageChanged($event)"
+  >
+  </mat-paginator>
+</div>

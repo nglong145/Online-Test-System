@@ -1,0 +1,39 @@
+@use "./app/shared/styles/snackbar.scss";
+
+html,
+body {
+  height: 100%;
+}
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+$background-color: #f9fafb !default;
+$text-color: #333333 !default;
+$primary-color: #2f80ed !default;
+$secondary-color: #56cc9d !default;
+$error-color: #eb5757 !default;
+$border-color: #e0e0e0 !default;
+$subtext-color: #828282 !default;
+
+body {
+  font-family: "Roboto", sans-serif;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+}
+
+h1,
+h2,
+h3 {
+  color: var(--color-primary);
+}
+
+.mat-toolbar {
+  background-color: var(--color-primary);
+  color: white;
+}
+
+button {
+  cursor: pointer;
+}

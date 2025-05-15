@@ -1,0 +1,53 @@
+<div class="container">
+  <div class="header">
+    <h2>Category List</h2>
+    <!-- Add New Button -->
+    <button
+      mat-raised-button
+      color="primary"
+      class="add-new-btn"
+      (click)="openAddModal()"
+    >
+      + Add New
+    </button>
+  </div>
+
+  <!-- User List Table for Teachers -->
+  <mat-table [dataSource]="categoryDataSource" matSort>
+    <ng-container matColumnDef="name">
+      <mat-header-cell *matHeaderCellDef mat-sort-header>
+        Name
+      </mat-header-cell>
+      <mat-cell *matCellDef="let cate">
+        <!-- Thêm liên kết vào tên -->
+        <a [routerLink]="['/teacher/category', cate.id]">{{ cate.name }}</a>
+      </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="description">
+      <mat-header-cell *matHeaderCellDef mat-sort-header>
+        dateOfBirth
+      </mat-header-cell>
+      <mat-cell *matCellDef="let cate">{{
+        cate.description || "khoong cos"
+      }}</mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="categoryParent">
+      <mat-header-cell *matHeaderCellDef> Danh muc cha </mat-header-cell>
+      <mat-cell *matCellDef="let cate">{{ cate.parentName }}</mat-cell>
+    </ng-container>
+
+    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+    <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
+  </mat-table>
+
+  <!-- Pagination -->
+  <mat-paginator
+    [length]="totalCategories"
+    [pageSize]="pageSize"
+    [pageSizeOptions]="[5, 10, 25, 100]"
+    (page)="pageChanged($event)"
+  >
+  </mat-paginator>
+</div>

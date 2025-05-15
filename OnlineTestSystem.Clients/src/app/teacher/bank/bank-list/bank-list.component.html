@@ -1,0 +1,57 @@
+<div class="container">
+  <div class="header">
+    <h2>Bank List</h2>
+    <!-- Add New Button -->
+    <button
+      mat-raised-button
+      color="primary"
+      class="add-new-btn"
+      (click)="openAddModal()"
+    >
+      + Add New
+    </button>
+  </div>
+
+  <!-- User List Table for Teachers -->
+  <mat-table [dataSource]="bankDataSource" matSort>
+    <ng-container matColumnDef="name">
+      <mat-header-cell *matHeaderCellDef mat-sort-header>
+        Name
+      </mat-header-cell>
+      <mat-cell *matCellDef="let bank">
+        <a [routerLink]="['/teacher/bank', bank.id]">{{ bank.name }}</a>
+      </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="owner">
+      <mat-header-cell *matHeaderCellDef mat-sort-header>
+        Nguoi tao
+      </mat-header-cell>
+      <mat-cell *matCellDef="let bank">{{
+        bank.ownerFullName || "khoong cos"
+      }}</mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="category">
+      <mat-header-cell *matHeaderCellDef> Danh muc</mat-header-cell>
+      <mat-cell *matCellDef="let bank">{{ bank.categoryName }}</mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="total">
+      <mat-header-cell *matHeaderCellDef> Cau hoi</mat-header-cell>
+      <mat-cell *matCellDef="let bank">{{ bank.totalQuestion }}</mat-cell>
+    </ng-container>
+
+    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+    <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
+  </mat-table>
+
+  <!-- Pagination -->
+  <mat-paginator
+    [length]="totalBanks"
+    [pageSize]="pageSize"
+    [pageSizeOptions]="[5, 10, 25, 100]"
+    (page)="pageChanged($event)"
+  >
+  </mat-paginator>
+</div>

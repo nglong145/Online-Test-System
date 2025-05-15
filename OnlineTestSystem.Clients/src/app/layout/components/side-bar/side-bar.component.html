@@ -1,0 +1,18 @@
+<mat-sidenav-container class="sidenav-container">
+  <mat-sidenav #sidenav mode="side" opened>
+    <mat-nav-list>
+      <mat-list-item
+        *ngFor="let navItem of navItems"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        [routerLink]="navItem.route"
+      >
+        <mat-icon>{{ navItem.icon }}</mat-icon>
+        <span>{{ navItem.name }}</span>
+      </mat-list-item>
+    </mat-nav-list>
+  </mat-sidenav>
+  <mat-sidenav-content>
+    <!-- Content goes here -->
+  </mat-sidenav-content>
+</mat-sidenav-container>

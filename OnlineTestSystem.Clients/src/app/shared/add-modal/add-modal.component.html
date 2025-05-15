@@ -1,0 +1,121 @@
+<!-- add-modal.component.html -->
+<mat-dialog-content>
+  <h2>{{ title }}</h2>
+
+  <form (ngSubmit)="onSubmit()">
+    <div *ngFor="let field of fields">
+      <!-- text -->
+      <div *ngIf="field.type === 'text'">
+        <mat-form-field appearance="fill">
+          <mat-label>{{ field.label }}</mat-label>
+          <input
+            matInput
+            [(ngModel)]="formData[field.name]"
+            name="{{ field.name }}"
+          />
+        </mat-form-field>
+      </div>
+
+      <!-- select -->
+      <div *ngIf="field.type === 'select'">
+        <mat-form-field appearance="fill">
+          <mat-label>{{ field.label }}</mat-label>
+          <mat-select
+            [(ngModel)]="formData[field.name]"
+            name="{{ field.name }}"
+          >
+            <mat-option [value]="null"
+              >-- Chọn {{ field.label.toLowerCase() }} --</mat-option
+            >
+            <mat-option
+              *ngFor="let option of field.options"
+              [value]="option.value"
+            >
+              {{ option.label }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <!-- select-search-api -->
+      <div *ngIf="field.type === 'select-search-api'">
+        <mat-form-field appearance="fill">
+          <mat-label>{{ field.label }}</mat-label>
+          <!-- input search riêng -->
+          <input
+            matInput
+            placeholder="Tìm kiếm {{ field.label.toLowerCase() }}"
+            (input)="onSearchFromInput($event, field)"
+          />
+          <!-- dropdown select -->
+          <mat-select
+            [(ngModel)]="formData[field.name]"
+            name="{{ field.name }}"
+          >
+            <mat-option [value]="null"
+              >-- Chọn {{ field.label.toLowerCase() }} --</mat-option
+            >
+            <mat-option
+              *ngFor="let option of field.options"
+              [value]="option.value"
+            >
+              {{ option.label }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <!-- date -->
+      <div *ngIf="field.type === 'date'">
+        <mat-form-field appearance="fill">
+          <mat-label>{{ field.label }}</mat-label>
+          <input
+            matInput
+            [matDatepicker]="picker"
+            [(ngModel)]="formData[field.name]"
+            name="{{ field.name }}"
+          />
+          <mat-datepicker-toggle
+            matSuffix
+            [for]="picker"
+          ></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+        </mat-form-field>
+      </div>
+
+      <!-- autocomplete-api -->
+      <div *ngIf="field.type === 'autocomplete-api'">
+        <mat-form-field appearance="fill">
+          <mat-label>{{ field.label }}</mat-label>
+          <input
+            type="text"
+            matInput
+            [matAutocomplete]="auto"
+            [ngModel]="getOptionLabel(field, formData[field.name])"
+            (ngModelChange)="onSearch(field, $event)"
+            name="{{ field.name }}"
+          />
+          <mat-autocomplete
+            #auto="matAutocomplete"
+            (optionSelected)="onOptionSelected(field, $event)"
+          >
+            <mat-option
+              *ngFor="let option of field.options"
+              [value]="option.value"
+            >
+              {{ option.label }}
+            </mat-option>
+          </mat-autocomplete>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <!-- actions -->
+    <div class="modal-actions">
+      <button mat-button type="button" (click)="closeModal()">Cancel</button>
+      <button mat-raised-button color="primary" type="submit">
+        {{ submitButtonText }}
+      </button>
+    </div>
+  </form>
+</mat-dialog-content>

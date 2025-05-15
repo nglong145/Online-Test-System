@@ -1,0 +1,138 @@
+<!-- list-user.component.html -->
+<div class="container">
+  <div class="header">
+    <h1>Danh sách học viên</h1>
+    <!-- Add New Button -->
+    <button
+      mat-raised-button
+      color="primary"
+      class="add-new-btn"
+      (click)="openAddModal()"
+    >
+      Thêm mới
+    </button>
+  </div>
+
+  <!-- Filter Inputs -->
+  <div class="filter-container">
+    <mat-form-field appearance="outline" class="filter-input">
+      <mat-label>Mã Học viên</mat-label>
+      <input
+        matInput
+        placeholder="Nhập mã học viên"
+        [(ngModel)]="filter.studentCode"
+        (keyup.enter)="applyFilter()"
+      />
+    </mat-form-field>
+    <mat-form-field appearance="outline" class="filter-input">
+      <mat-label>Họ và tên</mat-label>
+      <input
+        matInput
+        placeholder="Nhập họ hoặc tên"
+        [(ngModel)]="filter.name"
+        (keyup.enter)="applyFilter()"
+      />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="filter-input">
+      <mat-label>Email</mat-label>
+      <input
+        matInput
+        placeholder="Nhập email"
+        [(ngModel)]="filter.email"
+        (keyup.enter)="applyFilter()"
+      />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="filter-input">
+      <mat-label>Địa chỉ</mat-label>
+      <input
+        matInput
+        placeholder="Nhập địa chỉ"
+        [(ngModel)]="filter.address"
+        (keyup.enter)="applyFilter()"
+      />
+    </mat-form-field>
+
+    <!-- Nút tìm kiếm và xóa bộ lọc -->
+    <div class="filter-buttons">
+      <button mat-raised-button color="primary" (click)="applyFilter()">
+        Tìm kiếm
+      </button>
+      <button mat-stroked-button color="warn" (click)="clearFilter()">
+        Xóa bộ lọc
+      </button>
+    </div>
+  </div>
+
+  <!-- User List Table for studnet -->
+  <mat-table [dataSource]="studentDataSource" matSort>
+    <ng-container matColumnDef="studentCode">
+      <mat-header-cell *matHeaderCellDef mat-sort-header>
+        Mã học viên
+      </mat-header-cell>
+      <mat-cell *matCellDef="let user">
+        <!-- Thêm liên kết vào tên -->
+        <a [routerLink]="['/admin/student', user.id]">{{ user.studentCode }}</a>
+      </mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="name">
+      <mat-header-cell *matHeaderCellDef mat-sort-header>
+        Họ và tên
+      </mat-header-cell>
+      <mat-cell *matCellDef="let user">
+        {{ user.firstName }} {{ user.lastName }}
+      </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="dateOfBirth">
+      <mat-header-cell *matHeaderCellDef mat-sort-header>
+        Ngày tháng năm sinh
+      </mat-header-cell>
+      <mat-cell *matCellDef="let user">{{
+        user.dateOfBirth | date : "dd/MM/yyyy"
+      }}</mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="email">
+      <mat-header-cell *matHeaderCellDef> Email </mat-header-cell>
+      <mat-cell *matCellDef="let user">{{ user.email }}</mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="phoneNumber">
+      <mat-header-cell *matHeaderCellDef> Số điện thoại </mat-header-cell>
+      <mat-cell *matCellDef="let user">{{ user.phoneNumber }}</mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="address">
+      <mat-header-cell *matHeaderCellDef> Địa chỉ </mat-header-cell>
+      <mat-cell *matCellDef="let user">{{ user.address }}</mat-cell>
+    </ng-container>
+
+    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+    <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
+  </mat-table>
+
+  <div
+    class="no-data"
+    *ngIf="studentDataSource.length === 0"
+    style="
+      text-align: center;
+      margin: 20px 0;
+      padding: 16px;
+      font-style: italic;
+      color: #999;
+    "
+  >
+    Không có dữ liệu phù hợp
+  </div>
+
+  <!-- Pagination -->
+  <mat-paginator
+    [length]="totalUsers"
+    [pageSize]="pageSize"
+    [pageSizeOptions]="[5, 10, 25, 100]"
+    (page)="pageChanged($event)"
+  >
+  </mat-paginator>
+</div>
