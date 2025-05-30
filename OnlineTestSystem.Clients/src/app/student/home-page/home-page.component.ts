@@ -291,6 +291,7 @@ export class HomePageComponent implements AfterViewInit {
   openAccessCodeInputModal(exam: any): void {
     const dialogRef = this.dialog.open(AccessModalComponent, {
       width: '400px',
+      panelClass: 'add-modal-dialog',
       data: { exam },
     });
 

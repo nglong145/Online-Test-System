@@ -20,6 +20,7 @@ using OnlineTestSystem.BLL.Services.UserService;
 using OnlineTestSystem.DAL.Data;
 using OnlineTestSystem.DAL.Infrastructure;
 using OnlineTestSystem.DAL.Models;
+using OnlineTestSystem.DAL.Seed;
 using System.ComponentModel;
 using System.Text;
 
@@ -125,6 +126,13 @@ builder.Services.AddAuthentication(config =>
     });
 
 var app = builder.Build();
+
+// Seed example data
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<TestSystemDbContext>();
+    await SeedData.InitializeAsync(dbContext);
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

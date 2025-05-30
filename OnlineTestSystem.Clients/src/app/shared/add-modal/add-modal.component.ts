@@ -354,11 +354,11 @@ export class AddModalComponent implements OnInit, OnDestroy {
   setupTimeHint(): void {
     const lang = navigator.language || 'en';
     if (lang.startsWith('vi')) {
-      this.timeHint = 'HH:mm (24 giờ)';
+      this.timeHint = 'HH:mm (12 giờ)';
     } else if (lang.startsWith('en')) {
-      this.timeHint = 'HH:mm (24-hour format)';
+      this.timeHint = 'HH:mm (12 giờ)';
     } else {
-      this.timeHint = 'HH:mm (24-hour format)';
+      this.timeHint = 'HH:mm (12 giờ)';
     }
   }
 

@@ -79,6 +79,8 @@ export class LoginComponent {
         error: (err) => {
           if (err.error?.message === 'Invalid login credentials!') {
             this.snackBar.error('Thông tin đăng nhập không hợp lệ');
+          } else if (err.error?.message === 'User account is inactive!') {
+            this.snackBar.error('Tài khoản người dùng không hoạt động');
           } else {
             this.snackBar.error('Lỗi từ phía máy chủ');
           }

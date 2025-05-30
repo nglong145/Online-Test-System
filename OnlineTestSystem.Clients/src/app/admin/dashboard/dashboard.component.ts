@@ -136,11 +136,16 @@ export class DashboardComponent implements OnInit, OnDestroy {
   @ViewChild('ongoingExamsContainer') ongoingExamsContainer!: ElementRef;
   @ViewChild('upcomingExamsContainer') upcomingExamsContainer!: ElementRef;
 
+  private refreshInterval: any;
+  private readonly REFRESH_INTERVAL_MS = 60000; // Cập nhật mỗi 1 phút
+
   ngOnInit(): void {
     this.loadSummaryData();
     this.loadChartData();
     this.loadOngoingExams();
     this.loadUpcomingExams();
+
+    this.startAutoRefresh();
   }
 
   ngOnDestroy(): void {
@@ -148,6 +153,26 @@ export class DashboardComponent implements OnInit, OnDestroy {
     if (this.examChart) {
       this.examChart.destroy();
       this.examChart = null;
+    }
+
+    this.stopAutoRefresh();
+  }
+
+  private startAutoRefresh(): void {
+    this.refreshInterval = setInterval(() => {
+      // Chỉ cập nhật danh sách kỳ thi, không làm mới toàn bộ dashboard
+      this.loadOngoingExams();
+      this.loadUpcomingExams();
+
+      // Cập nhật thêm các thông tin tổng quan liên quan đến kỳ thi
+      this.loadSummaryData();
+    }, this.REFRESH_INTERVAL_MS);
+  }
+
+  private stopAutoRefresh(): void {
+    if (this.refreshInterval) {
+      clearInterval(this.refreshInterval);
+      this.refreshInterval = null;
     }
   }
 
@@ -398,7 +423,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
     return formatDate(date, 'dd/MM/yyyy HH:mm', this.locale);
   }
 
-  loadOngoingExams(loadMore: boolean = false): void {
+  loadOngoingExams(
+    loadMore: boolean = false,
+    autoRefresh: boolean = false
+  ): void {
     if (loadMore) {
       this.isLoadingMoreOngoing = true;
     } else {
@@ -409,8 +437,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
     this.examService
       .getFilterExamOncoming(
-        this.ongoingExamsPage,
-        this.ongoingExamsPageSize,
+        autoRefresh ? 1 : this.ongoingExamsPage,
+        autoRefresh ? 100 : this.ongoingExamsPageSize,
         'startTime',
         'asc',
         { isActive: true }
@@ -418,44 +446,55 @@ export class DashboardComponent implements OnInit, OnDestroy {
       .pipe(
         finalize(() => {
           this.isLoadingMoreOngoing = false;
-          this.isExamsLoading = false;
+          if (!autoRefresh) this.isExamsLoading = false;
         })
       )
       .subscribe({
         next: (result) => {
           const newExams = result.items || [];
-          if (loadMore) {
+          if (autoRefresh) {
+            // Khi tự động làm mới, thay thế toàn bộ danh sách
+            this.ongoingExams = newExams;
+            this.ongoingExamsHasMore = newExams.length >= 100;
+          } else if (loadMore) {
             this.ongoingExams = [...this.ongoingExams, ...newExams];
+            this.ongoingExamsHasMore =
+              newExams.length === this.ongoingExamsPageSize;
           } else {
             this.ongoingExams = newExams;
+            this.ongoingExamsHasMore =
+              newExams.length === this.ongoingExamsPageSize;
           }
-
-          // Check if there are more exams to load
-          this.ongoingExamsHasMore =
-            newExams.length === this.ongoingExamsPageSize;
         },
         error: (error) => {
-          this.notification.error(
-            'Không thể tải danh sách kỳ thi đang diễn ra'
-          );
-          console.error('Error loading ongoing exams:', error);
+          if (!autoRefresh) {
+            // Chỉ hiển thị thông báo lỗi nếu không phải là tự động làm mới
+            this.notification.error(
+              'Không thể tải danh sách kỳ thi đang diễn ra'
+            );
+            console.error('Error loading ongoing exams:', error);
+          }
         },
       });
   }
 
   // Modify loadUpcomingExams to support pagination
-  loadUpcomingExams(loadMore: boolean = false): void {
+  loadUpcomingExams(
+    loadMore: boolean = false,
+    autoRefresh: boolean = false
+  ): void {
     if (loadMore) {
       this.isLoadingMoreUpcoming = true;
-    } else {
+    } else if (!autoRefresh) {
+      // Chỉ đặt lại trạng thái khi không phải là tự động làm mới
       this.upcomingExamsPage = 1;
       this.upcomingExams = [];
     }
 
     this.examService
       .getFilterExamUpcoming(
-        this.upcomingExamsPage,
-        this.upcomingExamsPageSize,
+        autoRefresh ? 1 : this.upcomingExamsPage,
+        autoRefresh ? 100 : this.upcomingExamsPageSize,
         'startTime',
         'asc',
         { isActive: true }
@@ -468,18 +507,26 @@ export class DashboardComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (result) => {
           const newExams = result.items || [];
-          if (loadMore) {
+          if (autoRefresh) {
+            // Khi tự động làm mới, thay thế toàn bộ danh sách
+            this.upcomingExams = newExams;
+            this.upcomingExamsHasMore = newExams.length >= 100;
+          } else if (loadMore) {
             this.upcomingExams = [...this.upcomingExams, ...newExams];
+            this.upcomingExamsHasMore =
+              newExams.length === this.upcomingExamsPageSize;
           } else {
             this.upcomingExams = newExams;
+            this.upcomingExamsHasMore =
+              newExams.length === this.upcomingExamsPageSize;
           }
-
-          // Check if there are more exams to load
-          this.upcomingExamsHasMore =
-            newExams.length === this.upcomingExamsPageSize;
         },
         error: (error) => {
-          this.notification.error('Không thể tải danh sách kỳ thi sắp diễn ra');
+          if (!autoRefresh) {
+            this.notification.error(
+              'Không thể tải danh sách kỳ thi sắp diễn ra'
+            );
+          }
         },
       });
   }

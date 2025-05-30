@@ -68,6 +68,11 @@ namespace OnlineTestSystem.BLL.Services.AuthenticationService
                 throw new Exception("Invalid login credentials!");
             }
 
+            if (!user.IsActive)
+            {
+                throw new Exception("User account is inactive!");
+            }
+
             return await GenerateJwtTokenAsync(user);
         }
 

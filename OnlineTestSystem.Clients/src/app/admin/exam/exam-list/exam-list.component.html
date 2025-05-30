@@ -173,7 +173,13 @@
     </div>
   </div>
   <div class="dialog-actions">
-    <button mat-button class="cancel-btn" (click)="data.cancelAction()">
+    <button
+      mat-button
+      class="cancel-btn"
+      (click)="data.cancelAction()"
+      type="button"
+      aria-label="Hủy thao tác xóa"
+    >
       Hủy
     </button>
     <button
@@ -181,8 +187,13 @@
       class="confirm-btn"
       [disabled]="(countdownValue$ | async) !== 0"
       (click)="data.confirmAction()"
+      type="button"
+      aria-label="Xác nhận xóa kỳ thi"
     >
-      Xác nhận xóa
+      <ng-container *ngIf="(countdownValue$ | async) === 0; else waitingState">
+        Xác nhận xóa
+      </ng-container>
+      <ng-template #waitingState> Vui lòng đợi... </ng-template>
     </button>
   </div>
 </ng-template>

@@ -136,7 +136,7 @@ $space-unit: 8px;
   .exam-card-time {
     font-size: 0.85rem;
     color: #64748b;
-    margin-bottom: $space-unit / 2;
+    margin-bottom: calc($space-unit / 2);
     display: flex;
     align-items: center;
     position: relative;
@@ -144,7 +144,7 @@ $space-unit: 8px;
 
     &::before {
       content: "🕒";
-      margin-right: $space-unit / 2;
+      margin-right: calc($space-unit / 2);
       font-size: 0.8rem;
     }
   }
@@ -163,7 +163,7 @@ $space-unit: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: $space-unit / 2;
+    gap: calc($space-unit / 2);
     font-size: 0.9rem;
     position: relative;
     z-index: 1;
@@ -175,7 +175,7 @@ $space-unit: 8px;
     }
 
     &:hover:not([disabled]) {
-      background: darken($primary-color, 5%);
+      background: color.adjust($primary-color, $lightness: -5%);
       box-shadow: 0 2px 8px rgba($primary-color, 0.25);
     }
 
@@ -205,25 +205,57 @@ $space-unit: 8px;
 
     .filter-buttons {
       display: flex;
-      gap: $space-unit;
-      align-items: flex-end;
-      grid-column: 1 / -1;
+      gap: 12px;
+      align-items: flex-start;
+      margin-top: 4px;
 
-      @media (min-width: 768px) {
-        justify-content: flex-end;
+      @media (max-width: 768px) {
+        flex-direction: column;
+        width: 100%;
+
+        button {
+          width: 100%;
+          justify-content: center;
+        }
       }
 
       button {
-        font-weight: 500;
-        padding: $space-unit $space-unit * 1.5;
         display: flex;
         align-items: center;
-        gap: $space-unit / 2;
+        gap: 6px;
+        font-weight: 600;
+        border-radius: 4px;
+        padding: 0.6rem 1rem;
+        height: 42px;
+        min-width: 120px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        transition: all 0.2s ease;
 
         mat-icon {
           font-size: 18px;
-          width: 18px;
           height: 18px;
+          width: 18px;
+        }
+      }
+
+      button[color="primary"] {
+        background: linear-gradient(135deg, #1976d2, #1565c0);
+        border: none;
+
+        &:hover {
+          background: linear-gradient(135deg, #1565c0, #0d47a1);
+          box-shadow: 0 4px 12px rgba(25, 118, 210, 0.25);
+        }
+      }
+
+      button[color="warn"] {
+        border: 1px solid #f44336;
+        color: #f44336;
+        background: white;
+
+        &:hover {
+          background: rgba(244, 67, 54, 0.08);
+          box-shadow: 0 4px 12px rgba(244, 67, 54, 0.15);
         }
       }
     }
@@ -250,7 +282,7 @@ $space-unit: 8px;
 
       mat-icon {
         color: white;
-        margin-right: $space-unit / 2;
+        margin-right: calc($space-unit / 2);
         vertical-align: middle;
       }
     }
@@ -426,45 +458,6 @@ mat-paginator {
 }
 
 // Thêm style cho các nút tìm kiếm và xóa bộ lọc
-.filter-buttons {
-  display: flex;
-  gap: $space-unit;
-  align-items: flex-end;
-  grid-column: 1 / -1;
-
-  @media (min-width: 768px) {
-    justify-content: flex-end;
-  }
-
-  button {
-    font-weight: 500;
-    padding: $space-unit $space-unit * 1.5;
-    display: flex;
-    align-items: center;
-    gap: $space-unit / 2;
-
-    mat-icon {
-      font-size: 18px;
-      width: 18px;
-      height: 18px;
-    }
-
-    // Đảm bảo nút có màu nền
-    &[color="primary"] {
-      background-color: $primary-color;
-      color: white;
-    }
-
-    &[color="warn"] {
-      border: 1px solid #f44336;
-      color: #f44336;
-
-      &:hover {
-        background-color: rgba(244, 67, 54, 0.04);
-      }
-    }
-  }
-}
 
 // Đảm bảo các nút filter trong trang có đúng style
 .filter-container {
@@ -474,7 +467,7 @@ mat-paginator {
       color: white;
 
       &:hover {
-        background-color: darken($primary-color, 5%);
+        background-color: color.adjust($primary-color, $lightness: -5%);
       }
     }
 

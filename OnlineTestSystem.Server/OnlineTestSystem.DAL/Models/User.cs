@@ -9,7 +9,7 @@ namespace OnlineTestSystem.DAL.Models
         public string LastName { get; set; }
         public DateTime? DateOfBirth { get; set; }
         public string? Address { get; set; }
-        public bool? IsActive { get; set; } = true;
+        public bool IsActive { get; set; } = true;
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public Guid RoleId { get; set; }
         public Role Role { get; set; }
