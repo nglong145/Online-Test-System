@@ -14,6 +14,9 @@ namespace OnlineTestSystem.DAL.Configurations
                    .HasMaxLength(255)
                    .IsUnicode(true);
 
+            builder.Property(qb => qb.CreatedAt)
+               .HasDefaultValueSql("GETDATE()");
+
             builder.HasOne(qb => qb.Owner)
                    .WithMany(u => u.QuestionBanks)
                    .HasForeignKey(qb => qb.OwnerId)
@@ -24,6 +27,9 @@ namespace OnlineTestSystem.DAL.Configurations
                    .HasForeignKey(qb => qb.QuizCategoryId)
                    .OnDelete(DeleteBehavior.SetNull)
                    .IsRequired(false);
+
+            builder.Property(qb => qb.IsActive)
+                   .HasDefaultValue(true);
         }
     }
 }

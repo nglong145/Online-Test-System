@@ -12,20 +12,28 @@ import { AuthService } from '../../core/auth/services/auth.service';
 })
 export class AdminLayoutComponent {
   navItems: any[] = [];
+  isMobileMenuOpen: boolean = false;
+
   constructor(private authService: AuthService) {}
 
   ngOnInit(): void {
     // Example: Set different nav items based on user role
-    // const role = this.authService.getUserRole();
-    const role = 'Admin';
+    const role = this.authService.getUserRole();
     if (role === 'Admin') {
       this.navItems = [
         { name: 'Dashboard', icon: 'dashboard', route: 'dashboard' },
-        { name: 'Teachers', icon: 'school', route: 'teacher' },
-        { name: 'Students', icon: 'people', route: 'student' },
-        { name: 'Exams', icon: 'assignment', route: 'exam' },
-        { name: 'Groups', icon: 'group', route: 'group' },
+        { name: 'Giáo viên', icon: 'school', route: 'teacher' },
+        { name: 'Sinh viên', icon: 'people', route: 'student' },
+        { name: 'Nhóm', icon: 'groups', route: 'group' },
+        { name: 'Danh mục', icon: 'category', route: 'category' },
+        { name: 'Ngân hàng câu hỏi', icon: 'quiz', route: 'bank' },
+        { name: 'Đề thi', icon: 'description', route: 'quiz' },
+        { name: 'Kỳ thi', icon: 'event', route: 'exam' },
       ];
     }
+  }
+
+  toggleMobileMenu(): void {
+    this.isMobileMenuOpen = !this.isMobileMenuOpen;
   }
 }

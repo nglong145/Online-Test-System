@@ -41,4 +41,8 @@ export class CategoryService {
       category
     );
   }
+
+  deleteCategory(categoryId: string): Observable<any> {
+    return this.http.delete<any>(`${API_URL}/QuizCategory/${categoryId}`);
+  }
 }

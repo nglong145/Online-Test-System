@@ -108,10 +108,14 @@ namespace OnlineTestSystem.Presentation.Controllers
                 exam.EndTime=addExamVm.EndTime;
                 exam.IsActive=addExamVm.IsActive;
 
-                await _examService.UpdateAsync(exam);
-                return Ok(exam);
+                var result = await _examService.UpdateAsync(exam);
+                if (result > 0)
+                {
+                    return Ok(new { message = "Exam updated successfully." });
+                }
+                return BadRequest(new { message = "Failed to updated exam" });
             }
-            return BadRequest("The exam does not exist!");
+            return NotFound(new { message = "The exam does not exist!" });
         }
 
         [HttpDelete("delete-exam/{id}")]
@@ -142,6 +146,55 @@ namespace OnlineTestSystem.Presentation.Controllers
             try
             {
                 var exams = await _examService.FilterExamsAsync(filterRequest, pageIndex, pageSize, sortBy, sortOrder);
+                return Ok(exams);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Internal server error", error = ex.Message });
+            }
+
+        }
+
+        [HttpPost("filter-upcoming")]
+        public async Task<IActionResult> GetFilteredExamsUpcoming([FromQuery] int pageIndex,
+                                                   [FromQuery] int pageSize,
+                                                   [FromBody] FilterExamVm filterRequest,
+                                                   [FromQuery] string sortBy = "StartTime",
+                                                   [FromQuery] string sortOrder = "desc")
+        {
+            if (pageIndex <= 0 || pageSize <= 0)
+            {
+                return BadRequest(new { message = "PageIndex and PageSize must be greater than 0." });
+            }
+
+            try
+            {
+                var exams = await _examService.FilterExamsUpcomingAsync(filterRequest, pageIndex, pageSize, sortBy, sortOrder);
+                return Ok(exams);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Internal server error", error = ex.Message });
+            }
+
+        }
+
+
+        [HttpPost("filter-oncoming")]
+        public async Task<IActionResult> GetFilteredExamsOncoming([FromQuery] int pageIndex,
+                                                   [FromQuery] int pageSize,
+                                                   [FromBody] FilterExamVm filterRequest,
+                                                   [FromQuery] string sortBy = "StartTime",
+                                                   [FromQuery] string sortOrder = "desc")
+        {
+            if (pageIndex <= 0 || pageSize <= 0)
+            {
+                return BadRequest(new { message = "PageIndex and PageSize must be greater than 0." });
+            }
+
+            try
+            {
+                var exams = await _examService.FilterExamsOncomingAsync(filterRequest, pageIndex, pageSize, sortBy, sortOrder);
                 return Ok(exams);
             }
             catch (Exception ex)

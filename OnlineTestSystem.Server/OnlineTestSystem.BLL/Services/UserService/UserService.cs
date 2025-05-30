@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using OnlineTestSystem.BLL.Services.Base;
 using OnlineTestSystem.BLL.ViewModels;
@@ -158,12 +159,52 @@ namespace OnlineTestSystem.BLL.Services.UserService
 
         }
 
+        public async Task<UserVm?> GetUserByStudentCodeAsync(string studentCode)
+        {
+            if (string.IsNullOrWhiteSpace(studentCode))
+                return null;
+
+            var user = await _userManager.Users
+                .FirstOrDefaultAsync(u => u.StudentCode == studentCode);
+
+            if (user == null)
+                return null;
+
+            // Lấy thêm tên role nếu cần
+            var role = await _roleManager.FindByIdAsync(user.RoleId.ToString());
+
+            return new UserVm
+            {
+                Id = user.Id,
+                StudentCode = user.StudentCode ?? string.Empty,
+                FirstName = user.FirstName ?? string.Empty,
+                LastName = user.LastName ?? string.Empty,
+                DateOfBirth = user.DateOfBirth,
+                Email = user.Email ?? string.Empty,
+                PhoneNumber = user.PhoneNumber ?? string.Empty,
+                Address = user.Address ?? string.Empty,
+                IsActive = user.IsActive,
+                RoleId = user.RoleId,
+                RoleName = role?.Name ?? string.Empty
+            };
+        }
+
         public async Task<bool> AddUserAsync(CreateUserVm userVm)
         {
             var existingUser = await _userManager.FindByEmailAsync(userVm.Email);
             if (existingUser != null)
             {
-                throw new Exception($"User with email {userVm.Email} already exists.");
+                throw new Exception($"Email {userVm.Email} đã được đăng ký bởi {existingUser.LastName + ' ' + existingUser.FirstName}");
+            }
+
+            if (!string.IsNullOrWhiteSpace(userVm.StudentCode))
+            {
+                var studentCodeExists = await _userManager.Users.FirstOrDefaultAsync(u => u.StudentCode == userVm.StudentCode); ;
+
+                if (studentCodeExists!=null)
+                {
+                    throw new Exception($"Mã sinh viên {userVm.StudentCode} đã được đăng ký bởi {studentCodeExists.LastName + ' ' + studentCodeExists.FirstName}");
+                }
             }
 
             var role = await _roleManager.FindByNameAsync(userVm.Role);
@@ -193,9 +234,25 @@ namespace OnlineTestSystem.BLL.Services.UserService
                 throw new Exception("User not found.");
             }
 
+            if (!string.IsNullOrWhiteSpace(updateUserVm.Email) && updateUserVm.Email != user.Email)
+            {
+                var emailExists = await _userManager.FindByEmailAsync(updateUserVm.Email);
+                if (emailExists!=null)
+                    throw new Exception($"Email {updateUserVm.Email} đã được đăng ký bởi {emailExists.LastName + ' ' + emailExists.FirstName}");
+            }
+
+            // Kiểm tra student code nếu có cập nhật
+            if (!string.IsNullOrWhiteSpace(updateUserVm.StudentCode) && updateUserVm.StudentCode != user.StudentCode)
+            {
+                var studentCodeExists = await _userManager.Users.FirstOrDefaultAsync(u => u.StudentCode == updateUserVm.StudentCode);
+                if (studentCodeExists!=null)
+                    throw new Exception($"Mã sinh viên {updateUserVm.StudentCode} đã được đăng ký bởi {studentCodeExists.LastName + ' ' + user.FirstName}");
+            }
+
             user.StudentCode = updateUserVm.StudentCode;
             user.FirstName = updateUserVm.FirstName;
             user.LastName = updateUserVm.LastName;
+            user.Email = updateUserVm.Email;
             user.PhoneNumber = updateUserVm.PhoneNumber;
             user.DateOfBirth = updateUserVm.DateOfBirth;
             user.Address = updateUserVm.Address;
@@ -219,64 +276,25 @@ namespace OnlineTestSystem.BLL.Services.UserService
             return 0; // Failure
         }
 
-        //public async Task<IEnumerable<UserVm>> GetUsersByGroupAsync(Guid groupId)
-        //{
-        //    var usersInGroup = await _context.UserGroups
-        //        .Where(ug => ug.GroupId == groupId)
-        //        .Include(ug => ug.User) 
-        //        .ToListAsync();
+        public async Task<bool> ChangePasswordAsync(ChangePasswordVm vm)
+        {
+            var user = await _userManager.FindByIdAsync(vm.UserId.ToString());
+            if (user == null)
+                throw new Exception("User not found.");
 
-        //    var userVms = new List<UserVm>();
+            var isOldPasswordValid = await _userManager.CheckPasswordAsync(user, vm.CurrentPassword);
+            if (!isOldPasswordValid)
+                throw new Exception("Mật khẩu hiện tại không đúng.");
 
-        //    foreach (var user in usersInGroup)
-        //    {
-        //        var role = await _roleManager.FindByIdAsync(user.RoleId.ToString());
+            var result = await _userManager.ChangePasswordAsync(user, vm.CurrentPassword, vm.NewPassword);
+            if (!result.Succeeded)
+            {
+                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                throw new Exception($"Đổi mật khẩu thất bại: {errors}");
+            }
 
-        //        userVms.Add(new UserVm
-        //        {
-        //            Id = user.Id,
-        //            StudentCode = user.StudentCode ?? string.Empty,
-        //            FirstName = user.FirstName ?? string.Empty,
-        //            LastName = user.LastName ?? string.Empty,
-        //            DateOfBirth = user.DateOfBirth ?? DateTime.MinValue,
-        //            Email = user.Email ?? string.Empty,
-        //            PhoneNumber = user.PhoneNumber ?? string.Empty,
-        //            Address = user.Address ?? string.Empty,
-        //            IsActive = user.IsActive,
-        //            RoleId = user.RoleId,
-        //            RoleName = role?.Name ?? string.Empty // Gán tên role sau khi tìm thấy
-        //        });
-        //    }
-
-        //    return usersInGroup;
-
-        //    var users = await _userManager.Users.ToListAsync();
-
-        //    // Duyệt qua các user và lấy tên role bất đồng bộ
-        //    var userVms = new List<UserVm>();
-
-        //    foreach (var user in users)
-        //    {
-        //        var role = await _roleManager.FindByIdAsync(user.RoleId.ToString());
-
-        //        userVms.Add(new UserVm
-        //        {
-        //            Id = user.Id,
-        //            StudentCode = user.StudentCode ?? string.Empty,
-        //            FirstName = user.FirstName ?? string.Empty,
-        //            LastName = user.LastName ?? string.Empty,
-        //            DateOfBirth = user.DateOfBirth ?? DateTime.MinValue,
-        //            Email = user.Email ?? string.Empty,
-        //            PhoneNumber = user.PhoneNumber ?? string.Empty,
-        //            Address = user.Address ?? string.Empty,
-        //            IsActive = user.IsActive,
-        //            RoleId = user.RoleId,
-        //            RoleName = role?.Name ?? string.Empty // Gán tên role sau khi tìm thấy
-        //        });
-        //    }
-
-        //    return userVms;
-        //}
+            return result.Succeeded;
+        }
 
 
         public async Task<IEnumerable<UserVm>> GetUsersByRoleNameAsync(string roleName)

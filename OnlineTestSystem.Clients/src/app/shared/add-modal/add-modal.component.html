@@ -1,91 +1,197 @@
-<!-- add-modal.component.html -->
-<mat-dialog-content>
-  <h2>{{ title }}</h2>
+<div class="dialog-header">
+  <h2>
+    <mat-icon>{{ getHeaderIcon() }}</mat-icon>
+    {{ title }}
+  </h2>
+</div>
 
-  <form (ngSubmit)="onSubmit()">
-    <div *ngFor="let field of fields">
+<div class="dialog-content">
+  <!-- Loading overlay -->
+  <div class="loading-overlay" *ngIf="isLoading">
+    <mat-spinner diameter="40"></mat-spinner>
+  </div>
+
+  <form #mainForm="ngForm" (ngSubmit)="onSubmit(mainForm)">
+    <div *ngFor="let field of fields; trackBy: trackByFieldName">
       <!-- text -->
       <div *ngIf="field.type === 'text'">
-        <mat-form-field appearance="fill">
+        <mat-form-field appearance="outline">
           <mat-label>{{ field.label }}</mat-label>
           <input
             matInput
             [(ngModel)]="formData[field.name]"
             name="{{ field.name }}"
+            #ngModel="ngModel"
+            [required]="!!field.validators?.required"
+            [minlength]="field.validators?.minLength ?? null"
+            [maxlength]="field.validators?.maxLength ?? null"
+            [pattern]="field.validators?.pattern || ''"
+            [placeholder]="getPlaceholder(field)"
+            autocomplete="off"
           />
+          <mat-icon matSuffix>{{ getFieldIcon(field) }}</mat-icon>
+          <mat-error
+            *ngIf="ngModel.invalid && (ngModel.touched || ngModel.dirty)"
+          >
+            {{ getFieldError(field, ngModel) }}
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <!-- password -->
+      <div *ngIf="field.type === 'password'">
+        <mat-form-field appearance="outline">
+          <mat-label>{{ field.label }}</mat-label>
+          <input
+            matInput
+            [type]="field.hide ? 'password' : 'text'"
+            [(ngModel)]="formData[field.name]"
+            name="{{ field.name }}"
+            #ngModel="ngModel"
+            [required]="!!field.validators?.required"
+            [minlength]="field.validators?.minLength ?? null"
+            [maxlength]="field.validators?.maxLength ?? null"
+            [pattern]="field.validators?.pattern || ''"
+            [placeholder]="getPlaceholder(field)"
+            autocomplete="new-password"
+          />
+          <button
+            mat-icon-button
+            matSuffix
+            type="button"
+            (click)="togglePassword(field)"
+          >
+            <mat-icon>{{
+              field.hide ? "visibility_off" : "visibility"
+            }}</mat-icon>
+          </button>
+          <mat-error
+            *ngIf="ngModel.invalid && (ngModel.touched || ngModel.dirty)"
+          >
+            {{ getFieldError(field, ngModel) }}
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <!-- textarea -->
+      <div *ngIf="field.type === 'textarea'">
+        <mat-form-field appearance="outline">
+          <mat-label>{{ field.label }}</mat-label>
+          <textarea
+            matInput
+            rows="4"
+            [(ngModel)]="formData[field.name]"
+            name="{{ field.name }}"
+            #ngModel="ngModel"
+            [required]="!!field.validators?.required"
+            [minlength]="field.validators?.minLength ?? null"
+            [maxlength]="field.validators?.maxLength ?? null"
+            [placeholder]="getPlaceholder(field)"
+          ></textarea>
+          <mat-icon matSuffix>{{ getFieldIcon(field) }}</mat-icon>
+          <mat-error
+            *ngIf="ngModel.invalid && (ngModel.touched || ngModel.dirty)"
+          >
+            {{ getFieldError(field, ngModel) }}
+          </mat-error>
+          <mat-hint *ngIf="field.validators?.maxLength">
+            {{ formData[field.name]?.length || 0 }}/{{
+              field.validators?.maxLength
+            }}
+            ký tự
+          </mat-hint>
         </mat-form-field>
       </div>
 
       <!-- select -->
       <div *ngIf="field.type === 'select'">
-        <mat-form-field appearance="fill">
+        <mat-form-field appearance="outline">
           <mat-label>{{ field.label }}</mat-label>
           <mat-select
             [(ngModel)]="formData[field.name]"
             name="{{ field.name }}"
+            #ngModel="ngModel"
+            [required]="!!field.validators?.required"
+            [placeholder]="getPlaceholder(field)"
+            (selectionChange)="ngModel.control.markAsDirty()"
           >
-            <mat-option [value]="null"
-              >-- Chọn {{ field.label.toLowerCase() }} --</mat-option
-            >
+            <mat-option [value]="null">
+              -- Chọn {{ field.label.toLowerCase() }} --
+            </mat-option>
             <mat-option
-              *ngFor="let option of field.options"
+              *ngFor="let option of field.options; trackBy: trackByOptionValue"
               [value]="option.value"
             >
               {{ option.label }}
             </mat-option>
           </mat-select>
+          <mat-icon matSuffix>{{ getFieldIcon(field) }}</mat-icon>
+          <mat-error
+            *ngIf="ngModel.invalid && (ngModel.touched || ngModel.dirty)"
+          >
+            {{ getFieldError(field, ngModel) }}
+          </mat-error>
         </mat-form-field>
       </div>
 
       <!-- select-search-api -->
       <div *ngIf="field.type === 'select-search-api'">
-        <mat-form-field appearance="fill">
+        <mat-form-field appearance="outline">
           <mat-label>{{ field.label }}</mat-label>
-          <!-- input search riêng -->
-          <input
-            matInput
-            placeholder="Tìm kiếm {{ field.label.toLowerCase() }}"
-            (input)="onSearchFromInput($event, field)"
-          />
-          <!-- dropdown select -->
           <mat-select
             [(ngModel)]="formData[field.name]"
             name="{{ field.name }}"
+            #ngModel="ngModel"
+            [required]="!!field.validators?.required"
+            [placeholder]="getPlaceholder(field)"
+            (selectionChange)="ngModel.control.markAsDirty()"
+            (openedChange)="handleSelectOpened($event, field)"
           >
-            <mat-option [value]="null"
-              >-- Chọn {{ field.label.toLowerCase() }} --</mat-option
-            >
+            <mat-option>
+              <ngx-mat-select-search
+                [formControl]="selectSearchFilterControls[field.name]"
+                placeholderLabel="Tìm kiếm {{ field.label.toLowerCase() }}..."
+                noEntriesFoundLabel="Không tìm thấy kết quả"
+              >
+                <div
+                  *ngIf="loadingFields.has(field.name)"
+                  class="search-spinner-container"
+                >
+                  <mat-spinner diameter="20"></mat-spinner>
+                </div>
+              </ngx-mat-select-search>
+            </mat-option>
+            <mat-option [value]="null" *ngIf="!field.validators?.required">
+              -- Chọn {{ field.label.toLowerCase() }} --
+            </mat-option>
             <mat-option
-              *ngFor="let option of field.options"
+              *ngFor="let option of field.options; trackBy: trackByOptionValue"
               [value]="option.value"
             >
               {{ option.label }}
             </mat-option>
+            <mat-option
+              *ngIf="field.options?.length === 0 && !isLoading"
+              disabled
+            >
+              Không tìm thấy kết quả
+            </mat-option>
+            <mat-option *ngIf="isLoading && !field.options?.length" disabled>
+              <span>Đang tải...</span>
+            </mat-option>
           </mat-select>
-        </mat-form-field>
-      </div>
-
-      <!-- date -->
-      <div *ngIf="field.type === 'date'">
-        <mat-form-field appearance="fill">
-          <mat-label>{{ field.label }}</mat-label>
-          <input
-            matInput
-            [matDatepicker]="picker"
-            [(ngModel)]="formData[field.name]"
-            name="{{ field.name }}"
-          />
-          <mat-datepicker-toggle
-            matSuffix
-            [for]="picker"
-          ></mat-datepicker-toggle>
-          <mat-datepicker #picker></mat-datepicker>
+          <mat-icon matSuffix>{{ getFieldIcon(field) }}</mat-icon>
+          <mat-error
+            *ngIf="ngModel.invalid && (ngModel.touched || ngModel.dirty)"
+          >
+            {{ getFieldError(field, ngModel) }}
+          </mat-error>
         </mat-form-field>
       </div>
 
       <!-- autocomplete-api -->
       <div *ngIf="field.type === 'autocomplete-api'">
-        <mat-form-field appearance="fill">
+        <mat-form-field appearance="outline">
           <mat-label>{{ field.label }}</mat-label>
           <input
             type="text"
@@ -94,28 +200,187 @@
             [ngModel]="getOptionLabel(field, formData[field.name])"
             (ngModelChange)="onSearch(field, $event)"
             name="{{ field.name }}"
+            #ngModel="ngModel"
+            [placeholder]="getPlaceholder(field)"
+            [required]="!!field.validators?.required"
+            autocomplete="off"
           />
           <mat-autocomplete
             #auto="matAutocomplete"
             (optionSelected)="onOptionSelected(field, $event)"
           >
             <mat-option
-              *ngFor="let option of field.options"
+              *ngFor="let option of field.options; trackBy: trackByOptionValue"
               [value]="option.value"
             >
               {{ option.label }}
             </mat-option>
+            <mat-option *ngIf="!field.options?.length" disabled>
+              Không tìm thấy kết quả
+            </mat-option>
           </mat-autocomplete>
+          <mat-icon matSuffix>{{ getFieldIcon(field) }}</mat-icon>
+          <mat-error
+            *ngIf="ngModel.invalid && (ngModel.touched || ngModel.dirty)"
+          >
+            {{ getFieldError(field, ngModel) }}
+          </mat-error>
         </mat-form-field>
       </div>
-    </div>
 
-    <!-- actions -->
-    <div class="modal-actions">
-      <button mat-button type="button" (click)="closeModal()">Cancel</button>
-      <button mat-raised-button color="primary" type="submit">
-        {{ submitButtonText }}
-      </button>
+      <!-- date -->
+      <div *ngIf="field.type === 'date'">
+        <mat-form-field appearance="outline">
+          <mat-label>{{ field.label }}</mat-label>
+          <input
+            matInput
+            [matDatepicker]="picker"
+            [(ngModel)]="formData[field.name]"
+            name="{{ field.name }}"
+            #ngModel="ngModel"
+            [required]="!!field.validators?.required"
+            [placeholder]="getPlaceholder(field)"
+            readonly
+          />
+          <mat-datepicker-toggle
+            matIconSuffix
+            [for]="picker"
+          ></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+          <mat-error
+            *ngIf="ngModel.invalid && (ngModel.touched || ngModel.dirty)"
+          >
+            {{ getFieldError(field, ngModel) }}
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <!-- datetime field -->
+      <div *ngIf="field.type === 'datetime'" class="datetime-field">
+        <mat-form-field appearance="outline">
+          <mat-label>{{ field.label }}</mat-label>
+          <input
+            matInput
+            [matDatepicker]="datetimePicker"
+            [(ngModel)]="formData[field.name]"
+            name="{{ field.name }}_date"
+            #ngModel="ngModel"
+            [required]="!!field.validators?.required"
+            readonly
+            placeholder="Chọn ngày"
+          />
+          <mat-datepicker-toggle
+            matIconSuffix
+            [for]="datetimePicker"
+          ></mat-datepicker-toggle>
+          <mat-datepicker #datetimePicker></mat-datepicker>
+          <mat-error
+            *ngIf="ngModel.invalid && (ngModel.touched || ngModel.dirty)"
+          >
+            {{ getFieldError(field, ngModel) }}
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Thời gian</mat-label>
+          <input
+            matInput
+            type="time"
+            [(ngModel)]="formData[field.name + '_time']"
+            name="{{ field.name }}_time"
+            #timeModel="ngModel"
+            [required]="!!field.validators?.required"
+            placeholder="HH:MM"
+          />
+          <mat-icon matSuffix>schedule</mat-icon>
+          <mat-hint>{{ timeHint }}</mat-hint>
+          <mat-error
+            *ngIf="timeModel.invalid && (timeModel.touched || timeModel.dirty)"
+          >
+            Vui lòng chọn thời gian
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <!-- file -->
+      <div *ngIf="field.type === 'file'" class="file-upload-container">
+        <label class="file-label">{{ field.label }}</label>
+
+        <div class="file-upload-wrapper" (click)="fileInput.click()">
+          <mat-icon>cloud_upload</mat-icon>
+          <div class="upload-text">
+            <div class="main-text" *ngIf="!fileToUpload">Nhấp để chọn file</div>
+            <div class="main-text" *ngIf="fileToUpload">
+              Nhấp để thay đổi file
+            </div>
+            <div class="sub-text">
+              Chỉ hỗ trợ file Word (.doc, .docx) và Excel (.xls, .xlsx)
+            </div>
+          </div>
+        </div>
+
+        <input
+          type="file"
+          #fileInput
+          (change)="onFileChange($event)"
+          [accept]="getFileAcceptTypes()"
+          hidden
+        />
+
+        <!-- File preview -->
+        <div *ngIf="fileToUpload" class="file-preview">
+          <div class="file-info">
+            <mat-icon>{{ getFileIcon(fileToUpload) }}</mat-icon>
+            <div class="file-details">
+              <div class="file-name">{{ fileToUpload.name }}</div>
+              <div class="file-size">
+                {{ formatFileSize(fileToUpload.size) }}
+              </div>
+            </div>
+          </div>
+          <button
+            type="button"
+            class="remove-file-btn"
+            (click)="clearFile()"
+            [attr.aria-label]="'Xóa file ' + fileToUpload.name"
+            matTooltip="Xóa file"
+          >
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+
+        <!-- File error -->
+        <div *ngIf="fileError" class="file-error">
+          <mat-icon>error</mat-icon>
+          {{ fileError }}
+        </div>
+
+        <!-- File hint -->
+        <div class="file-hint">
+          Kích thước tối đa: {{ maxFileSize / (1024 * 1024) }}MB
+        </div>
+      </div>
     </div>
   </form>
-</mat-dialog-content>
+</div>
+
+<div class="dialog-actions">
+  <button
+    mat-button
+    type="button"
+    (click)="closeModal()"
+    [disabled]="isLoading"
+  >
+    Hủy bỏ
+  </button>
+  <button
+    mat-raised-button
+    color="primary"
+    type="submit"
+    [disabled]="mainForm.invalid || isLoading"
+    (click)="onSubmit(mainForm)"
+  >
+    <mat-icon>{{ getSubmitIcon() }}</mat-icon>
+    {{ isLoading ? "Đang xử lý..." : submitButtonText }}
+  </button>
+</div>

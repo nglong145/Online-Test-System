@@ -2,7 +2,13 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { API_URL } from '../../app.config';
-import { CreateUser, FilterUser, UpdateUser, User } from '../models/user.model';
+import {
+  ChangePassword,
+  CreateUser,
+  FilterUser,
+  UpdateUser,
+  User,
+} from '../models/user.model';
 
 @Injectable({
   providedIn: 'root',
@@ -20,7 +26,12 @@ export class UserService {
   ): Observable<any> {
     return this.http.post<any>(
       `${API_URL}/User/filter?role=${role}&pageIndex=${index}&pageSize=${size}&sortBy=${sortBy}&sortOrder=${sortOrder}`,
-      filter
+      filter,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
     );
   }
 
@@ -34,5 +45,9 @@ export class UserService {
 
   updateUser(userId: string, user: User): Observable<any> {
     return this.http.put<any>(`${API_URL}/User/update-user/${userId}`, user);
+  }
+
+  changePasssword(payload: ChangePassword): Observable<any> {
+    return this.http.post<any>(`${API_URL}/User/change-password`, payload);
   }
 }

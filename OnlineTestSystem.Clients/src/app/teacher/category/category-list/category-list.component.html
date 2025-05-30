@@ -1,53 +1,147 @@
 <div class="container">
+  <!-- Header với nút thêm mới -->
   <div class="header">
-    <h2>Category List</h2>
-    <!-- Add New Button -->
+    <div class="title-section">
+      <h1>Danh sách danh mục</h1>
+      <p class="subtitle">Quản lý danh mục cho ngân hàng câu hỏi</p>
+    </div>
     <button
       mat-raised-button
       color="primary"
       class="add-new-btn"
       (click)="openAddModal()"
     >
-      + Add New
+      <mat-icon>add</mat-icon>
+      <span>Thêm mới</span>
     </button>
   </div>
 
-  <!-- User List Table for Teachers -->
-  <mat-table [dataSource]="categoryDataSource" matSort>
-    <ng-container matColumnDef="name">
-      <mat-header-cell *matHeaderCellDef mat-sort-header>
-        Name
-      </mat-header-cell>
-      <mat-cell *matCellDef="let cate">
-        <!-- Thêm liên kết vào tên -->
-        <a [routerLink]="['/teacher/category', cate.id]">{{ cate.name }}</a>
-      </mat-cell>
-    </ng-container>
+  <!-- Filter Inputs -->
+  <div class="filter-section">
+    <h2 class="filter-title">Bộ lọc tìm kiếm</h2>
+    <div class="filter-container">
+      <mat-form-field appearance="outline" class="filter-input">
+        <mat-label>Tên danh mục</mat-label>
+        <input
+          matInput
+          placeholder="Nhập tên danh mục"
+          [(ngModel)]="filter.name"
+          (keyup.enter)="applyFilter()"
+        />
+        <mat-icon matSuffix>category</mat-icon>
+      </mat-form-field>
 
-    <ng-container matColumnDef="description">
-      <mat-header-cell *matHeaderCellDef mat-sort-header>
-        dateOfBirth
-      </mat-header-cell>
-      <mat-cell *matCellDef="let cate">{{
-        cate.description || "khoong cos"
-      }}</mat-cell>
-    </ng-container>
+      <mat-form-field appearance="outline" class="filter-input">
+        <mat-label>Tên danh mục cha</mat-label>
+        <input
+          matInput
+          placeholder="Nhập tên danh mục cha"
+          [(ngModel)]="filter.parentName"
+          (keyup.enter)="applyFilter()"
+        />
+        <mat-icon matSuffix>account_tree</mat-icon>
+      </mat-form-field>
 
-    <ng-container matColumnDef="categoryParent">
-      <mat-header-cell *matHeaderCellDef> Danh muc cha </mat-header-cell>
-      <mat-cell *matCellDef="let cate">{{ cate.parentName }}</mat-cell>
-    </ng-container>
+      <!-- Nút tìm kiếm và xóa bộ lọc -->
+      <div class="filter-buttons">
+        <button mat-raised-button color="primary" (click)="applyFilter()">
+          <mat-icon>search</mat-icon>
+          Tìm kiếm
+        </button>
+        <button mat-stroked-button color="warn" (click)="clearFilter()">
+          <mat-icon>filter_alt_off</mat-icon>
+          Xóa bộ lọc
+        </button>
+      </div>
+    </div>
+  </div>
 
-    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
-    <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
-  </mat-table>
+  <div class="table-container">
+    <!-- Loading overlay -->
+    <div class="loading-overlay" *ngIf="isLoading">
+      <mat-spinner diameter="40"></mat-spinner>
+      <span>Đang tải dữ liệu...</span>
+    </div>
 
-  <!-- Pagination -->
-  <mat-paginator
-    [length]="totalCategories"
-    [pageSize]="pageSize"
-    [pageSizeOptions]="[5, 10, 25, 100]"
-    (page)="pageChanged($event)"
-  >
-  </mat-paginator>
+    <!-- Category List Table -->
+    <mat-table
+      [dataSource]="categoryDataSource"
+      matSort
+      [class.blur-on-loading]="isLoading"
+    >
+      <ng-container matColumnDef="name">
+        <mat-header-cell *matHeaderCellDef mat-sort-header
+          >Tên danh mục</mat-header-cell
+        >
+        <mat-cell *matCellDef="let cate">
+          <div class="ellipsis" matTooltip="{{ cate.name }}">
+            <a [routerLink]="['/admin/category', cate.id]">{{ cate.name }}</a>
+          </div>
+        </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="description">
+        <mat-header-cell *matHeaderCellDef>Mô tả</mat-header-cell>
+        <mat-cell *matCellDef="let cate">
+          <div class="ellipsis" matTooltip="{{ cate.description }}">
+            {{ cate.description || "Không có mô tả" }}
+          </div>
+        </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="parentName">
+        <mat-header-cell *matHeaderCellDef>Danh mục cha</mat-header-cell>
+        <mat-cell *matCellDef="let cate">
+          <div class="ellipsis" matTooltip="{{ cate.parentName }}">
+            {{ cate.parentName || "Không có danh mục cha" }}
+          </div>
+        </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="actions">
+        <mat-header-cell *matHeaderCellDef>Thao tác</mat-header-cell>
+        <mat-cell *matCellDef="let cate">
+          <button
+            mat-icon-button
+            color="warn"
+            class="action-btn delete-btn"
+            (click)="removeCategory(cate); $event.stopPropagation()"
+            [attr.aria-label]="'Xóa ' + cate.name"
+            matTooltip="Xóa danh mục"
+          >
+            <mat-icon>delete</mat-icon>
+          </button>
+        </mat-cell>
+      </ng-container>
+
+      <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+      <mat-row
+        *matRowDef="let row; columns: displayedColumns"
+        (click)="goToDetail(row)"
+      ></mat-row>
+    </mat-table>
+
+    <!-- Empty state -->
+    <div class="no-data" *ngIf="categoryDataSource?.length === 0 && !isLoading">
+      <mat-icon>category_off</mat-icon>
+      <h3>Không tìm thấy danh mục</h3>
+      <p>Không có dữ liệu phù hợp với tiêu chí tìm kiếm</p>
+      <button mat-stroked-button color="primary" (click)="clearFilter()">
+        <mat-icon>refresh</mat-icon>
+        Làm mới tìm kiếm
+      </button>
+    </div>
+
+    <!-- Pagination -->
+    <mat-paginator
+      class="paginator"
+      [length]="totalCategories"
+      [pageSize]="pageSize"
+      [pageSizeOptions]="[5, 10, 25, 100]"
+      (page)="pageChanged($event)"
+      [showFirstLastButtons]="true"
+      aria-label="Chọn trang kết quả"
+    >
+    </mat-paginator>
+  </div>
 </div>

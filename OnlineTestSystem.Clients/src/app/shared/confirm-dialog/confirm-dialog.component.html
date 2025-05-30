@@ -1,0 +1,19 @@
+<h2 mat-dialog-title class="title">{{ data.title }}</h2>
+<mat-dialog-content class="mat-typography">
+  <div *ngIf="data.allowHtml; else plainText" [innerHTML]="data.message"></div>
+  <ng-template #plainText>
+    <p>{{ data.message }}</p>
+  </ng-template>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">
+    {{ data.cancelText || "Hủy" }}
+  </button>
+  <button
+    mat-raised-button
+    (click)="onConfirm()"
+    [class]="data.confirmButtonClass || 'mat-primary'"
+  >
+    {{ data.confirmText || "Xác nhận" }}
+  </button>
+</mat-dialog-actions>

@@ -1,5 +1,19 @@
+<app-header></app-header>
 <div class="access-denied-container">
-  <h1>Access Denied</h1>
-  <p>You do not have permission to access this page.</p>
-  <a routerLink="/">Go back to Home</a>
+  <img
+    src="assets/images/403-illustration.svg"
+    alt="Access denied"
+    class="error-illustration"
+    onerror="this.style.display='none'"
+  />
+  <h1 class="error-code">403</h1>
+  <h2 class="error-title">Truy cập bị từ chối</h2>
+  <p class="error-desc">
+    Xin lỗi, bạn không có quyền truy cập vào trang này.<br />
+    Vui lòng liên hệ người quản trị hoặc quay lại trang trước.
+  </p>
+  <button class="go-back-btn" (click)="goBack()">
+    <mat-icon>arrow_back</mat-icon>
+    <span>Quay lại trang trước</span>
+  </button>
 </div>

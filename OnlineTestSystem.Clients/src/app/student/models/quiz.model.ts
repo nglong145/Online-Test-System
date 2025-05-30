@@ -7,3 +7,19 @@ export interface FilterExamQuiz {
   title?: string;
   duration?: number;
 }
+
+export interface AddUserQuiz {
+  userId: string;
+  examId?: string;
+  finishedAt?: string;
+  score?: number;
+  isComplete?: boolean;
+}
+
+export interface AddUserAnswer {
+  questionId: string;
+  answerId: string;
+  userVoiceUrl?: string | null;
+  answerText?: string | null;
+  isCorrect?: boolean | null;
+}

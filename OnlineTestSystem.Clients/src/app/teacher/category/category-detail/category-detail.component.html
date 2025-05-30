@@ -1,73 +1,191 @@
 <div class="container">
-  <div class="header">
-    <h2>Teacher Detail</h2>
+  <!-- Header section with back button -->
+  <div class="back-btn-container">
+    <button
+      mat-stroked-button
+      color="primary"
+      (click)="goBack()"
+      [attr.aria-label]="'Go back to category list'"
+    >
+      <mat-icon>arrow_back</mat-icon>
+      Quay lại
+    </button>
   </div>
 
-  <!-- Hai phần thông tin giáo viên và nhóm lớp -->
+  <div class="header">
+    <h1>Thông tin chi tiết danh mục {{ category.name }}</h1>
+  </div>
+
   <div class="row">
-    <!-- Phần thông tin giáo viên -->
+    <!-- Category Information Column -->
     <div class="col">
       <div class="category-info">
-        <h3>Category Information</h3>
-        <form>
-          <div class="form-group">
-            <label for="categorySelect">Select Category</label>
-            <mat-form-field appearance="fill" class="full-width">
-              <mat-label>Category</mat-label>
-              <mat-select
-                [(ngModel)]="category.parentId"
-                name="parentId"
-                (openedChange)="onCategorySelectOpen($event)"
-                (selectionChange)="onCategorySelected($event.value)"
-                [compareWith]="compareCategoryIds"
-              >
-                <mat-option>
-                  <ngx-mat-select-search
-                    [formControl]="categoryFilterCtrl"
-                    placeholderLabel="Search categories..."
-                    noEntriesFoundLabel="No categories found"
-                  >
-                  </ngx-mat-select-search>
-                </mat-option>
-                <mat-option
-                  *ngFor="let c of categorySelectFilter"
-                  [value]="c.id"
-                >
-                  {{ c.name }}
-                </mat-option>
-              </mat-select>
-            </mat-form-field>
-          </div>
+        <h3>Thông tin danh mục</h3>
 
+        <form #formRef="ngForm">
           <div class="form-group">
-            <label for="name">Category Name</label>
+            <label for="name">Tên danh mục</label>
             <input
               id="name"
               [(ngModel)]="category.name"
               name="name"
               type="text"
               class="form-control"
+              placeholder="Nhập tên danh mục"
+              required
+              #categoryModel="ngModel"
             />
+            <div
+              *ngIf="
+                categoryModel.invalid &&
+                (categoryModel.touched || categoryModel.dirty)
+              "
+              class="text-danger"
+            >
+              <span *ngIf="categoryModel.errors?.['required']" class="error"
+                >Tên danh mục là bắt buộc</span
+              >
+            </div>
           </div>
 
           <div class="form-group">
-            <label for="description">Description</label>
+            <label for="parentId">Danh mục cha (nếu có)</label>
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-select
+                [(ngModel)]="category.parentId"
+                name="parentId"
+                (openedChange)="onCategorySelectOpen($event)"
+                (selectionChange)="onCategorySelected($event.value)"
+                [compareWith]="compareCategoryIds"
+                placeholder="Chọn danh mục cha (không bắt buộc)"
+              >
+                <mat-option>
+                  <ngx-mat-select-search
+                    [formControl]="categoryFilterCtrl"
+                    placeholderLabel="Tìm kiếm danh mục..."
+                    noEntriesFoundLabel="Không tìm thấy danh mục"
+                  >
+                  </ngx-mat-select-search>
+                </mat-option>
+                <mat-option
+                  *ngFor="let cate of categorySelectFilter"
+                  [value]="cate.id"
+                >
+                  {{ cate.name }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          <div class="form-group">
+            <label for="description">Mô tả</label>
             <textarea
               id="description"
               [(ngModel)]="category.description"
               name="description"
-              rows="4"
               class="form-control"
+              placeholder="Nhập mô tả cho danh mục (không bắt buộc)"
+              rows="3"
             ></textarea>
           </div>
 
-          <button mat-raised-button color="primary" (click)="updateCategory()">
-            Update
+          <div class="form-group">
+            <label for="status">Trạng thái</label>
+            <select
+              id="status"
+              [(ngModel)]="category.isActive"
+              name="status"
+              class="form-control"
+            >
+              <option [ngValue]="true">Hoạt động</option>
+              <option [ngValue]="false">Ngừng hoạt động</option>
+            </select>
+          </div>
+
+          <button
+            mat-raised-button
+            color="primary"
+            (click)="updateCategory()"
+            [disabled]="!formRef.form.valid || !isCategoryChanged()"
+          >
+            Cập nhật thông tin
           </button>
         </form>
       </div>
     </div>
 
-    <!-- Phần danh sách nhóm lớp -->
+    <!-- Question Banks Column -->
+    <div class="col">
+      <div class="bank-category">
+        <h3>Danh sách ngân hàng câu hỏi</h3>
+
+        <!-- Filter section -->
+        <div class="filter-container">
+          <mat-form-field appearance="outline" class="filter-input">
+            <mat-label>Tên ngân hàng câu hỏi</mat-label>
+            <input
+              matInput
+              placeholder="Nhập tên ngân hàng câu hỏi"
+              [(ngModel)]="bankFilter.name"
+              (keyup.enter)="applyFilter()"
+            />
+            <mat-icon matSuffix>description</mat-icon>
+          </mat-form-field>
+
+          <!-- Action buttons -->
+          <div class="filter-buttons">
+            <button mat-raised-button color="primary" (click)="applyFilter()">
+              Tìm kiếm
+            </button>
+            <button mat-stroked-button color="warn" (click)="clearFilter()">
+              Xóa bộ lọc
+            </button>
+          </div>
+        </div>
+
+        <!-- Banks table -->
+        <mat-table [dataSource]="filteredBankDataSource" matSort>
+          <ng-container matColumnDef="name">
+            <mat-header-cell *matHeaderCellDef mat-sort-header
+              >Ngân hàng câu hỏi</mat-header-cell
+            >
+            <mat-cell *matCellDef="let bank">
+              <a [routerLink]="['/teacher/bank', bank.id]">{{ bank.name }}</a>
+            </mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="questions">
+            <mat-header-cell *matHeaderCellDef mat-sort-header
+              >Số lượng câu hỏi</mat-header-cell
+            >
+            <mat-cell *matCellDef="let bank">{{
+              bank.totalQuestion || 0
+            }}</mat-cell>
+          </ng-container>
+
+          <mat-header-row
+            *matHeaderRowDef="bankDisplayedColumns"
+          ></mat-header-row>
+          <mat-row
+            *matRowDef="let row; columns: bankDisplayedColumns"
+            (click)="goToBankDetail(row)"
+          ></mat-row>
+        </mat-table>
+
+        <!-- Empty state when no banks -->
+        <div class="no-data" *ngIf="filteredBankDataSource.length === 0"></div>
+
+        <!-- Pagination -->
+        <mat-paginator
+          [length]="totalBanks"
+          [pageSize]="pageSize"
+          [pageSizeOptions]="[5, 10, 25, 100]"
+          (page)="pageChanged($event)"
+          [showFirstLastButtons]="true"
+          aria-label="Chọn trang"
+        >
+        </mat-paginator>
+      </div>
+    </div>
   </div>
 </div>

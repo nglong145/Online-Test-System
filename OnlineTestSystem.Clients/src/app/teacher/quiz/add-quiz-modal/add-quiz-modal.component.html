@@ -1,0 +1,167 @@
+<div class="dialog-header">
+  <h2>
+    <mat-icon>add_circle</mat-icon>
+    Thêm đề thi mới
+  </h2>
+</div>
+
+<div class="dialog-content">
+  <form #randomForm="ngForm" (ngSubmit)="onSubmitRandom()">
+    <mat-form-field appearance="outline">
+      <mat-label>Ngân hàng câu hỏi</mat-label>
+      <mat-select
+        [(ngModel)]="randomQuiz.questionBankId"
+        name="questionBankId"
+        #questionBankId="ngModel"
+        required
+      >
+        <mat-option>
+          <ngx-mat-select-search
+            [formControl]="bankFilterCtrl"
+            placeholderLabel="Tìm kiếm ngân hàng câu hỏi..."
+            noEntriesFoundLabel="Không tìm thấy ngân hàng"
+          ></ngx-mat-select-search>
+        </mat-option>
+        <mat-option *ngFor="let option of bankOptions" [value]="option.value">
+          {{ option.label }}
+        </mat-option>
+      </mat-select>
+      <mat-icon matSuffix>category</mat-icon>
+      <mat-error
+        *ngIf="
+          questionBankId.invalid &&
+          (questionBankId.dirty || questionBankId.touched)
+        "
+      >
+        Vui lòng chọn ngân hàng câu hỏi
+      </mat-error>
+    </mat-form-field>
+
+    <p class="description-text">
+      Hệ thống sẽ tự động tạo đề thi với số lượng câu hỏi được chọn ngẫu nhiên
+      từ ngân hàng câu hỏi. Bạn có thể tạo nhiều đề cùng lúc.
+    </p>
+
+    <div class="form-row">
+      <mat-form-field appearance="outline">
+        <mat-label>Số lượng đề</mat-label>
+        <input
+          matInput
+          type="number"
+          [(ngModel)]="randomQuiz.numberOfQuizzes"
+          name="numberOfQuizzes"
+          #numberOfQuizzes="ngModel"
+          required
+          min="1"
+          placeholder="Nhập số lượng đề"
+        />
+        <mat-icon matSuffix>content_copy</mat-icon>
+        <mat-error
+          *ngIf="
+            numberOfQuizzes.invalid &&
+            (numberOfQuizzes.dirty || numberOfQuizzes.touched)
+          "
+        >
+          <ng-container *ngIf="numberOfQuizzes.errors?.['required']"
+            >Vui lòng nhập số lượng đề</ng-container
+          >
+          <ng-container *ngIf="numberOfQuizzes.errors?.['min']"
+            >Phải lớn hơn hoặc bằng 1</ng-container
+          >
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Số câu hỏi/mỗi đề</mat-label>
+        <input
+          matInput
+          type="number"
+          [(ngModel)]="randomQuiz.numberOfQuestionsPerQuiz"
+          name="numberOfQuestionsPerQuiz"
+          #numberOfQuestionsPerQuiz="ngModel"
+          required
+          min="1"
+          placeholder="Nhập số câu hỏi mỗi đề"
+        />
+        <mat-icon matSuffix>question_answer</mat-icon>
+        <mat-error
+          *ngIf="
+            numberOfQuestionsPerQuiz.invalid &&
+            (numberOfQuestionsPerQuiz.dirty || numberOfQuestionsPerQuiz.touched)
+          "
+        >
+          <ng-container *ngIf="numberOfQuestionsPerQuiz.errors?.['required']"
+            >Vui lòng nhập số câu hỏi</ng-container
+          >
+          <ng-container *ngIf="numberOfQuestionsPerQuiz.errors?.['min']"
+            >Phải lớn hơn hoặc bằng 1</ng-container
+          >
+        </mat-error>
+      </mat-form-field>
+    </div>
+
+    <div class="form-row">
+      <mat-form-field appearance="outline">
+        <mat-label>Điểm số</mat-label>
+        <input
+          matInput
+          type="number"
+          [(ngModel)]="randomQuiz.score"
+          name="score"
+          #score="ngModel"
+          required
+          min="0"
+          placeholder="Nhập điểm số"
+        />
+        <mat-icon matSuffix>grade</mat-icon>
+        <mat-error *ngIf="score.invalid && (score.dirty || score.touched)">
+          <ng-container *ngIf="score.errors?.['required']"
+            >Vui lòng nhập điểm số</ng-container
+          >
+          <ng-container *ngIf="score.errors?.['min']"
+            >Phải lớn hơn hoặc bằng 0</ng-container
+          >
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Thời lượng (phút)</mat-label>
+        <input
+          matInput
+          type="number"
+          [(ngModel)]="randomQuiz.duration"
+          name="duration"
+          #duration="ngModel"
+          required
+          min="1"
+          placeholder="Nhập thời lượng làm bài"
+        />
+        <mat-icon matSuffix>timer</mat-icon>
+        <mat-error
+          *ngIf="duration.invalid && (duration.dirty || duration.touched)"
+        >
+          <ng-container *ngIf="duration.errors?.['required']"
+            >Vui lòng nhập thời lượng</ng-container
+          >
+          <ng-container *ngIf="duration.errors?.['min']"
+            >Phải lớn hơn hoặc bằng 1</ng-container
+          >
+        </mat-error>
+      </mat-form-field>
+    </div>
+  </form>
+</div>
+
+<div class="dialog-actions">
+  <button mat-button type="button" (click)="close()">Huỷ bỏ</button>
+  <button
+    mat-raised-button
+    color="primary"
+    type="submit"
+    [disabled]="randomForm.invalid"
+    (click)="onSubmitRandom()"
+  >
+    <mat-icon>auto_awesome</mat-icon>
+    Tạo tự động
+  </button>
+</div>

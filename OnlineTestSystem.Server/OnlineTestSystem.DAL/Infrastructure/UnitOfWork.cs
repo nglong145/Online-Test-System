@@ -26,6 +26,9 @@ namespace OnlineTestSystem.DAL.Infrastructure
         private IGenericRepository<ExamGroup>? _examGroupRepository;
         private IGenericRepository<ExamQuiz>? _examQuizRepository;
 
+        private IGenericRepository<UserAnswer>? _userAnswerRepository;
+
+
 
         public IGenericRepository<Exam> ExamRepository => _examRepository ?? new GenericRepository<Exam>(_context);
         public IGenericRepository<Answer> AnswerRepository => _answerRepository ?? new GenericRepository<Answer>(_context);
@@ -44,6 +47,8 @@ namespace OnlineTestSystem.DAL.Infrastructure
         public IGenericRepository<ExamParticipant> ExamParticipantRepository => _examParticipantRepository ?? new GenericRepository<ExamParticipant>(_context);
         public IGenericRepository<ExamGroup> ExamGroupRepository => _examGroupRepository ?? new GenericRepository<ExamGroup>(_context);
         public IGenericRepository<ExamQuiz> ExamQuizRepository => _examQuizRepository ?? new GenericRepository<ExamQuiz>(_context);
+
+        public IGenericRepository<UserAnswer> UserAnswer => _userAnswerRepository ?? new GenericRepository<UserAnswer>(_context);
 
 
 

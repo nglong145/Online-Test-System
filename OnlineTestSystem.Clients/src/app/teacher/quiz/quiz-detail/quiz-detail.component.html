@@ -1,0 +1,216 @@
+<div class="quiz-detail-wrapper">
+  <!-- Loading overlay -->
+  <div class="loading-overlay" *ngIf="isLoading">
+    <mat-spinner diameter="40"></mat-spinner>
+    <div class="loading-text">Đang tải dữ liệu...</div>
+  </div>
+
+  <!-- Sidebar bên trái -->
+  <nav class="sidebar">
+    <h3>Danh sách câu hỏi</h3>
+    <ul>
+      <li
+        *ngFor="let question of quiz?.questions; let i = index"
+        [class.active]="i === activeQuestionIndex"
+        (click)="scrollToQuestion(i)"
+        [attr.aria-label]="'Đi tới câu hỏi ' + (i + 1)"
+      >
+        <span>{{ i + 1 }}.</span>
+        {{ truncateText(question.content, 40) || "Câu hỏi chưa có nội dung" }}
+      </li>
+      <li *ngIf="!quiz?.questions?.length" class="no-questions">
+        <mat-icon>info</mat-icon>
+        <span>Chưa có câu hỏi nào</span>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Nội dung chính bên phải -->
+  <div class="main-content">
+    <div class="back-btn-container">
+      <button
+        mat-stroked-button
+        color="primary"
+        (click)="goBack()"
+        [attr.aria-label]="'Quay lại danh sách đề thi'"
+      >
+        <mat-icon>arrow_back</mat-icon>
+        Quay lại
+      </button>
+    </div>
+
+    <h1>Chi tiết đề thi</h1>
+
+    <!-- Thông tin đề thi -->
+    <div class="quiz-info" *ngIf="quiz">
+      <div class="form-row">
+        <mat-form-field appearance="outline">
+          <mat-label>Danh mục</mat-label>
+          <mat-select
+            [(ngModel)]="quiz.category"
+            name="category"
+            (openedChange)="onCategorySelectOpen($event)"
+            (selectionChange)="onCategorySelected($event.value)"
+            [compareWith]="compareCategoryIds"
+            placeholder="Chọn danh mục"
+          >
+            <mat-option>
+              <ngx-mat-select-search
+                [formControl]="categoryFilterCtrl"
+                placeholderLabel="Tìm kiếm danh mục..."
+                noEntriesFoundLabel="Không tìm thấy danh mục"
+              >
+              </ngx-mat-select-search>
+            </mat-option>
+            <mat-option *ngFor="let c of categorySelectFilter" [value]="c.id">
+              {{ c.name }}
+            </mat-option>
+          </mat-select>
+          <mat-icon matSuffix>category</mat-icon>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Thời lượng (phút)</mat-label>
+          <input
+            matInput
+            type="number"
+            [(ngModel)]="quiz.duration"
+            name="duration"
+            min="1"
+            placeholder="Nhập thời lượng làm bài"
+          />
+          <mat-icon matSuffix>timer</mat-icon>
+        </mat-form-field>
+      </div>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Tên đề thi</mat-label>
+        <input
+          matInput
+          [(ngModel)]="quiz.title"
+          placeholder="Nhập tên đề thi"
+          required
+        />
+        <mat-icon matSuffix>quiz</mat-icon>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Mô tả</mat-label>
+        <textarea
+          matInput
+          rows="3"
+          [(ngModel)]="quiz.description"
+          name="description"
+          placeholder="Nhập mô tả đề thi (không bắt buộc)"
+        ></textarea>
+        <mat-icon matSuffix>description</mat-icon>
+      </mat-form-field>
+
+      <button
+        mat-raised-button
+        color="primary"
+        (click)="updateQuiz()"
+        [disabled]="!isQuizChanged() || isLoading"
+        [attr.aria-label]="'Cập nhật thông tin đề thi'"
+      >
+        {{ isLoading ? "Đang cập nhật..." : "Cập nhật thông tin đề thi" }}
+      </button>
+    </div>
+
+    <!-- Danh sách câu hỏi chi tiết -->
+    <div class="questions-container" *ngIf="quiz?.questions?.length">
+      <div
+        *ngFor="let question of quiz?.questions; let i = index"
+        [attr.id]="'question-' + i"
+        class="question-card"
+        #questionCardRef
+      >
+        <h3>Câu hỏi {{ i + 1 }}</h3>
+
+        <!-- Nội dung câu hỏi -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Nội dung câu hỏi</mat-label>
+          <textarea
+            matInput
+            [(ngModel)]="question.content"
+            rows="3"
+            disabled="true"
+            placeholder="Nội dung câu hỏi"
+          ></textarea>
+          <mat-icon matSuffix>help_outline</mat-icon>
+        </mat-form-field>
+
+        <div class="form-row">
+          <!-- Select mức độ -->
+          <mat-form-field appearance="outline">
+            <mat-label>Mức độ</mat-label>
+            <mat-select [(ngModel)]="question.level" disabled="true">
+              <mat-option [value]="question.level">
+                {{ getQuestionLevelDisplayName(question.level) }}
+              </mat-option>
+            </mat-select>
+            <mat-icon matSuffix>signal_cellular_alt</mat-icon>
+          </mat-form-field>
+
+          <!-- Select loại câu hỏi -->
+          <mat-form-field appearance="outline">
+            <mat-label>Loại câu hỏi</mat-label>
+            <mat-select [(ngModel)]="question.questionType" disabled="true">
+              <mat-option [value]="question.questionType">
+                {{ getQuestionTypeDisplayName(question.questionType) }}
+              </mat-option>
+            </mat-select>
+            <mat-icon matSuffix>format_list_bulleted</mat-icon>
+          </mat-form-field>
+        </div>
+
+        <!-- Đáp án -->
+        <div class="answers-section">
+          <label>Đáp án</label>
+          <div
+            *ngFor="let answer of question.answers; let j = index"
+            class="answer-item"
+          >
+            <mat-checkbox
+              [checked]="answer.isCorrect"
+              disabled="true"
+              color="primary"
+              [attr.aria-label]="
+                'Đáp án ' +
+                (j + 1) +
+                (answer.isCorrect ? ' - Đáp án đúng' : ' - Đáp án sai')
+              "
+            >
+            </mat-checkbox>
+            <input
+              type="text"
+              [(ngModel)]="answer.content"
+              class="answer-input"
+              disabled="true"
+              [placeholder]="'Nội dung đáp án ' + (j + 1)"
+              readonly
+            />
+          </div>
+
+          <div *ngIf="!question.answers?.length" class="no-answers-message">
+            <mat-icon>info</mat-icon>
+            <span>Câu hỏi này chưa có đáp án nào</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty state khi không có câu hỏi -->
+    <div
+      class="no-questions-state"
+      *ngIf="!quiz?.questions?.length && !isLoading"
+    >
+      <mat-icon>quiz</mat-icon>
+      <h3>Chưa có câu hỏi</h3>
+      <p>
+        Đề thi này chưa có câu hỏi nào. Vui lòng thêm câu hỏi để hoàn thiện đề
+        thi.
+      </p>
+    </div>
+  </div>
+</div>

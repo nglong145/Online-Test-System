@@ -27,6 +27,7 @@ namespace OnlineTestSystem.Presentation.Controllers
                 {
                     Id = answer.Id,
                     Content = answer.Content,
+                    Order = answer.Order,
                     IsCorrect = answer.IsCorrect,
                     IsActive = answer.IsActive,
                     QuestionId = answer.QuestionId,
@@ -45,6 +46,7 @@ namespace OnlineTestSystem.Presentation.Controllers
                 {
                     Id = answer.Id,
                     Content = answer.Content,
+                    Order = answer.Order,
                     IsCorrect = answer.IsCorrect,
                     IsActive = answer.IsActive,
                     QuestionId = answer.QuestionId,
@@ -73,6 +75,7 @@ namespace OnlineTestSystem.Presentation.Controllers
             var answer = new Answer()
             {
                 Content = addAnswerVm.Content,
+                Order = addAnswerVm.Order,
                 IsCorrect = addAnswerVm.IsCorrect,
                 IsActive = addAnswerVm.IsActive,
                 QuestionId = addAnswerVm.QuestionId
@@ -88,6 +91,7 @@ namespace OnlineTestSystem.Presentation.Controllers
             if (answer != null)
             {
                 answer.Content = addAnswerVm.Content;
+                addAnswerVm.Order = addAnswerVm.Order;
                 answer.IsCorrect = addAnswerVm.IsCorrect;
                 answer.IsActive = addAnswerVm.IsActive;
                 answer.QuestionId = addAnswerVm.QuestionId;
@@ -104,7 +108,7 @@ namespace OnlineTestSystem.Presentation.Controllers
             var answer = await _answerService.GetByIdAsync(id);
             if (answer != null)
             {
-                await _answerService.DeleteAsync(answer);
+                await _answerService.RemoveAnswerAndReorderAsync(id);
                 return Ok("Delete Successful");
             }
             return BadRequest("Delete Faild!");

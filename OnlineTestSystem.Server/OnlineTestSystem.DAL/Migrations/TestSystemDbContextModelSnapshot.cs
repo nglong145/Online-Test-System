@@ -63,6 +63,9 @@ namespace OnlineTestSystem.DAL.Migrations
                         .HasColumnType("bit")
                         .HasDefaultValue(false);
 
+                    b.Property<int>("Order")
+                        .HasColumnType("int");
+
                     b.Property<Guid>("QuestionId")
                         .HasColumnType("uniqueidentifier");
 
@@ -81,6 +84,11 @@ namespace OnlineTestSystem.DAL.Migrations
 
                     b.Property<string>("AccessCode")
                         .HasColumnType("varchar(20)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
@@ -229,6 +237,9 @@ namespace OnlineTestSystem.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("Order")
+                        .HasColumnType("int");
+
                     b.Property<string>("QuestionType")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -250,6 +261,16 @@ namespace OnlineTestSystem.DAL.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -316,6 +337,11 @@ namespace OnlineTestSystem.DAL.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
@@ -470,7 +496,7 @@ namespace OnlineTestSystem.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("Nvarchar(50)");
 
-                    b.Property<bool>("IsActive")
+                    b.Property<bool?>("IsActive")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
                         .HasDefaultValue(true);

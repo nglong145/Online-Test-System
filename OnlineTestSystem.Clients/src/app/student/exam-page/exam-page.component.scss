@@ -1,0 +1,400 @@
+@use "../../../styles.scss" as *;
+@use "sass:color";
+
+.exam-page-container {
+  display: flex;
+  height: 100vh;
+  background-color: #f8fafc;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    height: auto;
+    min-height: 100vh;
+  }
+}
+
+// ===== SIDEBAR =====
+.sidebar {
+  width: 280px;
+  padding: 20px 16px;
+  background-color: white;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: none;
+  z-index: 10;
+
+  @media (max-width: 768px) {
+    width: 100%;
+    height: auto;
+    padding: 16px;
+    position: static;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+}
+
+.timer {
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin-bottom: 24px;
+  padding: 12px 20px;
+  border-radius: 12px;
+  background: linear-gradient(
+    135deg,
+    $primary-color,
+    color.adjust($primary-color, $lightness: -10%)
+  );
+  color: white;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba($primary-color, 0.25);
+
+  @media (max-width: 768px) {
+    font-size: 1.2rem;
+    padding: 10px 16px;
+    margin-bottom: 16px;
+  }
+}
+
+.question-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 24px;
+  justify-content: center;
+  width: 100%;
+  max-width: 240px;
+
+  @media (max-width: 768px) {
+    max-width: 100%;
+  }
+}
+
+.question-circle {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background-color: white;
+  border: 1px solid #cbd5e1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+  font-weight: 500;
+  font-size: 0.9rem;
+  color: #64748b;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: $primary-color;
+    color: $primary-color;
+    transform: translateY(-2px);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  &.answered {
+    background-color: $secondary-color;
+    color: white;
+    border-color: $secondary-color;
+
+    &:hover {
+      background-color: color.adjust($secondary-color, $lightness: 5%);
+      box-shadow: 0 3px 8px rgba($secondary-color, 0.3);
+    }
+  }
+
+  &.active {
+    border: 2px solid $primary-color;
+    color: $primary-color;
+    font-weight: 700;
+    background-color: color.adjust($primary-color, $lightness: 42%);
+    box-shadow: 0 0 0 2px rgba($primary-color, 0.2);
+  }
+
+  @media (max-width: 576px) {
+    width: 36px;
+    height: 36px;
+    font-size: 0.85rem;
+  }
+}
+
+.sidebar button[mat-raised-button] {
+  width: 100%;
+  padding: 10px;
+  font-weight: 600;
+  font-size: 1rem;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(
+    135deg,
+    $success-color,
+    color.adjust($success-color, $lightness: -5%)
+  );
+  color: white;
+  box-shadow: 0 4px 12px rgba($success-color, 0.25);
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: linear-gradient(
+      135deg,
+      color.adjust($success-color, $lightness: -5%),
+      color.adjust($success-color, $lightness: -10%)
+    );
+    box-shadow: 0 6px 16px rgba($success-color, 0.35);
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(1px);
+    box-shadow: 0 2px 8px rgba($success-color, 0.2);
+  }
+}
+
+// ===== MAIN CONTENT =====
+.main-content {
+  flex-grow: 1;
+  padding: 30px;
+  overflow-y: auto;
+
+  @media (max-width: 768px) {
+    padding: 20px;
+  }
+
+  @media (max-width: 576px) {
+    padding: 16px;
+  }
+
+  h2 {
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: $primary-color;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid rgba($primary-color, 0.2);
+
+    @media (max-width: 768px) {
+      font-size: 1.4rem;
+    }
+  }
+
+  p {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: $text-color;
+    background-color: white;
+    padding: 16px 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border-left: 4px solid $primary-color;
+    margin-bottom: 24px;
+
+    @media (max-width: 768px) {
+      font-size: 1rem;
+      padding: 14px 16px;
+      border-left-width: 3px;
+    }
+  }
+}
+
+// ===== ANSWER CHOICES =====
+.answers {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  mat-checkbox,
+  mat-radio-button {
+    display: block;
+    margin-bottom: 14px;
+    padding: 12px 16px;
+    background-color: white;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    border: 1px solid #e2e8f0;
+
+    &:hover {
+      background-color: #f1f5f9;
+      border-color: #cbd5e1;
+    }
+
+    ::ng-deep .mat-checkbox-layout,
+    ::ng-deep .mat-radio-label {
+      width: 100%;
+      font-size: 1rem;
+    }
+
+    ::ng-deep .mat-checkbox-inner-container,
+    ::ng-deep .mat-radio-container {
+      margin-right: 12px;
+    }
+
+    @media (max-width: 768px) {
+      padding: 10px 14px;
+
+      ::ng-deep .mat-checkbox-layout,
+      ::ng-deep .mat-radio-label {
+        font-size: 0.95rem;
+      }
+    }
+  }
+
+  ::ng-deep .mat-checkbox-checked,
+  ::ng-deep .mat-radio-checked {
+    background-color: color.adjust($secondary-color, $lightness: 42%);
+    border-color: $secondary-color;
+  }
+}
+
+// ===== NAVIGATION BUTTONS =====
+.navigation-buttons {
+  margin-top: 30px;
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+
+  @media (max-width: 576px) {
+    margin-top: 24px;
+    gap: 12px;
+  }
+
+  button {
+    min-width: 120px;
+    padding: 10px 24px;
+    font-weight: 500;
+    border-radius: 8px;
+    border: 1px solid #cbd5e1;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+      transition: transform 0.2s ease;
+    }
+
+    &:not([disabled]) {
+      color: $primary-color;
+      background: linear-gradient(to bottom, #ffffff, #f8fafc);
+
+      &::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          to bottom,
+          rgba($primary-color, 0.05),
+          rgba($primary-color, 0.1)
+        );
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+
+      &:hover {
+        background: linear-gradient(to bottom, #f1f5f9, #e2e8f0);
+        border-color: $primary-color;
+        color: color.adjust($primary-color, $lightness: -10%);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba($primary-color, 0.15);
+
+        &::before {
+          opacity: 1;
+        }
+
+        mat-icon {
+          transform: translateX(2px);
+        }
+
+        // Icon cho nút "Câu trước" di chuyển về phía trái
+        &:first-child mat-icon {
+          transform: translateX(-2px);
+        }
+      }
+
+      &:active {
+        transform: translateY(1px);
+        box-shadow: 0 2px 6px rgba($primary-color, 0.1);
+      }
+    }
+
+    &[disabled] {
+      color: #94a3b8;
+      border-color: #e2e8f0;
+      background: linear-gradient(to bottom, #f8fafc, #f1f5f9);
+      opacity: 0.6;
+      cursor: not-allowed;
+
+      mat-icon {
+        opacity: 0.5;
+      }
+
+      &:hover {
+        transform: none;
+        box-shadow: none;
+
+        mat-icon {
+          transform: none;
+        }
+      }
+    }
+
+    @media (max-width: 576px) {
+      min-width: 100px;
+      padding: 8px 16px;
+      font-size: 0.9rem;
+      gap: 6px;
+
+      mat-icon {
+        font-size: 16px;
+        width: 16px;
+        height: 16px;
+      }
+    }
+  }
+}
+
+// ===== RESPONSIVE STYLES =====
+@media (max-width: 576px) {
+  .sidebar {
+    padding: 12px;
+  }
+
+  .main-content {
+    padding: 14px;
+  }
+}
+
+// ===== ANIMATIONS =====
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba($error-color, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 8px rgba($error-color, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba($error-color, 0);
+  }
+}
+
+.timer.warning {
+  animation: pulse 2s infinite;
+  background: linear-gradient(
+    135deg,
+    $error-color,
+    color.adjust($error-color, $lightness: 8%)
+  );
+}

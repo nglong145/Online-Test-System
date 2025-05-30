@@ -1,0 +1,490 @@
+@use "../../../styles.scss" as *;
+@use "sass:color";
+
+// Variables
+$primary-color: #2f80ed;
+$accent-color: #56cc9d;
+$background-color: #f8fafc;
+$border-color: #edf2f7;
+$card-background: white;
+$shadow-light: 0 2px 8px rgba(0, 0, 0, 0.05);
+$shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.08);
+$border-radius: 12px;
+$space-unit: 8px;
+
+// Container chính
+.homepage-container {
+  max-width: 1280px;
+  margin: 24px auto;
+  padding: 0 $space-unit * 2;
+  display: flex;
+  flex-direction: column;
+  gap: $space-unit * 4;
+
+  @media (max-width: 768px) {
+    margin: $space-unit * 2 auto;
+    padding: 0 $space-unit;
+    gap: $space-unit * 3;
+  }
+}
+
+// Hàng kỳ thi
+.exams-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $space-unit * 3;
+
+  @media (max-width: 960px) {
+    grid-template-columns: 1fr;
+    gap: $space-unit * 2;
+  }
+}
+
+// Hàng lịch sử
+.history-row {
+  width: 100%;
+}
+
+// Section chung
+.exam-section {
+  background: $card-background;
+  border-radius: $border-radius;
+  box-shadow: $shadow-light;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: box-shadow 0.3s ease;
+  border: 1px solid $border-color;
+  height: 100%;
+
+  &:hover {
+    box-shadow: $shadow-medium;
+  }
+
+  // Tiêu đề section
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: $space-unit;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: $accent-color;
+    padding: $space-unit * 2;
+    margin: 0;
+    background: rgba($accent-color, 0.05);
+    border-bottom: 2px solid rgba($accent-color, 0.2);
+
+    mat-icon {
+      color: $accent-color;
+    }
+  }
+}
+
+// Cards chứa danh sách kỳ thi
+.exam-cards {
+  padding: $space-unit * 2;
+  display: flex;
+  flex-direction: column;
+  gap: $space-unit * 1.5;
+  flex: 1;
+  overflow-y: auto;
+  max-height: 320px; // Giới hạn chiều cao để hiển thị scrollbar khi cần
+}
+
+// Card kỳ thi
+.exam-card {
+  border-radius: $space-unit;
+  background: $background-color;
+  padding: $space-unit * 1.5;
+  border-left: 3px solid $primary-color;
+  transition: all 0.2s ease-in-out;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+  }
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      135deg,
+      rgba($primary-color, 0.05),
+      transparent 70%
+    );
+    z-index: 0;
+  }
+
+  // Tiêu đề card
+  .exam-card-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: $primary-color;
+    margin-bottom: $space-unit;
+    position: relative;
+    z-index: 1;
+  }
+
+  // Thời gian trong card
+  .exam-card-time {
+    font-size: 0.85rem;
+    color: #64748b;
+    margin-bottom: $space-unit / 2;
+    display: flex;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+
+    &::before {
+      content: "🕒";
+      margin-right: $space-unit / 2;
+      font-size: 0.8rem;
+    }
+  }
+
+  // Nút trong card
+  button {
+    margin-top: $space-unit;
+    width: 100%;
+    background: $primary-color;
+    color: white;
+    font-weight: 500;
+    border: none;
+    border-radius: 6px;
+    padding: $space-unit $space-unit * 2;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: $space-unit / 2;
+    font-size: 0.9rem;
+    position: relative;
+    z-index: 1;
+
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+
+    &:hover:not([disabled]) {
+      background: darken($primary-color, 5%);
+      box-shadow: 0 2px 8px rgba($primary-color, 0.25);
+    }
+
+    &[disabled] {
+      background: #e2e8f0;
+      color: #94a3b8;
+    }
+  }
+}
+
+// Lịch sử thi
+.exam-history {
+  // Bộ lọc
+  .filter-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: $space-unit;
+    padding: $space-unit * 2;
+    background: rgba($background-color, 0.5);
+    margin-bottom: 0;
+    border-bottom: 1px solid $border-color;
+
+    .filter-input {
+      width: 100%;
+      margin: 0;
+    }
+
+    .filter-buttons {
+      display: flex;
+      gap: $space-unit;
+      align-items: flex-end;
+      grid-column: 1 / -1;
+
+      @media (min-width: 768px) {
+        justify-content: flex-end;
+      }
+
+      button {
+        font-weight: 500;
+        padding: $space-unit $space-unit * 1.5;
+        display: flex;
+        align-items: center;
+        gap: $space-unit / 2;
+
+        mat-icon {
+          font-size: 18px;
+          width: 18px;
+          height: 18px;
+        }
+      }
+    }
+
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+    }
+  }
+}
+
+// Bảng lịch sử
+.history-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+
+  mat-header-row {
+    background: rgba($accent-color, 0.9);
+    min-height: 48px;
+
+    mat-header-cell {
+      color: white;
+      font-weight: 500;
+
+      mat-icon {
+        color: white;
+        margin-right: $space-unit / 2;
+        vertical-align: middle;
+      }
+    }
+  }
+
+  mat-row {
+    background: white;
+    min-height: 48px;
+    transition: background 0.2s ease;
+    border-bottom: 1px solid $border-color;
+    cursor: pointer;
+
+    &:hover {
+      background: rgba($accent-color, 0.05);
+    }
+  }
+
+  .score-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    min-width: 40px;
+
+    &.excellent {
+      background: #4caf50;
+      color: white;
+    }
+
+    &.good {
+      background: #2196f3;
+      color: white;
+    }
+
+    &.average {
+      background: #ff9800;
+      color: white;
+    }
+
+    &.poor {
+      background: #f44336;
+      color: white;
+    }
+  }
+
+  .ellipsis {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 180px;
+    display: block;
+
+    @media (max-width: 768px) {
+      max-width: 120px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    mat-cell,
+    mat-header-cell {
+      &.mat-column-startedAt,
+      &.mat-column-finishedAt {
+        display: none;
+      }
+    }
+  }
+
+  @media (max-width: 480px) {
+    mat-cell,
+    mat-header-cell {
+      &.mat-column-quizName {
+        display: none;
+      }
+    }
+  }
+}
+
+// Empty state
+.no-data {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: $space-unit * 4;
+  color: #94a3b8;
+  text-align: center;
+
+  mat-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    margin-bottom: $space-unit;
+    opacity: 0.5;
+  }
+
+  p {
+    font-size: 0.9rem;
+    margin: 0;
+  }
+}
+
+// Loading state
+.loading-spinner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: $space-unit * 4;
+
+  mat-spinner {
+    margin-bottom: $space-unit;
+  }
+
+  p {
+    color: #64748b;
+    font-size: 0.9rem;
+    margin: 0;
+  }
+}
+
+// Paginator
+mat-paginator {
+  background: rgba($background-color, 0.5);
+  border-top: 1px solid $border-color;
+  margin-top: auto;
+
+  &.card-paginator {
+    // Chỉnh sửa cho paginator ở section cards
+    border-top: 1px solid rgba($border-color, 0.7);
+    background: rgba($background-color, 0.7);
+  }
+}
+
+// Responsive fixes
+@media (max-width: 576px) {
+  .history-table {
+    font-size: 0.85rem;
+
+    mat-cell,
+    mat-header-cell {
+      padding: $space-unit;
+    }
+  }
+
+  mat-paginator {
+    ::ng-deep .mat-mdc-paginator-container {
+      padding: 0 $space-unit;
+    }
+  }
+}
+
+// Scrollbar styling
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba($background-color, 0.8);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba($primary-color, 0.3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba($primary-color, 0.5);
+}
+
+// Thêm style cho các nút tìm kiếm và xóa bộ lọc
+.filter-buttons {
+  display: flex;
+  gap: $space-unit;
+  align-items: flex-end;
+  grid-column: 1 / -1;
+
+  @media (min-width: 768px) {
+    justify-content: flex-end;
+  }
+
+  button {
+    font-weight: 500;
+    padding: $space-unit $space-unit * 1.5;
+    display: flex;
+    align-items: center;
+    gap: $space-unit / 2;
+
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+
+    // Đảm bảo nút có màu nền
+    &[color="primary"] {
+      background-color: $primary-color;
+      color: white;
+    }
+
+    &[color="warn"] {
+      border: 1px solid #f44336;
+      color: #f44336;
+
+      &:hover {
+        background-color: rgba(244, 67, 54, 0.04);
+      }
+    }
+  }
+}
+
+// Đảm bảo các nút filter trong trang có đúng style
+.filter-container {
+  .filter-buttons {
+    button[mat-raised-button] {
+      background-color: $primary-color;
+      color: white;
+
+      &:hover {
+        background-color: darken($primary-color, 5%);
+      }
+    }
+
+    button[mat-stroked-button] {
+      border: 1px solid #f44336;
+      color: #f44336;
+
+      &:hover {
+        background-color: rgba(244, 67, 54, 0.04);
+      }
+    }
+  }
+}

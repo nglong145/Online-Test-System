@@ -1,86 +1,533 @@
-/* login.component.scss */
-$primary-color: #a3c7f5; // Màu xanh dương nhạt
-$secondary-color: #0077b6; // Màu xanh dương đậm
+@use "../../../../styles.scss" as *;
+@use "sass:color";
 
 .login-container {
+  min-height: 100vh;
   display: flex;
-  justify-content: space-between;
-  height: 100vh;
-  background-color: $primary-color;
+  align-items: center;
+  justify-content: center;
+  // Đổi gradient background với tông xanh dương nhẹ nhàng hơn
+  background: linear-gradient(
+    135deg,
+    #e1f5fe 0%,
+    // Màu xanh dương rất nhạt
+    #b3e5fc 50%,
+    // Màu xanh dương nhạt hơn
+    #81d4fa 100% // Màu xanh dương nhẹ
+  );
   padding: 20px;
+  position: relative;
+  overflow: hidden;
+  // box-sizing: border-box;
+}
 
-  .login-box {
-    width: 45%;
-    background-color: #ffffff;
-    padding: 30px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
+// Thêm pattern để tạo kết cấu cho background
+.login-container::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.3;
+}
+
+.login-card {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15); // Tăng shadow cho nổi bật hơn
+  padding: 40px;
+  width: 100%;
+  max-width: 440px;
+  position: relative;
+  z-index: 2;
+
+  // Thêm border mỏng để tạo layer cảm giác
+  border: 1px solid rgba(255, 255, 255, 0.8);
+
+  @media (max-width: 576px) {
+    padding: 30px 24px;
+    margin: 10px;
+    border-radius: 12px;
+  }
+}
+
+// Logo section đồng bộ với header
+.logo-section {
+  text-align: center;
+  margin-bottom: 32px;
+
+  .logo {
     display: flex;
-    flex-direction: column;
     align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 8px;
 
-    h2 {
-      color: $secondary-color;
-      margin-bottom: 30px;
+    .logo-icon {
+      font-size: 3rem;
+      width: 3rem;
+      height: 3rem;
+      color: $primary-color;
+      background: linear-gradient(135deg, $primary-color, $secondary-color);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
 
-    .input-field {
-      width: 100%;
-      margin-bottom: 20px;
+    h1 {
+      font-size: 2.2rem;
+      font-weight: 700;
+      margin: 0;
+      background: linear-gradient(135deg, $primary-color, $secondary-color);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.5px;
+    }
+  }
+
+  .system-description {
+    color: $subtext-color;
+    font-size: 1rem;
+    margin: 0;
+    font-weight: 500;
+  }
+}
+
+// Tùy chỉnh background decoration để phù hợp với background mới
+.background-decoration {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+
+  .circle {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.25); // Làm nhạt hơn
+    backdrop-filter: blur(8px);
+    animation: float 6s ease-in-out infinite;
+    border: 1px solid rgba(255, 255, 255, 0.5); // Thêm border cho các hình tròn
+
+    &.circle-1 {
+      width: 200px;
+      height: 200px;
+      top: 10%;
+      left: 10%;
+      animation-delay: 0s;
+      background: linear-gradient(
+        135deg,
+        rgba(33, 150, 243, 0.1),
+        rgba(3, 169, 244, 0.2)
+      );
     }
 
-    .login-actions {
-      width: 100%;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 20px;
+    &.circle-2 {
+      width: 150px;
+      height: 150px;
+      top: 60%;
+      right: 15%;
+      animation-delay: 2s;
+      background: linear-gradient(
+        135deg,
+        rgba(3, 169, 244, 0.15),
+        rgba(0, 188, 212, 0.25)
+      );
+    }
 
-      .forgot-password {
-        color: $secondary-color;
-        font-size: 14px;
+    &.circle-3 {
+      width: 100px;
+      height: 100px;
+      bottom: 20%;
+      left: 20%;
+      animation-delay: 4s;
+      background: linear-gradient(
+        135deg,
+        rgba(0, 188, 212, 0.1),
+        rgba(77, 208, 225, 0.2)
+      );
+    }
+
+    // Thêm một hình tròn thứ 4 để trang trí thêm
+    &.circle-4 {
+      width: 120px;
+      height: 120px;
+      bottom: 40%;
+      right: 25%;
+      animation-delay: 3s;
+      background: linear-gradient(
+        135deg,
+        rgba(33, 150, 243, 0.1),
+        rgba(66, 165, 245, 0.2)
+      );
+    }
+  }
+}
+
+// Thêm nhiều chi tiết trang trí nhỏ
+.small-dots {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.4;
+  background-image: radial-gradient(#4fc3f7 1px, transparent 1px);
+  background-size: 30px 30px;
+}
+
+// Phần còn lại của CSS giữ nguyên
+.login-form {
+  h2 {
+    text-align: center;
+    color: $text-color;
+    font-weight: 600;
+    font-size: 1.5rem;
+    margin-bottom: 28px;
+    position: relative;
+
+    &::after {
+      content: "";
+      position: absolute;
+      bottom: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 3px;
+      background: linear-gradient(90deg, $primary-color, $secondary-color);
+      border-radius: 1.5px;
+    }
+  }
+}
+.input-field {
+  width: 100%;
+  margin-bottom: 20px;
+
+  ::ng-deep {
+    .mat-form-field-outline {
+      color: #e0e7ff;
+    }
+
+    .mat-form-field-outline-thick {
+      color: $primary-color;
+    }
+
+    .mat-form-field-label {
+      color: $subtext-color;
+      font-weight: 500;
+    }
+
+    .mat-form-field-prefix {
+      margin-right: 12px;
+
+      mat-icon {
+        color: $primary-color;
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+      }
+    }
+
+    .mat-form-field-suffix {
+      mat-icon-button {
+        color: $subtext-color;
+
+        &:hover {
+          color: $primary-color;
+          background-color: rgba($primary-color, 0.1);
+        }
+      }
+    }
+
+    input {
+      font-size: 1rem;
+      padding: 12px 0;
+
+      &::placeholder {
+        color: $subtext-color;
+        opacity: 0.7;
+      }
+    }
+
+    .mat-error {
+      font-size: 0.85rem;
+      color: $error-color;
+      margin-top: 4px;
+    }
+  }
+}
+
+.login-actions {
+  margin-top: 32px;
+
+  .login-button {
+    width: 100%;
+    height: 48px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border-radius: 8px;
+    background: linear-gradient(
+      135deg,
+      $primary-color,
+      color.adjust($primary-color, $lightness: -10%)
+    );
+    color: white;
+    border: none;
+    box-shadow: 0 4px 15px rgba($primary-color, 0.3);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+    }
+
+    &:hover:not([disabled]) {
+      background: linear-gradient(
+        135deg,
+        color.adjust($primary-color, $lightness: -5%),
+        color.adjust($primary-color, $lightness: -15%)
+      );
+      box-shadow: 0 6px 20px rgba($primary-color, 0.4);
+      transform: translateY(-2px);
+    }
+
+    &:active:not([disabled]) {
+      transform: translateY(1px);
+      box-shadow: 0 2px 10px rgba($primary-color, 0.3);
+    }
+
+    &[disabled] {
+      background: #e2e8f0;
+      color: #94a3b8;
+      box-shadow: none;
+      cursor: not-allowed;
+    }
+  }
+}
+
+::ng-deep .mdc-button__label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+// Background decoration
+.background-decoration {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+
+  .circle {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    animation: float 6s ease-in-out infinite;
+
+    &.circle-1 {
+      width: 200px;
+      height: 200px;
+      top: 10%;
+      left: 10%;
+      animation-delay: 0s;
+    }
+
+    &.circle-2 {
+      width: 150px;
+      height: 150px;
+      top: 60%;
+      right: 15%;
+      animation-delay: 2s;
+    }
+
+    &.circle-3 {
+      width: 100px;
+      height: 100px;
+      bottom: 20%;
+      left: 20%;
+      animation-delay: 4s;
+    }
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px) rotate(0deg);
+    opacity: 0.5;
+  }
+  50% {
+    transform: translateY(-20px) rotate(180deg);
+    opacity: 0.8;
+  }
+}
+
+// Responsive improvements
+@media (max-width: 768px) {
+  .login-container {
+    padding: 16px;
+  }
+
+  .logo-section {
+    margin-bottom: 24px;
+
+    .logo {
+      .logo-icon {
+        font-size: 2.5rem;
+        width: 2.5rem;
+        height: 2.5rem;
       }
 
-      button {
-        width: 100%;
-        background-color: $secondary-color;
-        color: white;
-        font-weight: bold;
+      h1 {
+        font-size: 1.8rem;
       }
     }
 
-    .register {
-      margin-top: 15px;
-      font-size: 14px;
-      text-align: center;
+    .system-description {
+      font-size: 0.9rem;
+    }
+  }
 
-      a {
-        color: $secondary-color;
-        font-weight: bold;
+  .login-form h2 {
+    font-size: 1.3rem;
+    margin-bottom: 20px;
+  }
+
+  .input-field {
+    margin-bottom: 16px;
+  }
+
+  .login-actions {
+    margin-top: 24px;
+
+    .login-button {
+      height: 44px;
+      font-size: 1rem;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .login-card {
+    padding: 24px 20px;
+  }
+
+  .logo-section {
+    .logo {
+      flex-direction: column;
+      gap: 8px;
+
+      .logo-icon {
+        font-size: 2.2rem;
+        width: 2.2rem;
+        height: 2.2rem;
+      }
+
+      h1 {
+        font-size: 1.6rem;
       }
     }
   }
 
-  .right-side {
-    width: 45%;
+  .background-decoration .circle {
+    &.circle-1 {
+      width: 120px;
+      height: 120px;
+    }
+
+    &.circle-2 {
+      width: 100px;
+      height: 100px;
+    }
+
+    &.circle-3 {
+      width: 80px;
+      height: 80px;
+    }
+  }
+}
+
+.spinner-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  mat-spinner {
+    ::ng-deep circle {
+      stroke: white !important;
+    }
+  }
+
+  span {
+    font-size: 0.9rem;
+  }
+}
+
+// Chỉnh sửa button khi loading
+.login-button {
+  // Các style hiện có giữ nguyên
+  .login-text {
     display: flex;
-    justify-content: center;
     align-items: center;
+    gap: 10px;
+  }
 
-    .logo-container {
-      text-align: center;
+  &[disabled] {
+    background: #e2e8f0;
+    color: #94a3b8;
+    box-shadow: none;
+    cursor: not-allowed;
 
-      .logo {
-        width: 150px;
-        height: auto;
-        margin-bottom: 15px;
-      }
+    // Nếu disabled do đang loading thì giữ màu chính
+    &.loading {
+      background: linear-gradient(
+        135deg,
+        color.adjust($primary-color, $lightness: 5%, $saturation: -20%),
+        color.adjust($primary-color, $lightness: -5%, $saturation: -20%)
+      );
+      color: white;
+      opacity: 0.8;
+    }
+  }
+}
 
-      h3 {
-        color: $secondary-color;
-        font-size: 24px;
-        font-weight: bold;
-      }
+// Điều chỉnh animation cho spinner
+::ng-deep .mat-mdc-progress-spinner {
+  animation: fadeIn 0.3s;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+// Responsive cho spinner container
+@media (max-width: 480px) {
+  .spinner-container {
+    gap: 6px;
+
+    span {
+      font-size: 0.8rem;
     }
   }
 }

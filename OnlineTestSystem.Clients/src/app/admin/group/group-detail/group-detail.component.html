@@ -1,69 +1,267 @@
-<div class="group-detail-container">
-  <h2>Group Detail</h2>
+<div class="container">
+  <!-- Header section with back button -->
+  <div class="back-btn-container">
+    <button
+      mat-stroked-button
+      color="primary"
+      (click)="goBack()"
+      [attr.aria-label]="'Go back to group list'"
+    >
+      <mat-icon>arrow_back</mat-icon>
+      Quay lại
+    </button>
+  </div>
 
-  <!-- Thông tin group -->
-  <mat-card>
-    <mat-card-title>Group Information</mat-card-title>
-    <mat-card-content>
-      <form>
-        <mat-form-field appearance="fill" class="full-width">
-          <mat-label>Group Name</mat-label>
-          <input matInput [(ngModel)]="group.name" name="name" />
-        </mat-form-field>
+  <div class="header">
+    <h1>Thông tin chi tiết nhóm {{ group.name }}</h1>
+  </div>
 
-        <mat-form-field appearance="fill" class="full-width">
-          <mat-label>Active Status</mat-label>
-          <mat-select [(ngModel)]="group.isActive" name="isActive">
-            <mat-option [value]="true">Active</mat-option>
-            <mat-option [value]="false">Inactive</mat-option>
-          </mat-select>
-        </mat-form-field>
+  <div class="row">
+    <div class="col">
+      <div class="group-info">
+        <h3>Thông tin nhóm</h3>
 
-        <!-- User Manager -->
-        <mat-form-field appearance="fill" class="full-width">
-          <mat-label>User Manager</mat-label>
-          <mat-select [(ngModel)]="group.userManagerId" name="userManagerId">
-            <mat-option *ngFor="let teacher of teachers" [value]="teacher.id">
-              {{ teacher.lastName }} {{ teacher.firstName }}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
+        <form #formRef="ngForm">
+          <div class="form-group">
+            <label for="name">Tên nhóm</label>
+            <input
+              id="name"
+              [(ngModel)]="group.name"
+              name="name"
+              type="text"
+              class="form-control"
+              placeholder="Nhập tên nhóm"
+              required
+              #groupModel="ngModel"
+            />
+            <div
+              *ngIf="
+                groupModel.invalid && (groupModel.touched || groupModel.dirty)
+              "
+              class="text-danger"
+            >
+              <span *ngIf="groupModel.errors?.['required']" class="error"
+                >Tên nhóm là bắt buộc</span
+              >
+            </div>
+          </div>
 
-        <mat-form-field appearance="fill" class="full-width">
-          <mat-label>Description</mat-label>
-          <textarea
-            matInput
-            [(ngModel)]="group.description"
-            name="description"
-          ></textarea>
-        </mat-form-field>
+          <div class="form-group" *ngIf="role === 'Admin'">
+            <label for="userManager">Giáo viên quản lý</label>
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-select
+                [(ngModel)]="group.userManager"
+                name="userManager"
+                (openedChange)="onTeacherSelectOpen($event)"
+                (selectionChange)="onTeacherSelected($event.value)"
+                [compareWith]="compareTeacherIds"
+                placeholder="Chọn giáo viên quản lý"
+              >
+                <mat-option>
+                  <ngx-mat-select-search
+                    [formControl]="teacherFilterCtrl"
+                    placeholderLabel="Tìm kiếm giáo viên..."
+                    noEntriesFoundLabel="Không tìm thấy giáo viên"
+                  >
+                  </ngx-mat-select-search>
+                </mat-option>
+                <mat-option
+                  *ngFor="let t of teacherSelectFilter"
+                  [value]="t.id"
+                >
+                  {{ t.lastName }} {{ t.firstName }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
 
-        <button mat-raised-button color="primary" (click)="updateGroup()">
-          Update Group
-        </button>
-      </form>
-    </mat-card-content>
-  </mat-card>
+          <div class="form-group">
+            <label for="description">Mô tả</label>
+            <textarea
+              id="description"
+              [(ngModel)]="group.description"
+              name="description"
+              class="form-control"
+              placeholder="Nhập mô tả về nhóm (không bắt buộc)"
+              rows="3"
+            ></textarea>
+          </div>
 
-  <!-- Danh sách thành viên -->
-  <h3>Group Members</h3>
-  <mat-table [dataSource]="members" class="mat-elevation-z8">
-    <ng-container matColumnDef="fullName">
-      <mat-header-cell *matHeaderCellDef> Full Name </mat-header-cell>
-      <mat-cell *matCellDef="let member">
-        {{ member.lastName }} {{ member.firstName }}
-      </mat-cell>
-    </ng-container>
+          <div class="form-group">
+            <label for="status">Trạng thái</label>
+            <select
+              id="status"
+              [(ngModel)]="group.isActive"
+              name="status"
+              class="form-control"
+            >
+              <option [ngValue]="true">Hoạt động</option>
+              <option [ngValue]="false">Ngừng hoạt động</option>
+            </select>
+          </div>
 
-    <mat-header-row *matHeaderRowDef="['fullName']"></mat-header-row>
-    <mat-row *matRowDef="let row; columns: ['fullName']"></mat-row>
-  </mat-table>
+          <button
+            mat-raised-button
+            color="primary"
+            (click)="updateGroup()"
+            [disabled]="!formRef.form.valid || !isGroupChanged()"
+          >
+            <mat-icon>save</mat-icon>
+            Cập nhật thông tin
+          </button>
+        </form>
+      </div>
+    </div>
 
-  <mat-paginator
-    [length]="totalMembers"
-    [pageSize]="pageSize"
-    [pageSizeOptions]="[5, 10, 25]"
-    (page)="pageChanged($event)"
-  >
-  </mat-paginator>
+    <!-- Members Column -->
+    <div class="col">
+      <div class="user-groups">
+        <h3>Danh sách thành viên nhóm</h3>
+
+        <!-- Filter section -->
+        <div class="filter-container">
+          <mat-form-field appearance="outline" class="filter-input">
+            <mat-label>Mã sinh viên</mat-label>
+            <input
+              matInput
+              placeholder="Nhập mã sinh viên"
+              [(ngModel)]="userGroupFilter.studentCode"
+              (keyup.enter)="applyFilter()"
+            />
+            <mat-icon matSuffix>badge</mat-icon>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="filter-input">
+            <mat-label>Họ và tên</mat-label>
+            <input
+              matInput
+              placeholder="Nhập họ và tên"
+              [(ngModel)]="userGroupFilter.fullName"
+              (keyup.enter)="applyFilter()"
+            />
+            <mat-icon matSuffix>person</mat-icon>
+          </mat-form-field>
+
+          <!-- Action buttons -->
+          <div class="filter-buttons">
+            <button mat-raised-button color="primary" (click)="applyFilter()">
+              <mat-icon>search</mat-icon>
+              Tìm kiếm
+            </button>
+            <button mat-stroked-button color="warn" (click)="clearFilter()">
+              <mat-icon>filter_alt_off</mat-icon>
+              Xóa bộ lọc
+            </button>
+          </div>
+        </div>
+
+        <!-- Members table -->
+        <mat-table [dataSource]="filteredUserGroupDataSource" matSort>
+          <ng-container matColumnDef="studentCode">
+            <mat-header-cell *matHeaderCellDef mat-sort-header
+              >Mã sinh viên</mat-header-cell
+            >
+            <mat-cell *matCellDef="let user">{{ user.studentCode }}</mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="fullName">
+            <mat-header-cell *matHeaderCellDef>Họ và tên</mat-header-cell>
+            <mat-cell *matCellDef="let user">{{ user.fullName }}</mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="actions">
+            <mat-header-cell *matHeaderCellDef>Hành động</mat-header-cell>
+            <mat-cell *matCellDef="let user">
+              <button
+                mat-icon-button
+                color="warn"
+                class="action-btn delete-btn"
+                (click)="removeUserFromGroup(user); $event.stopPropagation()"
+                [attr.aria-label]="'Xóa ' + user.fullName"
+                matTooltip="Xóa thành viên"
+              >
+                <mat-icon>delete</mat-icon>
+              </button>
+            </mat-cell>
+          </ng-container>
+
+          <mat-header-row
+            *matHeaderRowDef="userGroupDisplayedColumns"
+          ></mat-header-row>
+          <mat-row
+            *matRowDef="let row; columns: userGroupDisplayedColumns"
+          ></mat-row>
+        </mat-table>
+
+        <!-- Empty state when no members -->
+        <div class="no-data" *ngIf="filteredUserGroupDataSource.length === 0">
+          <mat-icon class="empty-icon">people_outline</mat-icon>
+          <p class="empty-title">Không có thành viên nào</p>
+          <p class="empty-message">
+            Nhóm này chưa có thành viên hoặc không có kết quả phù hợp với bộ
+            lọc.
+          </p>
+        </div>
+
+        <!-- Add new member button -->
+        <div style="margin-top: 16px">
+          <button
+            mat-raised-button
+            color="primary"
+            *ngIf="!showAddUserRow"
+            (click)="showAddUserRow = true"
+          >
+            Thêm thành viên
+          </button>
+        </div>
+
+        <!-- Add new member form -->
+        <div *ngIf="showAddUserRow" class="add-user-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Chọn sinh viên</mat-label>
+            <mat-select
+              [(ngModel)]="selectedAddUserId"
+              [compareWith]="compareStudentIds"
+              (openedChange)="onStudentSelectOpen($event)"
+              placeholder="Chọn sinh viên cần thêm vào nhóm"
+            >
+              <mat-option>
+                <ngx-mat-select-search
+                  [formControl]="studentAddFilterCtrl"
+                  placeholderLabel="Tìm kiếm sinh viên..."
+                  noEntriesFoundLabel="Không tìm thấy sinh viên"
+                ></ngx-mat-select-search>
+              </mat-option>
+              <mat-option *ngFor="let sv of studentAddOptions" [value]="sv.id">
+                {{ sv.studentCode }} - {{ sv.lastName }} {{ sv.firstName }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <button
+            mat-flat-button
+            color="primary"
+            (click)="confirmAddUser()"
+            [disabled]="!selectedAddUserId"
+          >
+            Xác nhận
+          </button>
+          <button mat-stroked-button color="warn" (click)="cancelAddUser()">
+            Hủy
+          </button>
+        </div>
+
+        <!-- Pagination -->
+        <mat-paginator
+          [length]="totalUserGroups"
+          [pageSize]="pageSize"
+          [pageSizeOptions]="[5, 10, 25, 100]"
+          (page)="pageChanged($event)"
+          [showFirstLastButtons]="true"
+          aria-label="Chọn trang"
+        >
+        </mat-paginator>
+      </div>
+    </div>
+  </div>
 </div>

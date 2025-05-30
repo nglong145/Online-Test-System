@@ -1,97 +1,188 @@
-<!-- list-user.component.html -->
 <div class="container">
   <div class="header">
-    <h1>Danh sách kỳ thi</h1>
-    <!-- Add New Button -->
+    <div class="title-section">
+      <h1>Danh sách kỳ thi</h1>
+      <p class="subtitle">Quản lý kỳ thi và nội dung kỳ thi</p>
+    </div>
     <button
       mat-raised-button
       color="primary"
       class="add-new-btn"
       (click)="openAddModal()"
     >
-      Thêm mới
+      <mat-icon>add</mat-icon>
+      <span>Thêm mới</span>
     </button>
   </div>
 
-  <div class="filter-container">
-    <mat-form-field appearance="outline" class="filter-input">
-      <mat-label>Họ và tên</mat-label>
-      <input
-        matInput
-        placeholder="Nhập họ hoặc tên"
-        [(ngModel)]="filter.name"
-        (keyup.enter)="applyFilter()"
-      />
-    </mat-form-field>
+  <div class="filter-section">
+    <h2 class="filter-title">Bộ lọc tìm kiếm</h2>
+    <div class="filter-container">
+      <mat-form-field appearance="outline" class="filter-input">
+        <mat-label>Kỳ thi</mat-label>
+        <input
+          matInput
+          placeholder="Nhập tên kỳ thi"
+          [(ngModel)]="filter.name"
+          (keyup.enter)="applyFilter()"
+        />
+        <mat-icon matSuffix>category</mat-icon>
+      </mat-form-field>
 
-    <!-- Nút tìm kiếm và xóa bộ lọc -->
-    <div class="filter-buttons">
-      <button mat-raised-button color="primary" (click)="applyFilter()">
-        Tìm kiếm
-      </button>
-      <button mat-stroked-button color="warn" (click)="clearFilter()">
-        Xóa bộ lọc
-      </button>
+      <div class="filter-buttons">
+        <button mat-raised-button color="primary" (click)="applyFilter()">
+          <mat-icon>search</mat-icon>
+          Tìm kiếm
+        </button>
+        <button mat-stroked-button color="warn" (click)="clearFilter()">
+          <mat-icon>filter_alt_off</mat-icon>
+          Xóa bộ lọc
+        </button>
+      </div>
     </div>
   </div>
 
-  <!-- User List Table for Teachers -->
-  <mat-table [dataSource]="examDataSource" matSort>
-    <ng-container matColumnDef="name">
-      <mat-header-cell *matHeaderCellDef mat-sort-header>
-        Tên kỳ thi
-      </mat-header-cell>
-      <mat-cell *matCellDef="let exam">
-        <!-- Thêm liên kết vào tên -->
-        <a [routerLink]="['/admin/exam', exam.id]">{{ exam.name }}</a>
-      </mat-cell>
-    </ng-container>
+  <div class="table-container">
+    <div class="loading-overlay" *ngIf="isLoading">
+      <mat-spinner diameter="40"></mat-spinner>
+      <span>Đang tải dữ liệu...</span>
+    </div>
+    <!-- User List Table for Teachers -->
+    <mat-table
+      [dataSource]="examDataSource"
+      matSort
+      [class.blur-on-loading]="isLoading"
+    >
+      <ng-container matColumnDef="name">
+        <mat-header-cell *matHeaderCellDef mat-sort-header>
+          Tên kỳ thi
+        </mat-header-cell>
+        <mat-cell *matCellDef="let exam">
+          <div class="ellipsis" matTooltip="{{ exam.name }}">
+            <a
+              [routerLink]="
+                role === 'Admin'
+                  ? ['/admin/exam', exam.id]
+                  : ['/teacher/exam', exam.id]
+              "
+              >{{ exam.name }}</a
+            >
+          </div>
+        </mat-cell>
+      </ng-container>
 
-    <ng-container matColumnDef="description">
-      <mat-header-cell *matHeaderCellDef mat-sort-header>
-        Mô tả
-      </mat-header-cell>
-      <mat-cell *matCellDef="let exam">{{ exam.description }}</mat-cell>
-    </ng-container>
+      <ng-container matColumnDef="description">
+        <mat-header-cell *matHeaderCellDef> Mô tả </mat-header-cell>
+        <mat-cell *matCellDef="let exam">
+          <div class="ellipsis" matTooltip="{{ exam.description }}">
+            {{ exam.description || "Không có dữ liệu" }}
+          </div>
+        </mat-cell>
+      </ng-container>
 
-    <ng-container matColumnDef="startTime">
-      <mat-header-cell *matHeaderCellDef> Thời gian bắt đầu </mat-header-cell>
-      <mat-cell *matCellDef="let exam">{{
-        exam.startTime | date : "  HH:mm'm' dd/MM/yyyy"
-      }}</mat-cell>
-    </ng-container>
+      <ng-container matColumnDef="startTime">
+        <mat-header-cell *matHeaderCellDef mat-sort-header>
+          Thời gian bắt đầu
+        </mat-header-cell>
+        <mat-cell *matCellDef="let exam">
+          {{ getLocaleDate(exam.startTime) }}
+          {{ getLocaleTime(exam.startTime) }}</mat-cell
+        >
+      </ng-container>
 
-    <ng-container matColumnDef="endTime">
-      <mat-header-cell *matHeaderCellDef> Thời gian kết thúc </mat-header-cell>
-      <mat-cell *matCellDef="let exam">{{
-        exam.endTime | date : "  HH:mm'm' dd/MM/yyyy"
-      }}</mat-cell>
-    </ng-container>
+      <ng-container matColumnDef="endTime">
+        <mat-header-cell *matHeaderCellDef mat-sort-header>
+          Thời gian kết thúc
+        </mat-header-cell>
+        <mat-cell *matCellDef="let exam">
+          {{ getLocaleDate(exam.endTime) }}
+          {{ getLocaleTime(exam.endTime) }}</mat-cell
+        >
+      </ng-container>
 
-    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
-    <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
-  </mat-table>
+      <ng-container matColumnDef="actions">
+        <mat-header-cell *matHeaderCellDef>Thao tác</mat-header-cell>
+        <mat-cell *matCellDef="let exam">
+          <button
+            mat-icon-button
+            color="warn"
+            class="action-btn delete-btn"
+            (click)="openDeleteConfirmDialog(exam); $event.stopPropagation()"
+            [attr.aria-label]="'Xóa ' + exam.name"
+            matTooltip="Xóa kỳ thi"
+          >
+            <mat-icon>delete</mat-icon>
+          </button>
+        </mat-cell>
+      </ng-container>
 
-  <div
-    class="no-data"
-    *ngIf="examDataSource.length === 0"
-    style="
-      text-align: center;
-      margin: 20px 0;
-      padding: 16px;
-      font-style: italic;
-      color: #999;
-    "
-  >
-    Không có dữ liệu phù hợp
+      <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+      <mat-row
+        *matRowDef="let row; columns: displayedColumns"
+        (click)="goToExamDetail(row)"
+      ></mat-row>
+    </mat-table>
+
+    <div class="no-data" *ngIf="examDataSource?.length === 0 && !isLoading">
+      <mat-icon>folder_off</mat-icon>
+      <h3>Không tìm thấy kỳ thi</h3>
+      <p>Không có dữ liệu phù hợp với tiêu chí tìm kiếm</p>
+      <button mat-stroked-button color="primary" (click)="clearFilter()">
+        <mat-icon>refresh</mat-icon>
+        Làm mới tìm kiếm
+      </button>
+    </div>
+
+    <!-- Pagination -->
+    <mat-paginator
+      class="paginator"
+      [length]="totalExams"
+      [pageSize]="pageSize"
+      [pageSizeOptions]="[5, 10, 25, 100]"
+      (page)="pageChanged($event)"
+      [showFirstLastButtons]="true"
+      aria-label="Chọn trang kết quả"
+    >
+    </mat-paginator>
   </div>
-
-  <!-- Pagination -->
-  <mat-paginator
-    [length]="totalUsers"
-    [pageSize]="pageSize"
-    [pageSizeOptions]="[5, 10, 25, 100]"
-    (page)="pageChanged($event)"
-  >
-  </mat-paginator>
 </div>
+
+<!-- Delete Confirmation Dialog Template -->
+<ng-template #deleteConfirmDialog let-data>
+  <div class="dialog-header">
+    <h2>Xác nhận xóa</h2>
+  </div>
+  <div class="dialog-content">
+    <p>
+      Bạn có chắc chắn muốn xóa kỳ thi
+      <strong>{{ data.exam.name }}</strong
+      >?
+    </p>
+    <p>
+      Hành động này không thể hoàn tác và tất cả câu hỏi trong kỳ thi sẽ bị xóa.
+    </p>
+
+    <div class="countdown-container">
+      <div class="countdown">{{ countdownValue$ | async }}</div>
+      <p class="countdown-text" *ngIf="(countdownValue$ | async) !== 0">
+        Vui lòng đợi {{ countdownValue$ | async }} giây để xác nhận
+      </p>
+      <p class="countdown-text" *ngIf="(countdownValue$ | async) === 0">
+        Bạn có thể xác nhận bây giờ
+      </p>
+    </div>
+  </div>
+  <div class="dialog-actions">
+    <button mat-button class="cancel-btn" (click)="data.cancelAction()">
+      Hủy
+    </button>
+    <button
+      mat-raised-button
+      class="confirm-btn"
+      [disabled]="(countdownValue$ | async) !== 0"
+      (click)="data.confirmAction()"
+    >
+      Xác nhận xóa
+    </button>
+  </div>
+</ng-template>

@@ -1,18 +1,24 @@
-<mat-sidenav-container class="sidenav-container">
-  <mat-sidenav #sidenav mode="side" opened>
-    <mat-nav-list>
-      <mat-list-item
-        *ngFor="let navItem of navItems"
-        routerLinkActive="active"
-        [routerLinkActiveOptions]="{ exact: true }"
-        [routerLink]="navItem.route"
-      >
-        <mat-icon>{{ navItem.icon }}</mat-icon>
-        <span>{{ navItem.name }}</span>
-      </mat-list-item>
-    </mat-nav-list>
-  </mat-sidenav>
-  <mat-sidenav-content>
-    <!-- Content goes here -->
-  </mat-sidenav-content>
-</mat-sidenav-container>
+<div
+  class="sidenav-overlay"
+  [class.visible]="isMobileMenuOpen"
+  (click)="closeMobileMenu()"
+></div>
+
+<div
+  class="sidenav-container"
+  [class.mobile-hidden]="!isMobileMenuOpen"
+  [class.mobile-visible]="isMobileMenuOpen"
+>
+  <mat-nav-list>
+    <!-- Navigation Items -->
+    <mat-list-item
+      *ngFor="let item of navItems"
+      [routerLink]="item.route"
+      routerLinkActive="active"
+      (click)="onNavItemClick(item)"
+    >
+      <mat-icon>{{ item.icon }}</mat-icon>
+      <span>{{ item.name }}</span>
+    </mat-list-item>
+  </mat-nav-list>
+</div>

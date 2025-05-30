@@ -20,8 +20,8 @@ export interface CreateExam {
   name: string;
   description: string;
   accessCode: string;
-  startTime: string;
-  endTime?: string;
+  startTime: string | null;
+  endTime?: string | null;
   isActive: boolean;
 }
 
@@ -32,15 +32,4 @@ export interface UpdateExam {
   startTime?: string;
   endTime?: string;
   isActive?: boolean;
-}
-
-export interface ExamQuiz {
-  examId: string;
-  examName: string;
-  startTime: string;
-  endTime: String;
-  quizId: string;
-  title: string;
-  duration: string;
-  totalQuestion: number;
 }

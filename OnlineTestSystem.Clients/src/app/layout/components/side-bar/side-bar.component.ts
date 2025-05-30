@@ -1,15 +1,34 @@
 import {
   Component,
+  EventEmitter,
+  HostListener,
   Input,
   OnChanges,
   OnInit,
+  Output,
   SimpleChanges,
 } from '@angular/core';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { AuthService } from '../../../core/auth/services/auth.service';
+
+interface NavItem {
+  name: string;
+  icon: string;
+  route: string;
+  exact?: boolean;
+  badge?: string | number;
+  section?: string;
+  roles?: string[]; // Thêm roles để kiểm tra quyền
+}
+
+interface NavSection {
+  title?: string;
+  items: NavItem[];
+}
 
 @Component({
   selector: 'app-side-bar',
@@ -24,40 +43,36 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
   templateUrl: './side-bar.component.html',
   styleUrl: './side-bar.component.scss',
 })
-export class SideBarComponent implements OnInit, OnChanges {
-  @Input() navItems: any[] | undefined;
+export class SideBarComponent implements OnInit {
+  @Input() navItems: any[] = [];
+  @Input() isMobileMenuOpen: boolean = false;
 
-  activeItem: string = '';
+  @Output() mobileMenuToggle = new EventEmitter<boolean>();
+  @Output() navItemClicked = new EventEmitter<any>();
 
-  constructor() {}
+  constructor(private router: Router) {}
 
   ngOnInit(): void {
-    if (!this.navItems || this.navItems.length === 0) {
-      this.setDefaultNavItems();
+    this.checkScreenSize();
+  }
+
+  @HostListener('window:resize')
+  checkScreenSize(): void {
+    const isMobile = window.innerWidth <= 768;
+    if (!isMobile && this.isMobileMenuOpen) {
+      this.closeMobileMenu();
     }
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['navItems']) {
-      if (!this.navItems || this.navItems.length === 0) {
-        this.setDefaultNavItems();
-      }
+  onNavItemClick(item: any): void {
+    this.navItemClicked.emit(item);
+    if (window.innerWidth <= 768) {
+      this.closeMobileMenu();
     }
   }
 
-  setDefaultNavItems(): void {
-    this.navItems = [
-      { name: 'Dashboard', icon: 'dashboard', route: 'dashboard' },
-      { name: 'Teachers', icon: 'school', route: 'teacher' },
-      { name: 'Students', icon: 'people', route: 'student' },
-    ];
-  }
-
-  setActive(item: string): void {
-    this.activeItem = item;
-  }
-
-  isActive(item: string): boolean {
-    return this.activeItem === item;
+  closeMobileMenu(): void {
+    this.isMobileMenuOpen = false;
+    this.mobileMenuToggle.emit(false);
   }
 }

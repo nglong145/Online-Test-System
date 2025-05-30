@@ -11,8 +11,8 @@ export interface FilterCategory {
   id?: string;
   name?: string;
   description?: string;
-  ParentId?: string;
-  ParentName?: string;
+  parentId?: string;
+  parentName?: string;
   isActive?: boolean;
 }
 

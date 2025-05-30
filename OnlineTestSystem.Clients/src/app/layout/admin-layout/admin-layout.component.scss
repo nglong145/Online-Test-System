@@ -1,8 +1,54 @@
+@use "../../../styles.scss" as *;
+
+.layout-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
 .container {
   display: flex;
-  height: 100vh;
+  height: calc(100vh - 64px); // Height minus header
+  position: relative;
+
+  @media (max-width: 768px) {
+    height: calc(100vh - 56px); // Smaller header on mobile
+  }
 }
 
 .main-content {
-  width: 100%;
+  flex: 1;
+  padding: 24px;
+  overflow-y: auto;
+  background-color: $background-color;
+
+  @media (max-width: 768px) {
+    width: 100%;
+    padding: 16px;
+  }
+}
+
+// For mobile overlay when sidebar is open
+.sidebar-overlay {
+  display: none;
+
+  @media (max-width: 768px) {
+    display: block;
+    position: fixed;
+    top: 64px;
+    left: 0;
+    width: 100%;
+    height: calc(100% - 64px);
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 99;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s, visibility 0.3s;
+
+    &.active {
+      opacity: 1;
+      visibility: visible;
+    }
+  }
 }

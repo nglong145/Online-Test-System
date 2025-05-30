@@ -1,0 +1,282 @@
+<div class="homepage-container">
+  <!-- Hàng 1: Kỳ thi đang diễn ra và sắp diễn ra -->
+  <div class="exams-row">
+    <!-- Kỳ thi đang diễn ra -->
+    <div class="exam-section ongoing-exams">
+      <h2 class="section-title">
+        <mat-icon>play_circle_filled</mat-icon>
+        Kỳ thi đang diễn ra
+      </h2>
+
+      <div class="exam-cards">
+        <ng-container *ngFor="let exam of oncomingExamDataSource">
+          <div class="exam-card">
+            <div class="exam-card-title">{{ exam.examName }}</div>
+            <div class="exam-card-time">
+              Bắt đầu: {{ exam.startTime | date : "dd/MM/yyyy HH:mm" }}
+            </div>
+            <div class="exam-card-time">
+              Kết thúc: {{ exam.endTime | date : "dd/MM/yyyy HH:mm" }}
+            </div>
+            <button
+              mat-raised-button
+              color="primary"
+              (click)="openAccessCodeModal(exam)"
+            >
+              <mat-icon>play_arrow</mat-icon>
+              Vào thi ngay
+            </button>
+          </div>
+        </ng-container>
+
+        <!-- Loading state -->
+        <div *ngIf="isLoadingOncoming" class="loading-spinner">
+          <mat-spinner diameter="40"></mat-spinner>
+          <p>Đang tải dữ liệu...</p>
+        </div>
+
+        <!-- Empty state -->
+        <div
+          *ngIf="oncomingExamDataSource.length === 0 && !isLoadingOncoming"
+          class="no-data"
+        >
+          <mat-icon>event_busy</mat-icon>
+          <p>Không có kỳ thi đang diễn ra</p>
+        </div>
+      </div>
+
+      <!-- Phân trang -->
+      <mat-paginator
+        *ngIf="oncomingTotal > 0"
+        [length]="oncomingTotal"
+        [pageSize]="oncomingPageSize"
+        [pageSizeOptions]="[2, 4, 6]"
+        (page)="pageChangedOncoming($event)"
+        showFirstLastButtons
+        class="card-paginator"
+        aria-label="Chọn trang kỳ thi đang diễn ra"
+      ></mat-paginator>
+    </div>
+
+    <!-- Kỳ thi sắp tới -->
+    <div class="exam-section upcoming-exams">
+      <h2 class="section-title">
+        <mat-icon>schedule</mat-icon>
+        Kỳ thi sắp tới
+      </h2>
+
+      <div class="exam-cards">
+        <ng-container *ngFor="let exam of upcomingExamDataSource">
+          <div class="exam-card">
+            <div class="exam-card-title">{{ exam.examName }}</div>
+            <div class="exam-card-time">
+              Bắt đầu: {{ exam.startTime | date : "dd/MM/yyyy HH:mm" }}
+            </div>
+            <div class="exam-card-time">
+              Kết thúc: {{ exam.endTime | date : "dd/MM/yyyy HH:mm" }}
+            </div>
+            <button
+              mat-raised-button
+              color="primary"
+              (click)="openAccessCodeModal(exam)"
+              [disabled]="true"
+            >
+              <mat-icon>access_time</mat-icon>
+              Chưa tới giờ
+            </button>
+          </div>
+        </ng-container>
+
+        <!-- Loading state -->
+        <div *ngIf="isLoadingUpcoming" class="loading-spinner">
+          <mat-spinner diameter="40"></mat-spinner>
+          <p>Đang tải dữ liệu...</p>
+        </div>
+
+        <!-- Empty state -->
+        <div
+          *ngIf="upcomingExamDataSource.length === 0 && !isLoadingUpcoming"
+          class="no-data"
+        >
+          <mat-icon>event_busy</mat-icon>
+          <p>Không có kỳ thi sắp tới</p>
+        </div>
+      </div>
+
+      <!-- Phân trang -->
+      <mat-paginator
+        *ngIf="upcomingTotal > 0"
+        [length]="upcomingTotal"
+        [pageSize]="upcomingPageSize"
+        [pageSizeOptions]="[2, 4, 6]"
+        (page)="pageChangedUpcoming($event)"
+        showFirstLastButtons
+        class="card-paginator"
+        aria-label="Chọn trang kỳ thi sắp tới"
+      ></mat-paginator>
+    </div>
+  </div>
+
+  <!-- Hàng 2: Lịch sử thi -->
+  <div class="history-row">
+    <div class="exam-section exam-history">
+      <h2 class="section-title">
+        <mat-icon>assignment_turned_in</mat-icon>
+        Lịch sử làm bài thi
+      </h2>
+
+      <!-- Bộ lọc -->
+      <div class="filter-container">
+        <mat-form-field appearance="outline" class="filter-input">
+          <mat-label>Tên kỳ thi</mat-label>
+          <mat-icon matPrefix>search</mat-icon>
+          <input
+            matInput
+            placeholder="Nhập tên kỳ thi"
+            [(ngModel)]="userQUizFilter.examName"
+            (keyup.enter)="applyFilterUserQuiz()"
+          />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="filter-input">
+          <mat-label>Tên đề thi</mat-label>
+          <mat-icon matPrefix>quiz</mat-icon>
+          <input
+            matInput
+            placeholder="Nhập tên đề thi"
+            [(ngModel)]="userQUizFilter.quizName"
+            (keyup.enter)="applyFilterUserQuiz()"
+          />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="filter-input">
+          <mat-label>Điểm số</mat-label>
+          <mat-icon matPrefix>grade</mat-icon>
+          <input
+            matInput
+            placeholder="Nhập điểm"
+            [(ngModel)]="userQUizFilter.score"
+            (keyup.enter)="applyFilterUserQuiz()"
+            type="number"
+          />
+        </mat-form-field>
+
+        <div class="filter-buttons">
+          <button
+            mat-raised-button
+            color="primary"
+            (click)="applyFilterUserQuiz()"
+          >
+            <mat-icon>search</mat-icon>
+            Tìm kiếm
+          </button>
+          <button
+            mat-stroked-button
+            color="warn"
+            (click)="clearFilterUserQuiz()"
+          >
+            <mat-icon>clear</mat-icon>
+            Xóa bộ lọc
+          </button>
+        </div>
+      </div>
+
+      <!-- Bảng kết quả -->
+      <mat-table
+        [dataSource]="filteredUserQuizDataSource"
+        matSort
+        class="history-table"
+      >
+        <ng-container matColumnDef="examName">
+          <mat-header-cell *matHeaderCellDef mat-sort-header>
+            <mat-icon>event</mat-icon>
+            Kỳ thi
+          </mat-header-cell>
+          <mat-cell *matCellDef="let exam">
+            <div class="ellipsis" matTooltip="{{ exam.examName }}">
+              {{ exam.examName }}
+            </div>
+          </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="quizName">
+          <mat-header-cell *matHeaderCellDef>
+            <mat-icon>quiz</mat-icon>
+            Đề thi
+          </mat-header-cell>
+          <mat-cell *matCellDef="let exam">
+            <div class="ellipsis" matTooltip="{{ exam.quizName }}">
+              {{ exam.quizName || "N/A" }}
+            </div>
+          </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="startedAt">
+          <mat-header-cell *matHeaderCellDef>
+            <mat-icon>play_arrow</mat-icon>
+            Bắt đầu
+          </mat-header-cell>
+          <mat-cell *matCellDef="let exam">
+            {{ exam.startedAt | date : "dd/MM/yyyy HH:mm" }}
+          </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="finishedAt">
+          <mat-header-cell *matHeaderCellDef>
+            <mat-icon>stop</mat-icon>
+            Kết thúc
+          </mat-header-cell>
+          <mat-cell *matCellDef="let exam">
+            {{ exam.finishedAt | date : "dd/MM/yyyy HH:mm" }}
+          </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="score">
+          <mat-header-cell *matHeaderCellDef>
+            <mat-icon>grade</mat-icon>
+            Điểm
+          </mat-header-cell>
+          <mat-cell *matCellDef="let exam">
+            <span
+              class="score-badge"
+              [ngClass]="{
+                excellent: exam.score >= 8,
+                good: exam.score >= 6.5 && exam.score < 8,
+                average: exam.score >= 5 && exam.score < 6.5,
+                poor: exam.score < 5
+              }"
+            >
+              {{ exam.score }}/10
+            </span>
+          </mat-cell>
+        </ng-container>
+
+        <mat-header-row
+          *matHeaderRowDef="examDisplayedColumns"
+        ></mat-header-row>
+        <mat-row
+          *matRowDef="let row; columns: examDisplayedColumns"
+          (click)="goToUserQuizDetail(row)"
+          matRipple
+        ></mat-row>
+      </mat-table>
+
+      <!-- Empty state -->
+      <div class="no-data" *ngIf="filteredUserQuizDataSource.length === 0">
+        <mat-icon>description_off</mat-icon>
+        <p>Chưa có bài thi nào được hoàn thành</p>
+      </div>
+
+      <!-- Phân trang -->
+      <mat-paginator
+        class="paginator"
+        [length]="totalUserQuiz"
+        [pageSize]="pageSizeUserQuiz"
+        [pageSizeOptions]="[5, 10, 25, 50]"
+        (page)="pageChangedUserQuiz($event)"
+        [showFirstLastButtons]="true"
+        aria-label="Chọn trang lịch sử thi"
+      ></mat-paginator>
+    </div>
+  </div>
+</div>

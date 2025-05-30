@@ -33,6 +33,9 @@ namespace OnlineTestSystem.DAL.Configurations
             builder.Property(e => e.IsActive)
                    .HasDefaultValue(true);
 
+            builder.Property(e => e.CreatedAt)
+               .HasDefaultValueSql("GETDATE()");
+
         }
     }
 }

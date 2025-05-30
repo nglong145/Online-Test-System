@@ -37,16 +37,28 @@ export class ExamService {
     return this.http.put<any>(`${API_URL}/Exam/update-exam/${examId}`, exam);
   }
 
-  //examQuiz
-  getFilterExamQuiz(
+  getFilterExamUpcoming(
     index: number,
     size: number,
     sortBy: string,
     sortOrder: string,
-    filter: FilterExamQuiz
+    filter: FilterExam
   ): Observable<any> {
     return this.http.post<any>(
-      `${API_URL}/ExamExtend/filter-exam-quiz?pageIndex=${index}&pageSize=${size}&sortBy=${sortBy}&sortOrder=${sortOrder}`,
+      `${API_URL}/Exam/filter-upcoming?pageIndex=${index}&pageSize=${size}&sortBy=${sortBy}&sortOrder=${sortOrder}`,
+      filter
+    );
+  }
+
+  getFilterExamOncoming(
+    index: number,
+    size: number,
+    sortBy: string,
+    sortOrder: string,
+    filter: FilterExam
+  ): Observable<any> {
+    return this.http.post<any>(
+      `${API_URL}/Exam/filter-oncoming?pageIndex=${index}&pageSize=${size}&sortBy=${sortBy}&sortOrder=${sortOrder}`,
       filter
     );
   }

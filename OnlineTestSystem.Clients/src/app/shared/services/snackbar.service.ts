@@ -6,7 +6,7 @@ import { MatSnackBar, MatSnackBarConfig } from '@angular/material/snack-bar';
 })
 export class SnackbarService {
   private config: MatSnackBarConfig = {
-    duration: 3000,
+    duration: 5000,
     horizontalPosition: 'end',
     verticalPosition: 'top',
   };
@@ -14,22 +14,34 @@ export class SnackbarService {
   constructor(private snackBar: MatSnackBar) {}
 
   success(message: string): void {
-    this.config.panelClass = ['snackbar-success'];
-    this.snackBar.open(message, 'Đóng', this.config);
+    const config = {
+      ...this.config,
+      panelClass: ['mat-mdc-snack-bar-container', 'snackbar-success'],
+    };
+    this.snackBar.open(message, 'Đóng', config);
   }
 
   error(message: string): void {
-    this.config.panelClass = ['snackbar-error'];
-    this.snackBar.open(message, 'Đóng', this.config);
+    const config = {
+      ...this.config,
+      panelClass: ['mat-mdc-snack-bar-container', 'snackbar-error'],
+    };
+    this.snackBar.open(message, 'Đóng', config);
   }
 
   warning(message: string): void {
-    this.config.panelClass = ['snackbar-warning'];
-    this.snackBar.open(message, 'Đóng', this.config);
+    const config = {
+      ...this.config,
+      panelClass: ['mat-mdc-snack-bar-container', 'snackbar-warning'],
+    };
+    this.snackBar.open(message, 'Đóng', config);
   }
 
   info(message: string): void {
-    this.config.panelClass = ['snackbar-info'];
-    this.snackBar.open(message, 'Đóng', this.config);
+    const config = {
+      ...this.config,
+      panelClass: ['mat-mdc-snack-bar-container', 'snackbar-info'],
+    };
+    this.snackBar.open(message, 'Đóng', config);
   }
 }

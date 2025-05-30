@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using OnlineTestSystem.BLL.Services.ExamService;
 using OnlineTestSystem.BLL.Services.GroupService;
+using OnlineTestSystem.BLL.ViewModels.Group;
+using OnlineTestSystem.BLL.ViewModels.UserGroup;
 
 namespace OnlineTestSystem.Presentation.Controllers
 {
@@ -16,39 +18,66 @@ namespace OnlineTestSystem.Presentation.Controllers
             _userGroupService = userGroupService;
         }
 
-        [HttpGet("{groupId}/users")]
-        public async Task<IActionResult> GetUsersByGroup(Guid groupId, int pageIndex = 1, int pageSize = 10)
+        [HttpPost("filter-user-group")]
+        public async Task<IActionResult> GetFilteredUserGroups([FromQuery] int pageIndex,
+                                                   [FromQuery] int pageSize,
+                                                   [FromBody] UserGroupFilterVm filterRequest,
+                                                   [FromQuery] string sortBy = "CreatedAt",
+                                                   [FromQuery] string sortOrder = "desc")
         {
-            var result = await _userGroupService.GetUsersByGroupIdAsync(groupId, pageIndex, pageSize);
-
-            if (result.Items.Any())
+            if (pageIndex <= 0 || pageSize <= 0)
             {
-                return Ok(result);
+                return BadRequest(new { message = "PageIndex and PageSize must be greater than 0." });
             }
-            return NotFound("No users found for this group.");
+
+            try
+            {
+                var userGroups = await _userGroupService.FilterUserGroupsAsync(filterRequest, pageIndex, pageSize, sortBy, sortOrder);
+                return Ok(userGroups);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Internal server error", error = ex.Message });
+            }
+
         }
 
         // Add UserGroup
         [HttpPost("{groupId}/User/{userId}")]
-        public async Task<IActionResult> AddUsertoGroup(Guid userId, Guid groupId)
+        public async Task<IActionResult> AddUsertoGroup(Guid groupId,Guid userId)
         {
-            var added = await _userGroupService.AddUserToGroupAsync(userId, groupId);
-            if (!added)
-                return BadRequest("Thất bại");
+            try
+            {
+                var exists = await _userGroupService.ExistsAsync(groupId, userId);
+                if (exists)
+                {
+                    return BadRequest(new { message = "Sinh viên đã thuộc nhóm này." });
+                }
 
-            return Ok("sinh viên đã được thêm vào nhóm.");
+                var added = await _userGroupService.AddUserToGroupAsync(groupId, userId);
+                if (!added)
+                {
+                    return BadRequest(new { message = "Không thể thêm sinh viên vào nhóm." });
+                }
+
+                return Ok(new { message = "Sinh viên đã được thêm vào nhóm." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = ex.Message });
+            }
         }
 
         // Delete UserGroup
         [HttpDelete("{groupId}/User/{userId}")]
-        public async Task<IActionResult> RemoveUserFromGroup(Guid userId, Guid groupId)
+        public async Task<IActionResult> RemoveUserFromGroup( Guid groupId,Guid userId)
         {
-            var removed = await _userGroupService.RemoveUserFromGroupAsync(userId, groupId);
+            var removed = await _userGroupService.RemoveUserFromGroupAsync(groupId,userId);
 
             if (!removed)
-                return BadRequest("Failed.");
+                return BadRequest(new { message = "Xóa thất bại." });
 
-            return Ok("Đã xóa sinh viên khỏi nhóm.");
+            return Ok(new { message = "Xóa sinh viên khỏi nhóm thành công." });
         }
     }
 }

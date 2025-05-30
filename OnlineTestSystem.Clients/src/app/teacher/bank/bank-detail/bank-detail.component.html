@@ -1,1 +1,232 @@
-<p>bank-detail works!</p>
+<div class="bank-detail-wrapper">
+  <!-- Sidebar bên trái -->
+  <nav class="sidebar">
+    <h3>Danh sách câu hỏi</h3>
+    <ul>
+      <li
+        *ngFor="let question of bank?.questions; let i = index"
+        [class.active]="i === activeQuestionIndex"
+        (click)="scrollToQuestion(i)"
+      >
+        <span>{{ i + 1 }}.</span>
+        {{ truncateText(question.content, 40) || "Câu hỏi chưa có nội dung" }}
+      </li>
+      <li *ngIf="!bank?.questions?.length" class="no-questions">
+        <span><mat-icon>info</mat-icon></span> Chưa có câu hỏi nào
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Nội dung chính bên phải -->
+  <div class="main-content">
+    <div class="back-btn-container">
+      <button
+        mat-stroked-button
+        color="primary"
+        (click)="goBack()"
+        [attr.aria-label]="'Go back to bank list'"
+      >
+        <mat-icon>arrow_back</mat-icon>
+        Quay lại
+      </button>
+    </div>
+
+    <h1>Chi tiết ngân hàng câu hỏi</h1>
+
+    <!-- Thông tin ngân hàng -->
+    <div class="bank-info" *ngIf="bank">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Tên ngân hàng câu hỏi</mat-label>
+        <input
+          matInput
+          [(ngModel)]="bank.name"
+          placeholder="Nhập tên ngân hàng câu hỏi"
+          required
+        />
+        <mat-icon matSuffix>description</mat-icon>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Danh mục</mat-label>
+        <mat-select
+          [(ngModel)]="bank.quizCategoryId"
+          name="quizCategoryId"
+          (openedChange)="onCategorySelectOpen($event)"
+          (selectionChange)="onCategorySelected($event.value)"
+          [compareWith]="compareCategoryIds"
+          placeholder="Chọn danh mục"
+          required
+        >
+          <mat-option>
+            <ngx-mat-select-search
+              [formControl]="categoryFilterCtrl"
+              placeholderLabel="Tìm kiếm danh mục..."
+              noEntriesFoundLabel="Không tìm thấy danh mục"
+            >
+            </ngx-mat-select-search>
+          </mat-option>
+          <mat-option *ngFor="let c of categorySelectFilter" [value]="c.id">
+            {{ c.name }}
+          </mat-option>
+        </mat-select>
+        <mat-icon matSuffix>category</mat-icon>
+      </mat-form-field>
+
+      <button
+        mat-raised-button
+        color="primary"
+        (click)="updateBank()"
+        [disabled]="!bank.name || !bank.quizCategoryId || !isBankInfoChanged()"
+      >
+        Cập nhật thông tin ngân hàng câu hỏi
+      </button>
+    </div>
+
+    <!-- Danh sách câu hỏi chi tiết -->
+    <div class="questions-container">
+      <div
+        *ngFor="let question of bank?.questions; let i = index"
+        [attr.id]="'question-' + i"
+        class="question-card"
+        #questionCardRef
+      >
+        <div class="question-header">
+          <h3>Câu hỏi {{ i + 1 }}</h3>
+          <button
+            mat-icon-button
+            color="warn"
+            (click)="removeQuestion(i)"
+            [attr.aria-label]="'Xóa câu hỏi ' + (i + 1)"
+            matTooltip="Xóa câu hỏi"
+          >
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
+
+        <!-- Nội dung câu hỏi -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Nội dung câu hỏi</mat-label>
+          <textarea
+            matInput
+            [(ngModel)]="question.content"
+            (ngModelChange)="onQuestionChanged(question, i)"
+            rows="3"
+            placeholder="Nhập nội dung câu hỏi"
+            required
+          ></textarea>
+          <mat-icon matSuffix>help</mat-icon>
+        </mat-form-field>
+
+        <!-- Select mức độ -->
+        <mat-form-field appearance="outline" class="half-width">
+          <mat-label>Mức độ</mat-label>
+          <mat-select
+            [(ngModel)]="question.level"
+            (selectionChange)="onQuestionChanged(question, i)"
+            required
+          >
+            <mat-option
+              *ngFor="let level of questionLevelList"
+              [value]="level.value"
+            >
+              {{ questionLevelNameMap[level.name] || level.name }}
+            </mat-option>
+          </mat-select>
+          <mat-icon matSuffix>signal_cellular_alt</mat-icon>
+        </mat-form-field>
+
+        <!-- Select loại câu hỏi -->
+        <mat-form-field appearance="outline" class="half-width">
+          <mat-label>Loại câu hỏi</mat-label>
+          <mat-select
+            [(ngModel)]="question.questionType"
+            (selectionChange)="onQuestionChanged(question, i)"
+            required
+          >
+            <mat-option
+              *ngFor="let type of questionTypeList"
+              [value]="type.value"
+            >
+              {{ questionTypeNameMap[type.name] || type.name }}
+            </mat-option>
+          </mat-select>
+          <mat-icon matSuffix>format_list_bulleted</mat-icon>
+        </mat-form-field>
+
+        <!-- Đáp án -->
+        <div class="answers-section">
+          <label>Đáp án</label>
+          <div
+            *ngFor="let answer of question.answers; let j = index"
+            class="answer-item"
+          >
+            <mat-checkbox
+              [checked]="answer.isCorrect"
+              (change)="onAnswerCheckChange(i, j)"
+              color="primary"
+              [attr.aria-label]="
+                'Đánh dấu đáp án ' + (j + 1) + ' là đáp án đúng'
+              "
+            >
+            </mat-checkbox>
+            <input
+              type="text"
+              [(ngModel)]="answer.content"
+              (ngModelChange)="onAnswerChanged(answer, i, j)"
+              placeholder="Nhập nội dung đáp án"
+              class="answer-input"
+              [required]="true"
+            />
+            <button
+              mat-icon-button
+              color="warn"
+              (click)="removeAnswer(i, j)"
+              [attr.aria-label]="'Xóa đáp án ' + (j + 1)"
+              matTooltip="Xóa đáp án"
+            >
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+
+          <div *ngIf="!question.answers?.length" class="no-answers-message">
+            <mat-icon>info</mat-icon>
+            <span>Chưa có đáp án nào. Vui lòng thêm ít nhất một đáp án.</span>
+          </div>
+
+          <button
+            mat-stroked-button
+            color="primary"
+            (click)="addAnswer(i)"
+            class="add-answer-btn"
+            [attr.aria-label]="'Thêm đáp án cho câu hỏi ' + (i + 1)"
+          >
+            Thêm đáp án
+          </button>
+        </div>
+      </div>
+
+      <!-- Nút thêm câu hỏi đặt cuối cùng trong danh sách câu hỏi -->
+      <button
+        mat-stroked-button
+        color="primary"
+        class="add-question-btn"
+        (click)="addQuestion()"
+        [attr.aria-label]="'Thêm câu hỏi mới'"
+      >
+        Thêm câu hỏi
+      </button>
+    </div>
+
+    <!-- Nút cập nhật tất cả câu hỏi/đáp án -->
+    <button
+      mat-raised-button
+      color="accent"
+      (click)="updateAllQuestionsAndAnswers()"
+      [disabled]="!hasUnsavedChanges()"
+      class="update-all-btn sticky-update-btn"
+      [attr.aria-label]="'Cập nhật tất cả câu hỏi và đáp án'"
+    >
+      Cập nhật câu hỏi/đáp án
+    </button>
+  </div>
+</div>

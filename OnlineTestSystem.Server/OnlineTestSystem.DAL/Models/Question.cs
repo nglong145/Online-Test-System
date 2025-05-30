@@ -26,6 +26,7 @@
         public QuestionType QuestionType { get; set; }
         public string? AudioUrl { get; set; }
         public bool IsActive { get; set; } = true;
+        public int Order { get; set; }
         public DateTime CreatedAt { get; set; }= DateTime.Now;
         public QuestionLevel Level { get; set; }
         public Guid? BankId { get; set; }

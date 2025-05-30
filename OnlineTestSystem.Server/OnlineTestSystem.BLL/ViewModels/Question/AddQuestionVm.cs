@@ -3,6 +3,7 @@
     public class AddQuestionVm
     {
         public string Content { get; set; }
+        public int Order {  get; set; }
         public string QuestionType { get; set; }
         public string? AudioUrl { get; set; }
         public bool IsActive { get; set; } 

@@ -7,5 +7,6 @@
         public string? OwnerFullName { get; set; }
         public Guid? QuizCategoryId { get; set; }
         public string? CategoryName { get; set; }
+        public bool? IsActive { get; set; } 
     }
 }

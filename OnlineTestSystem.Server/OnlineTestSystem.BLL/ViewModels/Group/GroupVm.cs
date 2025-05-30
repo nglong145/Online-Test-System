@@ -9,7 +9,7 @@
         public DateTime CreatedAt { get; set; }
         public Guid? UserManager { get; set; }
 
-        public int MemeberCount { get; set; }
+        public int MemberCount { get; set; }
 
         public string? ManagerFisrtName { get; set; }
         public string? ManagerLastName { get; set; }

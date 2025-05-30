@@ -14,5 +14,7 @@ namespace OnlineTestSystem.BLL.Services.QuestionBankService
                                                                 string sortOrder);
 
         Task<Guid> ImportFromFileAsync(Stream fileStream, string fileName, AddQuestionBankVm bankVm);
+
+        Task<QuestionBankWithDetailVm?> GetBankFullDetailAsync(Guid bankId);
     }
 }

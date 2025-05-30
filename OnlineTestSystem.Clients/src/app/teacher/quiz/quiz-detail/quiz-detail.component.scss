@@ -1,0 +1,658 @@
+@use "../../../../styles.scss" as *;
+@use "sass:color";
+
+.quiz-detail-wrapper {
+  display: flex;
+  height: 100vh;
+  font-family: $font-family;
+  background-color: $background-color;
+  color: $text-color;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 280px;
+  background-color: white;
+  padding: 1.5rem;
+  border-right: 1px solid rgba($border-color, 0.5);
+  overflow-y: auto;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.05);
+
+  h3 {
+    font-weight: 700;
+    color: $primary-color;
+    margin-bottom: 1.25rem;
+    position: relative;
+    display: flex;
+    align-items: center;
+
+    &::before {
+      content: "";
+      display: inline-block;
+      width: 4px;
+      height: 18px;
+      background: linear-gradient(to bottom, $primary-color, $secondary-color);
+      margin-right: 10px;
+      border-radius: 2px;
+    }
+  }
+
+  ul {
+    list-style: none;
+    padding-left: 0;
+    margin-top: 1rem;
+
+    li {
+      cursor: pointer;
+      padding: 0.75rem;
+      border-radius: $border-radius;
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+      color: $text-color;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s ease;
+
+      span {
+        color: $primary-color;
+        font-weight: 600;
+        min-width: 20px;
+      }
+
+      &.active {
+        background-color: rgba($primary-color, 0.08);
+        color: $primary-color;
+        font-weight: 600;
+        box-shadow: 0 2px 8px rgba($primary-color, 0.1);
+      }
+
+      &:hover:not(.active) {
+        background-color: rgba($primary-color, 0.05);
+        transform: translateX(2px);
+      }
+
+      &.no-questions {
+        color: $subtext-color;
+        font-style: italic;
+        cursor: default;
+        justify-content: center;
+
+        &:hover {
+          background-color: transparent;
+          transform: none;
+        }
+
+        mat-icon {
+          color: rgba($subtext-color, 0.7);
+        }
+      }
+    }
+  }
+}
+
+/* Nội dung chính */
+.main-content {
+  flex-grow: 1;
+  padding: 2rem 3rem;
+  overflow-y: auto;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.9),
+    rgba(255, 255, 255, 1)
+  );
+
+  h1 {
+    font-weight: 700;
+    font-size: 1.8rem;
+    margin: 0 0 1.5rem 0;
+    background: linear-gradient(
+      135deg,
+      $primary-color,
+      color.adjust($primary-color, $lightness: -15%)
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .back-btn-container {
+    margin-bottom: 1.5rem;
+
+    button {
+      display: flex;
+      align-items: center;
+      font-weight: 600;
+      font-size: 0.95rem;
+      border-radius: $button-radius;
+      padding: 0.5rem 1.25rem;
+      background: rgba($primary-color, 0.08);
+      color: $primary-color;
+      border: 1px solid rgba($primary-color, 0.3);
+      box-shadow: 0 1px 8px rgba($primary-color, 0.08);
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+
+      mat-icon {
+        margin-right: 0.5rem;
+        color: inherit;
+        transition: transform 0.2s ease;
+      }
+
+      &:hover {
+        background: $primary-color;
+        color: white;
+        box-shadow: 0 4px 12px rgba($primary-color, 0.25);
+
+        mat-icon {
+          transform: translateX(-2px);
+        }
+      }
+
+      &:active {
+        transform: translateY(1px);
+        box-shadow: 0 2px 8px rgba($primary-color, 0.2);
+      }
+    }
+  }
+
+  .quiz-info {
+    background: white;
+    border-radius: $card-radius;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: $shadow;
+
+    .form-row {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1rem;
+
+      mat-form-field {
+        flex: 1;
+      }
+
+      @media (max-width: 768px) {
+        flex-direction: column;
+        gap: 0;
+      }
+    }
+
+    .full-width {
+      width: 100%;
+      margin-bottom: 1rem;
+    }
+
+    .half-width {
+      width: 48%;
+      margin-right: 4%;
+      margin-bottom: 1rem;
+      display: inline-block;
+
+      &:last-child {
+        margin-right: 0;
+      }
+    }
+
+    button {
+      background: linear-gradient(
+        135deg,
+        $primary-color,
+        color.adjust($primary-color, $lightness: -10%)
+      );
+      color: white;
+      font-weight: 600;
+      border-radius: $button-radius;
+      padding: 0.75rem 1.5rem;
+      border: none;
+      box-shadow: 0 3px 12px rgba($primary-color, 0.25);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      margin-top: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+
+      &::before {
+        content: "save";
+        font-family: "Material Icons";
+        font-size: 18px;
+      }
+
+      &:hover {
+        background: linear-gradient(
+          135deg,
+          color.adjust($primary-color, $lightness: -5%),
+          color.adjust($primary-color, $lightness: -15%)
+        );
+        box-shadow: 0 4px 15px rgba($primary-color, 0.4);
+        transform: translateY(-2px);
+      }
+
+      &:active {
+        transform: translateY(1px);
+        box-shadow: 0 2px 8px rgba($primary-color, 0.3);
+      }
+
+      &:disabled {
+        background: color.adjust($border-color, $lightness: 10%);
+        color: $subtext-color;
+        box-shadow: none;
+        transform: none;
+        cursor: not-allowed;
+      }
+    }
+  }
+
+  .questions-container {
+    .question-card {
+      background: white;
+      border-radius: $card-radius;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      position: relative;
+      box-shadow: $shadow;
+      transition: all 0.2s ease;
+
+      &:hover {
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+      }
+
+      h3 {
+        margin: 0 0 1.25rem 0;
+        color: $primary-color;
+        font-weight: 700;
+        font-size: 1.2rem;
+        display: flex;
+        align-items: center;
+        border-bottom: 1px solid rgba($border-color, 0.3);
+        padding-bottom: 0.75rem;
+
+        &::before {
+          content: "help_outline";
+          font-family: "Material Icons";
+          font-size: 20px;
+          margin-right: 8px;
+          color: $primary-color;
+        }
+      }
+
+      .form-row {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1rem;
+
+        mat-form-field {
+          flex: 1;
+        }
+
+        @media (max-width: 768px) {
+          flex-direction: column;
+          gap: 0;
+        }
+      }
+
+      .full-width {
+        width: 100%;
+        margin-bottom: 1rem;
+      }
+
+      .half-width {
+        width: 48%;
+        margin-right: 4%;
+        margin-bottom: 1rem;
+        display: inline-block;
+
+        &:last-child {
+          margin-right: 0;
+        }
+      }
+
+      // Disabled field styling cho các field chỉ đọc
+      mat-form-field {
+        ::ng-deep {
+          .mat-mdc-text-field-wrapper {
+            background-color: rgba($background-color, 0.3);
+            border-radius: $input-radius;
+          }
+
+          .mdc-text-field--outlined:not(.mdc-text-field--disabled)
+            .mdc-notched-outline__leading,
+          .mdc-text-field--outlined:not(.mdc-text-field--disabled)
+            .mdc-notched-outline__notch,
+          .mdc-text-field--outlined:not(.mdc-text-field--disabled)
+            .mdc-notched-outline__trailing {
+            border-color: rgba($border-color, 0.7);
+          }
+
+          .mat-mdc-form-field-icon-suffix {
+            color: rgba($primary-color, 0.8);
+          }
+        }
+
+        textarea[disabled],
+        input[disabled],
+        mat-select[disabled] {
+          background-color: rgba($background-color, 0.8) !important;
+          color: $text-color !important;
+          font-style: normal !important;
+          opacity: 1 !important;
+          cursor: not-allowed;
+          border: 1px solid rgba($border-color, 0.5) !important;
+          border-radius: $input-radius;
+          padding: 12px 16px;
+          font-family: inherit;
+        }
+      }
+
+      .answers-section {
+        margin-top: 1.5rem;
+
+        label {
+          font-weight: 600;
+          display: block;
+          margin-bottom: 1rem;
+          color: $text-color;
+          position: relative;
+
+          &::before {
+            content: "";
+            display: inline-block;
+            width: 3px;
+            height: 16px;
+            background: linear-gradient(
+              to bottom,
+              $secondary-color,
+              color.adjust($secondary-color, $lightness: -20%)
+            );
+            margin-right: 8px;
+            border-radius: 2px;
+            vertical-align: middle;
+          }
+        }
+
+        .answer-item {
+          display: flex;
+          align-items: center;
+          margin-bottom: 0.75rem;
+          background: rgba($background-color, 0.5);
+          padding: 0.75rem;
+          border-radius: $border-radius;
+          border: 1px solid rgba($border-color, 0.3);
+          transition: all 0.2s ease;
+
+          &:hover {
+            background: rgba($background-color, 0.8);
+            border-color: rgba($primary-color, 0.3);
+          }
+
+          mat-checkbox {
+            margin-right: 1rem;
+            pointer-events: none;
+
+            &.mat-checkbox-checked {
+              ::ng-deep .mat-checkbox-background {
+                background-color: $primary-color !important;
+                border-color: $primary-color !important;
+              }
+            }
+
+            &.mat-checkbox-disabled {
+              ::ng-deep .mat-checkbox-frame {
+                border-color: rgba($border-color, 0.6) !important;
+              }
+
+              ::ng-deep .mat-checkbox-background {
+                background-color: rgba($primary-color, 0.6) !important;
+              }
+            }
+          }
+
+          .answer-input {
+            flex-grow: 1;
+            background-color: rgba($background-color, 0.8) !important;
+            color: $text-color !important;
+            font-style: normal !important;
+            opacity: 1 !important;
+            border: 1px solid rgba($border-color, 0.5) !important;
+            cursor: not-allowed;
+            border-radius: $input-radius;
+            padding: 12px 16px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            transition: border-color 0.2s ease;
+
+            &:focus {
+              outline: none;
+              border-color: rgba($primary-color, 0.5) !important;
+            }
+          }
+        }
+
+        .no-answers-message {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          padding: 20px;
+          background: rgba($error-color, 0.05);
+          border: 1px solid rgba($error-color, 0.2);
+          border-radius: $input-radius;
+          color: $error-color;
+          font-style: italic;
+
+          mat-icon {
+            color: $error-color;
+            font-size: 1.2rem;
+          }
+        }
+      }
+    }
+
+    .no-questions-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 1rem;
+      text-align: center;
+      color: $subtext-color;
+
+      mat-icon {
+        font-size: 64px;
+        height: 64px;
+        width: 64px;
+        color: rgba($subtext-color, 0.5);
+        margin-bottom: 1.5rem;
+      }
+
+      h3 {
+        color: $text-color;
+        font-weight: 600;
+        margin: 0 0 0.5rem 0;
+        font-size: 1.3rem;
+      }
+
+      p {
+        color: $subtext-color;
+        margin: 0;
+        font-size: 1rem;
+        max-width: 400px;
+      }
+    }
+  }
+}
+
+/* Scrollbar tùy chỉnh */
+.sidebar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+  background: rgba($background-color, 0.8);
+  border-radius: 8px;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  background: rgba($primary-color, 0.5);
+  border-radius: 8px;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+  background: rgba($primary-color, 0.7);
+}
+
+.main-content::-webkit-scrollbar {
+  width: 10px;
+}
+
+.main-content::-webkit-scrollbar-track {
+  background: rgba($background-color, 0.5);
+}
+
+.main-content::-webkit-scrollbar-thumb {
+  background: rgba($secondary-color, 0.4);
+  border-radius: 8px;
+}
+
+.main-content::-webkit-scrollbar-thumb:hover {
+  background: rgba($secondary-color, 0.6);
+}
+
+// Loading overlay
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.8);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(2px);
+  border-radius: $border-radius;
+
+  mat-spinner {
+    ::ng-deep circle {
+      stroke: $primary-color;
+    }
+  }
+
+  .loading-text {
+    margin-top: 16px;
+    color: $primary-color;
+    font-weight: 600;
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 992px) {
+  .quiz-detail-wrapper {
+    flex-direction: column;
+    height: auto;
+  }
+
+  .sidebar {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid rgba($border-color, 0.5);
+    padding: 1rem;
+
+    ul {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+
+      li {
+        width: auto;
+        flex: 0 0 auto;
+      }
+    }
+  }
+
+  .main-content {
+    padding: 1.5rem;
+  }
+
+  .question-card .half-width {
+    width: 100%;
+    margin-right: 0;
+  }
+
+  .quiz-info .half-width {
+    width: 100%;
+    margin-right: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .main-content h1 {
+    font-size: 1.5rem;
+  }
+
+  .quiz-info,
+  .question-card {
+    padding: 1rem;
+  }
+}
+
+// Print-friendly styles
+@media print {
+  .quiz-detail-wrapper {
+    display: block;
+    height: auto;
+  }
+
+  .sidebar,
+  .back-btn-container {
+    display: none;
+  }
+
+  .main-content {
+    padding: 0;
+    background: none;
+
+    h1 {
+      color: black;
+      -webkit-text-fill-color: black;
+    }
+  }
+
+  .quiz-info,
+  .question-card {
+    break-inside: avoid;
+    box-shadow: none;
+    border: 1px solid #ddd;
+    margin-bottom: 1rem;
+  }
+
+  .quiz-info button {
+    display: none;
+  }
+}
+
+// High contrast mode support
+@media (prefers-contrast: high) {
+  .quiz-detail-wrapper {
+    .sidebar {
+      border: 2px solid $border-color;
+    }
+
+    .main-content {
+      border: 2px solid $border-color;
+    }
+
+    .question-card {
+      border-width: 2px !important;
+    }
+  }
+}
+
+// Reduced motion support
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}

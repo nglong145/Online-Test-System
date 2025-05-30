@@ -1,0 +1,121 @@
+.mat-mdc-dialog-surface {
+  background: #fcfcfe !important;
+  border-radius: 16px !important;
+}
+
+.confirm-dialog .mat-mdc-dialog-surface {
+  min-width: 330px !important;
+  max-width: 94vw !important;
+  overflow: hidden !important;
+  padding: 30px 22px 18px 22px !important;
+}
+
+// 3. Add modal: cho phép scroll, scroll đẹp
+.add-modal-dialog .mat-mdc-dialog-surface {
+  min-width: 410px !important;
+  max-width: 98vw !important;
+  min-height: 350px !important;
+  max-height: 90vh !important;
+  height: auto !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  padding: 10px 15px !important;
+}
+
+// Scrollbar đẹp cho add-modal nội dung lớn
+.add-modal-dialog .mat-mdc-dialog-content {
+  overflow-y: auto !important;
+  max-height: 100vh !important;
+  scrollbar-width: thin;
+  scrollbar-color: #1976d2 #f0f3fa;
+}
+.add-modal-dialog .mat-mdc-dialog-content::-webkit-scrollbar {
+  width: 7px;
+  background: #f0f3fa;
+}
+.add-modal-dialog .mat-mdc-dialog-content::-webkit-scrollbar-thumb {
+  background: #1976d2;
+  border-radius: 6px;
+}
+
+// Responsive
+@media (max-width: 600px) {
+  .add-modal-dialog .mat-mdc-dialog-surface {
+    min-width: unset !important;
+    padding: 16px 4px 16px 4px !important;
+  }
+}
+
+.confirm-submit-dialog .mat-mdc-dialog-surface {
+  border-top: 4px solid #43a047 !important;
+}
+
+.confirm-submit-dialog .mat-mdc-dialog-title {
+  color: #43a047 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+
+  &::before {
+    content: "✓" !important;
+    background: #43a047 !important;
+    color: white !important;
+    width: 24px !important;
+    height: 24px !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-weight: bold !important;
+  }
+}
+
+// Button và action
+.mat-mdc-dialog-actions {
+  margin-top: 28px !important;
+  justify-content: flex-end !important;
+  gap: 14px !important;
+  button {
+    min-width: 92px !important;
+    border-radius: 20px !important;
+    font-size: 1rem !important;
+    padding: 8px 22px !important;
+    font-weight: 500 !important;
+    transition: background 0.17s, color 0.18s !important;
+    &.mat-primary {
+      background: #1976d2 !important;
+      color: #fff !important;
+      &:hover {
+        background: #1562b1 !important;
+      }
+    }
+    &.mat-warn {
+      background: #f44336 !important;
+      color: #fff !important;
+      &:hover {
+        background: #c62828 !important;
+      }
+    }
+    &.mat-success {
+      background: #43a047 !important;
+      color: #fff !important;
+      box-shadow: 0 3px 10px rgba(67, 160, 71, 0.3) !important;
+      &:hover {
+        background: #388e3c !important;
+        box-shadow: 0 4px 12px rgba(67, 160, 71, 0.4) !important;
+        transform: translateY(-1px) !important;
+      }
+      &:active {
+        transform: translateY(1px) !important;
+        box-shadow: 0 2px 6px rgba(67, 160, 71, 0.2) !important;
+      }
+    }
+    &.mat-button {
+      background: #f5f8fe !important;
+      color: #1976d2 !important;
+      &:hover {
+        background: #e3edfc !important;
+      }
+    }
+  }
+}

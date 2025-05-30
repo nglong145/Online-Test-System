@@ -55,36 +55,65 @@ namespace OnlineTestSystem.Presentation.Controllers
         [HttpGet("get-user/{id}")]
         public async Task<IActionResult> GetUser(Guid id)
         {
-            var user = await _userService.GetUserInfoAsync(id);
-            if (user != null)
+            try
             {
-                return Ok(user);
+                var user = await _userService.GetUserInfoAsync(id);
+                if (user != null)
+                {
+                    return Ok(user);
+                }
+                return NotFound("User not found.");
             }
-            return NotFound("User not found.");
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Internal server error", error = ex.Message });
+            }
         }
 
         // API: Thêm người dùng mới
         [HttpPost("add-new-user")]
         public async Task<IActionResult> AddUser([FromBody] CreateUserVm createUserVm)
         {
-            var isUserCreated = await _userService.AddUserAsync(createUserVm);
-            if (isUserCreated)
+            try
             {
-                return Ok(new { message = "User created successfully." });
+                var isUserCreated = await _userService.AddUserAsync(createUserVm);
+                if (isUserCreated)
+                {
+                    return Ok(new { message = "User created successfully." });
+                }
+                return BadRequest(new { message = "Failed to create user." });
             }
-            return BadRequest(new { message = "Failed to create user." });
+            catch (Exception ex)
+            {
+                // Nếu là lỗi email đã tồn tại
+                if (ex.Message.Contains("already exists"))
+                    return BadRequest(new { message = ex.Message });
+                // Lỗi khác
+                return StatusCode(500, new { message = "Internal server error", error = ex.Message });
+            }
         }
 
         // API: Cập nhật thông tin người dùng
         [HttpPut("update-user/{id}")]
         public async Task<IActionResult> UpdateUser(Guid id, [FromBody] UpdateUserVm updateUserVm)
         {
-            var isUpdated = await _userService.UpdateUserInfoAsync(id, updateUserVm);
-            if (isUpdated)
+            try
             {
-                return Ok(new { message = "User updated successfully." });
+                var isUpdated = await _userService.UpdateUserInfoAsync(id, updateUserVm);
+                if (isUpdated)
+                {
+                    return Ok(new { message = "User updated successfully." });
+                }
+                return BadRequest(new { message = "Failed to update user." });
             }
-            return BadRequest(new { message = "User update failed." });
+            catch (Exception ex)
+            {
+                // Nếu là lỗi email đã tồn tại
+                if (ex.Message.Contains("already exists"))
+                    return BadRequest(new { message = ex.Message });
+                // Lỗi khác
+                return StatusCode(500, new { message = "Internal server error", error = ex.Message });
+            }
         }
 
         // API: Xóa người dùng
@@ -112,6 +141,23 @@ namespace OnlineTestSystem.Presentation.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpPost("change-password")]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordVm vm)
+        {
+            try
+            {
+                var result = await _userService.ChangePasswordAsync(vm);
+                if (result)
+                    return Ok(new { message = "Đổi mật khẩu thành công!" });
+                return BadRequest(new { message = "Đổi mật khẩu thất bại." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
 
     }
 }

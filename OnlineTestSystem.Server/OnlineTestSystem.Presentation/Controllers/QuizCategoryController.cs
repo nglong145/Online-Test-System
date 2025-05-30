@@ -128,10 +128,14 @@ namespace OnlineTestSystem.Presentation.Controllers
             var category = await _categoryService.GetByIdAsync(id);
             if (category != null)
             {
-                await _categoryService.DeleteAsync(category);
-                return Ok("Delete Successful");
+                var result = await _categoryService.DeleteAsync(category);
+                if(result>0)
+                {
+                return Ok(new { message= "Delete Successful"});
+                }
+                return BadRequest(new { message = "Delete Faild!" });
             }
-            return BadRequest("Delete Faild!");
+            return NotFound(new { message = "The category does not exist!" });
         }
     }
 }

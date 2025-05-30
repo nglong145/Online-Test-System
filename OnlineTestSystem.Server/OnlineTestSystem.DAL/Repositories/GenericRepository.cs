@@ -40,10 +40,16 @@ namespace OnlineTestSystem.DAL.Repositories
             var entity = _dbSet.Find(id);
             if (entity != null)
                 Delete(entity);
+
         }
 
         public void Delete(T entity)
         {
+            var entry = Context.Entry(entity);
+            if (entry.State == EntityState.Detached)
+            {
+                _dbSet.Attach(entity);
+            }
             _dbSet.Remove(entity);
         }
 

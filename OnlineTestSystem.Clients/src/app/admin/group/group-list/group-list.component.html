@@ -1,70 +1,172 @@
 <div class="container">
+  <!-- Header với nút thêm mới -->
   <div class="header">
-    <h2>Group List</h2>
-    <!-- Add New Button -->
+    <div class="title-section">
+      <h1>Danh sách nhóm</h1>
+      <p class="subtitle">Quản lý nhóm và lớp trong hệ thống</p>
+    </div>
     <button
       mat-raised-button
       color="primary"
       class="add-new-btn"
       (click)="openAddGroupModal()"
     >
-      + Add New Group
+      <mat-icon>add</mat-icon>
+      <span>Thêm mới</span>
     </button>
-
-    <!-- Search Box for Filtering by Name -->
   </div>
 
-  <!-- Group List Table -->
-  <mat-table [dataSource]="groupDataSource" matSort>
-    <!-- Name Column -->
-    <ng-container matColumnDef="name">
-      <mat-header-cell *matHeaderCellDef mat-sort-header>
-        Name
-      </mat-header-cell>
-      <mat-cell *matCellDef="let group">
-        <a [routerLink]="['/admin/groups', group.id]" class="group-link">{{
-          group.name
-        }}</a></mat-cell
-      >
-    </ng-container>
+  <!-- Filter Inputs -->
+  <div class="filter-section">
+    <h2 class="filter-title">Bộ lọc tìm kiếm</h2>
+    <div class="filter-container">
+      <mat-form-field appearance="outline" class="filter-input">
+        <mat-label>Tên nhóm</mat-label>
+        <input
+          matInput
+          placeholder="Nhập tên nhóm"
+          [(ngModel)]="filter.name"
+          (keyup.enter)="applyFilter()"
+        />
+        <mat-icon matSuffix>group</mat-icon>
+      </mat-form-field>
 
-    <!-- Description Column -->
-    <ng-container matColumnDef="description">
-      <mat-header-cell *matHeaderCellDef mat-sort-header>
-        Description
-      </mat-header-cell>
-      <mat-cell *matCellDef="let group">{{ group.description }}</mat-cell>
-    </ng-container>
+      <mat-form-field appearance="outline" class="filter-input">
+        <mat-label>Người quản lý</mat-label>
+        <input
+          matInput
+          placeholder="Nhập tên người quản lý"
+          [(ngModel)]="filter.managerName"
+          (keyup.enter)="applyFilter()"
+        />
+        <mat-icon matSuffix>person</mat-icon>
+      </mat-form-field>
 
-    <!-- Created At Column -->
-    <ng-container matColumnDef="createdAt">
-      <mat-header-cell *matHeaderCellDef mat-sort-header>
-        Created At
-      </mat-header-cell>
-      <mat-cell *matCellDef="let group">{{
-        group.createdAt | date : "dd/MM/yyyy"
-      }}</mat-cell>
-    </ng-container>
+      <!-- Nút tìm kiếm và xóa bộ lọc -->
+      <div class="filter-buttons">
+        <button mat-raised-button color="primary" (click)="applyFilter()">
+          <mat-icon>search</mat-icon>
+          Tìm kiếm
+        </button>
+        <button mat-stroked-button color="warn" (click)="clearFilter()">
+          <mat-icon>filter_alt_off</mat-icon>
+          Xóa bộ lọc
+        </button>
+      </div>
+    </div>
+  </div>
 
-    <!-- User Manager Column -->
-    <ng-container matColumnDef="userManager">
-      <mat-header-cell *matHeaderCellDef> User Manager </mat-header-cell>
-      <mat-cell *matCellDef="let group">{{ group.userManager }}</mat-cell>
-    </ng-container>
+  <div class="table-container">
+    <!-- Loading overlay -->
+    <div class="loading-overlay" *ngIf="isLoading">
+      <mat-spinner diameter="40"></mat-spinner>
+      <span>Đang tải dữ liệu...</span>
+    </div>
 
-    <!-- Header Row -->
-    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+    <!-- Group List Table -->
+    <mat-table
+      [dataSource]="groupDataSource"
+      matSort
+      [class.blur-on-loading]="isLoading"
+    >
+      <!-- Name Column -->
+      <ng-container matColumnDef="name">
+        <mat-header-cell *matHeaderCellDef mat-sort-header>
+          Tên nhóm
+        </mat-header-cell>
+        <mat-cell *matCellDef="let group">
+          <div class="ellipsis" matTooltip="{{ group.name }}">
+            <a
+              [routerLink]="
+                role === 'Admin'
+                  ? ['/admin/group', group.id]
+                  : ['/teacher/group', group.id]
+              "
+              >{{ group.name }}</a
+            >
+          </div>
+        </mat-cell>
+      </ng-container>
 
-    <!-- Data Row -->
-    <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
-  </mat-table>
+      <!-- Description Column -->
+      <ng-container matColumnDef="description">
+        <mat-header-cell *matHeaderCellDef> Mô tả </mat-header-cell>
+        <mat-cell *matCellDef="let group">
+          <div class="ellipsis" matTooltip="{{ group.description }}">
+            {{ group.description || "Chưa có mô tả" }}
+          </div>
+        </mat-cell>
+      </ng-container>
 
-  <!-- Pagination -->
-  <mat-paginator
-    [length]="totalGroups"
-    [pageSize]="pageSize"
-    [pageSizeOptions]="[1, 5, 10, 25, 100]"
-    (page)="pageChanged($event)"
-  >
-  </mat-paginator>
+      <!-- User Manager Column -->
+      <ng-container matColumnDef="userManager" *ngIf="role === 'Admin'">
+        <mat-header-cell *matHeaderCellDef>Giáo viên quản lý</mat-header-cell>
+        <mat-cell *matCellDef="let group">
+          <div
+            class="ellipsis"
+            matTooltip="{{ group.managerLastName }} {{
+              group.managerFisrtName
+            }}"
+          >
+            {{ group.managerLastName }} {{ group.managerFisrtName }}
+          </div>
+        </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="memberCount">
+        <mat-header-cell *matHeaderCellDef> Thành viên </mat-header-cell>
+        <mat-cell *matCellDef="let group">{{ group.memberCount }}</mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="isActive">
+        <mat-header-cell *matHeaderCellDef>Trạng thái</mat-header-cell>
+        <mat-cell *matCellDef="let group">
+          <span
+            class="status-badge"
+            [ngClass]="group.isActive ? 'active-badge' : 'inactive-badge'"
+          >
+            <mat-icon>{{
+              group.isActive ? "check_circle" : "cancel"
+            }}</mat-icon>
+            {{ group.isActive ? "Đang hoạt động" : "Ngừng hoạt động" }}
+          </span>
+        </mat-cell>
+      </ng-container>
+
+      <!-- Header Row -->
+      <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+
+      <!-- Data Row -->
+      <mat-row
+        *matRowDef="let row; columns: displayedColumns"
+        (click)="goToDetail(row)"
+      ></mat-row>
+    </mat-table>
+
+    <!-- Empty state -->
+    <div
+      class="empty-state"
+      *ngIf="groupDataSource?.length === 0 && !isLoading"
+    >
+      <mat-icon>groups_off</mat-icon>
+      <h3>Không tìm thấy nhóm</h3>
+      <p>Không có dữ liệu phù hợp với tiêu chí tìm kiếm</p>
+      <button mat-stroked-button color="primary" (click)="clearFilter()">
+        <mat-icon>refresh</mat-icon>
+        Làm mới tìm kiếm
+      </button>
+    </div>
+
+    <!-- Pagination -->
+    <mat-paginator
+      class="paginator"
+      [length]="totalGroups"
+      [pageSize]="pageSize"
+      [pageSizeOptions]="[5, 10, 25, 100]"
+      (page)="pageChanged($event)"
+      [showFirstLastButtons]="true"
+      aria-label="Chọn trang kết quả"
+    >
+    </mat-paginator>
+  </div>
 </div>

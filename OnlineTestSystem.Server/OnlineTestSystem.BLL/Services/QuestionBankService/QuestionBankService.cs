@@ -1,6 +1,10 @@
-﻿using OfficeOpenXml;
+﻿using DocumentFormat.OpenXml.Packaging;
+using DocumentFormat.OpenXml.Spreadsheet;
+using Microsoft.EntityFrameworkCore;
 using OnlineTestSystem.BLL.Services.Base;
 using OnlineTestSystem.BLL.ViewModels;
+using OnlineTestSystem.BLL.ViewModels.Answer;
+using OnlineTestSystem.BLL.ViewModels.Question;
 using OnlineTestSystem.BLL.ViewModels.QuestionBank;
 using OnlineTestSystem.BLL.ViewModels.UploadFile;
 using OnlineTestSystem.DAL.Infrastructure;
@@ -45,6 +49,9 @@ namespace OnlineTestSystem.BLL.Services.QuestionBankService
                 query = query.Where(b => b.QuizCategory.Name.Contains(filterRequest.CategoryName));
             }
 
+            if (filterRequest.IsActive.HasValue)
+                query = query.Where(b => b.IsActive == filterRequest.IsActive);
+
 
             if (!string.IsNullOrEmpty(sortBy))
             {
@@ -63,7 +70,7 @@ namespace OnlineTestSystem.BLL.Services.QuestionBankService
                 Id = bank.Id,
                 Name = bank.Name,
                 OwnerId = bank.OwnerId,
-                OwnerFullName = bank.Owner.LastName + bank.Owner.FirstName ,
+                OwnerFullName = bank.Owner.LastName +" "+ bank.Owner.FirstName ,
                 QuizCategoryId = bank.QuizCategoryId,
                 CategoryName = bank.QuizCategory.Name,
                 TotalQuestion=bank.Questions.Count,
@@ -74,46 +81,131 @@ namespace OnlineTestSystem.BLL.Services.QuestionBankService
         }
 
 
+        // Get detail with questions includes answers
+        public async Task<QuestionBankWithDetailVm?> GetBankFullDetailAsync(Guid bankId)
+        {
+            var bank = await _unitOfWork.GenericRepository<QuestionBank>()
+                .Get(q => q.Id == bankId, includesProperties: "Owner,QuizCategory,Questions.Answers")
+                .FirstOrDefaultAsync();
+
+            if (bank == null)
+                return null;
+
+            return new QuestionBankWithDetailVm
+            {
+                Id = bank.Id,
+                Name = bank.Name,
+                QuizCategoryId = bank.QuizCategoryId,
+                CategoryName = bank.QuizCategory?.Name,
+                OwnerId = bank.OwnerId,
+                OwnerFullName = bank.Owner?.LastName + " " + bank.Owner?.FirstName,
+                Questions = bank.Questions?.OrderBy(q => q.Order).Select(q => new QuestionWithAnswersVm
+                {
+                    Id = q.Id,
+                    Content = q.Content,
+                    Order=q.Order,
+                    QuestionType = q.QuestionType.ToString(),
+                    Level = q.Level.ToString(),
+                    IsActive = q.IsActive,
+                    Answers = q.Answers? .OrderBy(q => q.Order).Select(a => new AnswerVm
+                    {
+                        Id = a.Id,
+                        Content = a.Content,
+                        Order = a.Order,
+                        IsCorrect = a.IsCorrect,
+                        QuestionId= a.QuestionId,
+                    }).ToList() ?? new List<AnswerVm>()
+                }).ToList() ?? new List<QuestionWithAnswersVm>()
+            };
+        }
+
+
         // Read file Excel
         public List<QuestionImportModel> ReadQuestionsFromExcel(Stream fileStream)
         {
-            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             var questions = new List<QuestionImportModel>();
 
-            using (var package = new ExcelPackage(fileStream))
+            using var ms = new MemoryStream();
+            fileStream.CopyTo(ms);
+            ms.Position = 0;
+
+            using SpreadsheetDocument document = SpreadsheetDocument.Open(ms, false);
+            WorkbookPart workbookPart = document.WorkbookPart;
+            Sheet sheet = workbookPart.Workbook.Sheets.GetFirstChild<Sheet>();
+            WorksheetPart worksheetPart = (WorksheetPart)workbookPart.GetPartById(sheet.Id);
+            SheetData sheetData = worksheetPart.Worksheet.GetFirstChild<SheetData>();
+
+            SharedStringTablePart sharedStringPart = workbookPart.GetPartsOfType<SharedStringTablePart>().FirstOrDefault();
+            SharedStringTable sharedStringTable = sharedStringPart?.SharedStringTable;
+
+            var rows = sheetData.Elements<Row>().Skip(1); // Bỏ qua header
+
+            foreach (Row row in rows)
             {
-                var worksheet = package.Workbook.Worksheets[0]; // lấy sheet đầu tiên
-                int rowCount = worksheet.Dimension.Rows;
-
-                for (int row = 2; row <= rowCount; row++) // giả định dòng 1 là header
+                string GetCellText(string columnName)
                 {
-                    var content = worksheet.Cells[row, 1].Text;  // cột câu hỏi
-                    var answerA = worksheet.Cells[row, 2].Text;
-                    var answerB = worksheet.Cells[row, 3].Text;
-                    var answerC = worksheet.Cells[row, 4].Text;
-                    var answerD = worksheet.Cells[row, 5].Text;
-                    var correctAnswer = worksheet.Cells[row, 6].Text.Trim().ToUpper();
+                    var cell = row.Elements<Cell>().FirstOrDefault(c => string.Compare(GetColumnName(c.CellReference), columnName, true) == 0);
+                    if (cell == null) return string.Empty;
 
-                    var question = new QuestionImportModel
+                    if (cell.DataType != null && cell.DataType == CellValues.SharedString)
                     {
-                        Content = content,
-                        Answers = new List<AnswerImportModel>()
-                    };
-
-                    if (!string.IsNullOrEmpty(answerA))
-                        question.Answers.Add(new AnswerImportModel { Content = answerA, IsCorrect = (correctAnswer == "A") });
-                    if (!string.IsNullOrEmpty(answerB))
-                        question.Answers.Add(new AnswerImportModel { Content = answerB, IsCorrect = (correctAnswer == "B") });
-                    if (!string.IsNullOrEmpty(answerC))
-                        question.Answers.Add(new AnswerImportModel { Content = answerC, IsCorrect = (correctAnswer == "C") });
-                    if (!string.IsNullOrEmpty(answerD))
-                        question.Answers.Add(new AnswerImportModel { Content = answerD, IsCorrect = (correctAnswer == "D") });
-
-                    questions.Add(question);
+                        int ssid = int.Parse(cell.CellValue.Text);
+                        return sharedStringTable.ElementAt(ssid).InnerText.Trim();
+                    }
+                    else
+                    {
+                        return cell.CellValue?.Text?.Trim() ?? string.Empty;
+                    }
                 }
+
+                // Cột B là câu hỏi
+                string content = GetCellText("B");
+
+                // Cột C-F là đáp án A-D
+                string answerA = GetCellText("C");
+                string answerB = GetCellText("D");
+                string answerC = GetCellText("E");
+                string answerD = GetCellText("F");
+
+                // Cột G là đáp án đúng
+                string correctAnswer = GetCellText("G").ToUpper();
+
+                if (string.IsNullOrWhiteSpace(content))
+                    continue;
+
+                var question = new QuestionImportModel
+                {
+                    Content = content,
+                    Answers = new List<AnswerImportModel>()
+                };
+
+                if (!string.IsNullOrWhiteSpace(answerA))
+                    question.Answers.Add(new AnswerImportModel { Option = "A", Content = answerA, IsCorrect = (correctAnswer == "A") });
+                if (!string.IsNullOrWhiteSpace(answerB))
+                    question.Answers.Add(new AnswerImportModel { Option = "B", Content = answerB, IsCorrect = (correctAnswer == "B") });
+                if (!string.IsNullOrWhiteSpace(answerC))
+                    question.Answers.Add(new AnswerImportModel { Option = "C", Content = answerC, IsCorrect = (correctAnswer == "C") });
+                if (!string.IsNullOrWhiteSpace(answerD))
+                    question.Answers.Add(new AnswerImportModel { Option = "D", Content = answerD, IsCorrect = (correctAnswer == "D") });
+
+                questions.Add(question);
             }
 
             return questions;
+        }
+
+        // Hàm helper lấy tên cột từ CellReference, ví dụ "A1" => "A"
+        private string GetColumnName(string cellReference)
+        {
+            string columnName = string.Empty;
+            foreach (char ch in cellReference)
+            {
+                if (char.IsLetter(ch))
+                    columnName += ch;
+                else
+                    break;
+            }
+            return columnName;
         }
 
 
@@ -225,23 +317,28 @@ namespace OnlineTestSystem.BLL.Services.QuestionBankService
             _unitOfWork.GenericRepository<QuestionBank>().Add(questionBank);
             await _unitOfWork.SaveChangesAsync();
 
-            foreach (var q in questions)
+            for (int qIndex = 0; qIndex < questions.Count; qIndex++)
             {
+                var q = questions[qIndex];
+
                 var question = new Question
                 {
                     Id = Guid.NewGuid(),
                     Content = q.Content,
-                    QuestionType =QuestionType.SingleChoice,
+                    QuestionType = QuestionType.SingleChoice,
                     IsActive = true,
                     Level = QuestionLevel.Medium,
                     BankId = questionBank.Id,
+                    Order = q.Order > 0 ? q.Order : (qIndex + 1)  // Ưu tiên Order import, nếu không có thì tự tăng
                 };
 
                 _unitOfWork.GenericRepository<Question>().Add(question);
                 await _unitOfWork.SaveChangesAsync();
 
-                foreach (var a in q.Answers)
+                // Gán Order cho từng Answer
+                for (int aIndex = 0; aIndex < q.Answers.Count; aIndex++)
                 {
+                    var a = q.Answers[aIndex];
                     var answer = new Answer
                     {
                         Id = Guid.NewGuid(),
@@ -249,10 +346,10 @@ namespace OnlineTestSystem.BLL.Services.QuestionBankService
                         IsCorrect = a.IsCorrect,
                         QuestionId = question.Id,
                         IsActive = true,
+                        Order = a.Order > 0 ? a.Order : (aIndex + 1) // Ưu tiên Order import, nếu không có thì tự tăng
                     };
                     _unitOfWork.GenericRepository<Answer>().Add(answer);
                 }
-               
                 await _unitOfWork.SaveChangesAsync();
             }
 

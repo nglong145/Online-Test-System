@@ -7,6 +7,7 @@
         public string? Description { get; set; }
         public bool IsActive { get; set; } = true;
         public Guid? ParentId { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
         public QuizCategory Parent { get; set; }
         public ICollection<QuizCategory> Children { get; set; }
         public ICollection<QuestionBank> QuestionBanks { get; set; }

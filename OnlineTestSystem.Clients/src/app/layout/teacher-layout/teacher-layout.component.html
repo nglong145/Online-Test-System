@@ -1,8 +1,15 @@
-<app-header></app-header>
+<div class="layout-wrapper">
+  <app-header (mobileMenuToggle)="toggleMobileMenu()"></app-header>
 
-<div class="container">
-  <app-side-bar [navItems]="navItems"></app-side-bar>
-  <div class="main-content">
-    <router-outlet></router-outlet>
+  <div class="container">
+    <app-side-bar
+      [navItems]="navItems"
+      [isMobileMenuOpen]="isMobileMenuOpen"
+      (mobileMenuToggle)="isMobileMenuOpen = $event"
+    ></app-side-bar>
+
+    <div class="main-content">
+      <router-outlet></router-outlet>
+    </div>
   </div>
 </div>

@@ -1,0 +1,337 @@
+<div class="container">
+  <!-- Loading overlay -->
+  <div class="loading-overlay" *ngIf="isLoading">
+    <mat-spinner diameter="40"></mat-spinner>
+    <div class="loading-text">Đang tải dữ liệu...</div>
+  </div>
+
+  <!-- Header section with back button -->
+  <div class="back-btn-container">
+    <button
+      mat-stroked-button
+      color="primary"
+      (click)="goBack()"
+      [attr.aria-label]="'Quay lại chi tiết kỳ thi'"
+    >
+      <mat-icon>arrow_back</mat-icon>
+      Quay lại
+    </button>
+  </div>
+
+  <div class="header">
+    <h1>Thêm đề thi vào kỳ thi</h1>
+  </div>
+
+  <div class="content">
+    <!-- Left side: Quiz lists -->
+    <div class="quiz-lists">
+      <!-- ExamQuiz list -->
+      <div class="exam-quizzes">
+        <h3>Đề thi trong kỳ thi</h3>
+
+        <!-- Filter -->
+        <div class="filter-container">
+          <mat-form-field appearance="outline">
+            <mat-label>Tên đề thi</mat-label>
+            <input
+              matInput
+              placeholder="Nhập tên đề thi"
+              [(ngModel)]="filterExamQuiz.title"
+              (keyup.enter)="applyExamQuizFilter()"
+            />
+            <mat-icon matSuffix>description</mat-icon>
+          </mat-form-field>
+
+          <div class="filter-buttons">
+            <button
+              mat-raised-button
+              color="primary"
+              (click)="applyExamQuizFilter()"
+            >
+              <mat-icon>search</mat-icon>
+              Tìm kiếm
+            </button>
+            <button
+              mat-stroked-button
+              color="warn"
+              (click)="clearExamQuizFilter()"
+            >
+              <mat-icon>filter_alt_off</mat-icon>
+              Xóa bộ lọc
+            </button>
+          </div>
+        </div>
+
+        <!-- Table -->
+        <mat-table
+          [dataSource]="examQuizzes"
+          [class.blur-on-loading]="isExamQuizzesLoading"
+        >
+          <ng-container matColumnDef="title">
+            <mat-header-cell *matHeaderCellDef>Tên đề thi</mat-header-cell>
+            <mat-cell *matCellDef="let quiz">
+              <span class="quiz-title" (click)="previewQuiz(quiz.quizId)">
+                {{ quiz.title }}
+              </span>
+            </mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="totalQuestion">
+            <mat-header-cell *matHeaderCellDef>Số câu hỏi</mat-header-cell>
+            <mat-cell *matCellDef="let quiz">{{ quiz.totalQuestion }}</mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="duration">
+            <mat-header-cell *matHeaderCellDef
+              >Thời gian (phút)</mat-header-cell
+            >
+            <mat-cell *matCellDef="let quiz">{{ quiz.duration }}</mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="actions">
+            <mat-header-cell *matHeaderCellDef>Thao tác</mat-header-cell>
+            <mat-cell *matCellDef="let quiz">
+              <button
+                mat-icon-button
+                class="action-btn delete-btn"
+                (click)="removeQuizFromExam(quiz); $event.stopPropagation()"
+                [attr.aria-label]="'Xóa đề thi ' + quiz.title"
+                matTooltip="Xóa đề thi"
+                [disabled]="isItemLoading('examQuiz', quiz.quizId)"
+              >
+                <mat-spinner
+                  *ngIf="isItemLoading('examQuiz', quiz.quizId)"
+                  diameter="20"
+                ></mat-spinner>
+                <mat-icon *ngIf="!isItemLoading('examQuiz', quiz.quizId)"
+                  >delete</mat-icon
+                >
+              </button>
+            </mat-cell>
+          </ng-container>
+
+          <mat-header-row *matHeaderRowDef="examQuizColumns"></mat-header-row>
+          <mat-row
+            *matRowDef="let row; columns: examQuizColumns"
+            (click)="previewQuiz(row.quizId)"
+          ></mat-row>
+        </mat-table>
+
+        <!-- No data message -->
+        <div
+          class="no-data"
+          *ngIf="examQuizzes.length === 0 && !isExamQuizzesLoading"
+        >
+          <mat-icon class="empty-icon">quiz</mat-icon>
+          <p class="empty-title">Chưa có đề thi nào</p>
+          <p class="empty-message">
+            Kỳ thi này chưa có đề thi nào. Vui lòng thêm đề thi từ danh sách bên
+            dưới.
+          </p>
+        </div>
+      </div>
+
+      <mat-paginator
+        [length]="totalExamQuizzes"
+        [pageSize]="pageSizeExamQuiz"
+        [pageSizeOptions]="[5, 10, 25, 100]"
+        (page)="pageChangedExamQuiz($event)"
+        [showFirstLastButtons]="true"
+        aria-label="Chọn trang"
+      >
+      </mat-paginator>
+
+      <!-- Available Quiz list -->
+      <div class="available-quizzes">
+        <h3>Đề thi có sẵn</h3>
+
+        <!-- Filter -->
+        <div class="filter-container">
+          <mat-form-field appearance="outline">
+            <mat-label>Tên đề thi</mat-label>
+            <input
+              matInput
+              placeholder="Nhập tên đề thi"
+              [(ngModel)]="filterQuiz.title"
+              (keyup.enter)="applyQuizFilter()"
+            />
+            <mat-icon matSuffix>description</mat-icon>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Danh mục</mat-label>
+            <input
+              matInput
+              placeholder="Nhập tên danh mục"
+              [(ngModel)]="filterQuiz.categoryName"
+              (keyup.enter)="applyQuizFilter()"
+            />
+            <mat-icon matSuffix>category</mat-icon>
+          </mat-form-field>
+
+          <div class="filter-buttons">
+            <button
+              mat-raised-button
+              color="primary"
+              (click)="applyQuizFilter()"
+            >
+              <mat-icon>search</mat-icon>
+              Tìm kiếm
+            </button>
+            <button mat-stroked-button color="warn" (click)="clearQuizFilter()">
+              <mat-icon>filter_alt_off</mat-icon>
+              Xóa bộ lọc
+            </button>
+          </div>
+        </div>
+
+        <!-- Table -->
+        <mat-table
+          [dataSource]="availableQuizzes"
+          [class.blur-on-loading]="isAvailableQuizzesLoading"
+        >
+          <ng-container matColumnDef="title">
+            <mat-header-cell *matHeaderCellDef>Tên đề thi</mat-header-cell>
+            <mat-cell *matCellDef="let quiz">
+              <span class="quiz-title" (click)="previewQuiz(quiz.id)">
+                {{ quiz.title }}
+              </span>
+            </mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="totalQuestion">
+            <mat-header-cell *matHeaderCellDef>Số câu hỏi</mat-header-cell>
+            <mat-cell *matCellDef="let quiz">{{ quiz.totalQuestion }}</mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="duration">
+            <mat-header-cell *matHeaderCellDef
+              >Thời gian (phút)</mat-header-cell
+            >
+            <mat-cell *matCellDef="let quiz">{{ quiz.duration }}</mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="actions">
+            <mat-header-cell *matHeaderCellDef>Thao tác</mat-header-cell>
+            <mat-cell *matCellDef="let quiz">
+              <button
+                mat-raised-button
+                class="action-btn add-btn"
+                (click)="addQuizToExam(quiz.id); $event.stopPropagation()"
+                [attr.aria-label]="'Thêm đề thi ' + quiz.title"
+                matTooltip="Thêm đề thi vào kỳ thi"
+                [disabled]="isItemLoading('availableQuiz', quiz.id)"
+              >
+                <mat-spinner
+                  *ngIf="isItemLoading('availableQuiz', quiz.id)"
+                  diameter="20"
+                ></mat-spinner>
+                <mat-icon *ngIf="!isItemLoading('availableQuiz', quiz.id)"
+                  >add</mat-icon
+                >
+                Thêm
+              </button>
+            </mat-cell>
+          </ng-container>
+
+          <mat-header-row *matHeaderRowDef="quizColumns"></mat-header-row>
+          <mat-row
+            *matRowDef="let row; columns: quizColumns"
+            (click)="previewQuiz(row.id)"
+          ></mat-row>
+        </mat-table>
+
+        <!-- No data message -->
+        <div
+          class="no-data"
+          *ngIf="availableQuizzes.length === 0 && !isAvailableQuizzesLoading"
+        >
+          <mat-icon class="empty-icon">search_off</mat-icon>
+          <p class="empty-title">Không tìm thấy đề thi</p>
+          <p class="empty-message">
+            Không có đề thi nào phù hợp với bộ lọc hoặc chưa có đề thi nào trong
+            hệ thống.
+          </p>
+        </div>
+
+        <mat-paginator
+          [length]="totalAvailableQuizzes"
+          [pageSize]="pageSizeAvailableQuiz"
+          [pageSizeOptions]="[5, 10, 25, 100]"
+          (page)="pageChangedAvailableQuiz($event)"
+          [showFirstLastButtons]="true"
+          aria-label="Chọn trang"
+        >
+        </mat-paginator>
+      </div>
+    </div>
+
+    <!-- Right side: Quiz preview -->
+    <div class="quiz-preview" *ngIf="!isPreviewLoading && selectedQuiz">
+      <h3>Chi tiết đề thi</h3>
+
+      <div class="quiz-info">
+        <h4>{{ selectedQuiz.title }}</h4>
+        <p>
+          <mat-icon>timer</mat-icon> Thời gian: {{ selectedQuiz.duration }} phút
+        </p>
+        <p>
+          <mat-icon>help_outline</mat-icon> Tổng số câu hỏi:
+          {{ selectedQuiz.questions?.length || 0 }}
+        </p>
+        <p class="total-score">
+          <mat-icon>star</mat-icon> Tổng điểm: {{ selectedQuiz.totalScore }}
+        </p>
+      </div>
+
+      <div class="questions-list">
+        <mat-accordion multi="true">
+          <mat-expansion-panel
+            *ngFor="let question of selectedQuiz.questions; let i = index"
+          >
+            <mat-expansion-panel-header>
+              <mat-panel-title [attr.data-score]="question.score + ' điểm'">
+                Câu {{ i + 1 }}
+              </mat-panel-title>
+            </mat-expansion-panel-header>
+
+            <p class="question-content">{{ question.content }}</p>
+
+            <div class="answers">
+              <div
+                *ngFor="let answer of question.answers; let ansIndex = index"
+                [class.correct-answer]="answer.isCorrect"
+                class="answer-item"
+              >
+                <span class="answer-label">{{
+                  getAlphabetLabel(ansIndex)
+                }}</span>
+                {{ answer.content }}
+              </div>
+
+              <div *ngIf="!question.answers?.length" class="no-answers-message">
+                <mat-icon>info</mat-icon>
+                <span>Câu hỏi này chưa có đáp án nào</span>
+              </div>
+            </div>
+          </mat-expansion-panel>
+        </mat-accordion>
+      </div>
+    </div>
+
+    <div class="quiz-preview" *ngIf="isPreviewLoading">
+      <div class="loading-overlay">
+        <mat-spinner diameter="40"></mat-spinner>
+        <div class="loading-text">Đang tải chi tiết đề thi...</div>
+      </div>
+    </div>
+
+    <div class="quiz-preview" *ngIf="!isPreviewLoading && !selectedQuiz">
+      <div class="no-selection">
+        <mat-icon>quiz</mat-icon>
+        <h3>Chưa chọn đề thi</h3>
+        <p>Vui lòng chọn một đề thi để xem chi tiết.</p>
+      </div>
+    </div>
+  </div>
+</div>

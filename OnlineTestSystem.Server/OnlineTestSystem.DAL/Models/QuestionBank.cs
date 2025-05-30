@@ -8,6 +8,8 @@
         public virtual User Owner { get; set; }
         public Guid? QuizCategoryId { get; set; }
         public QuizCategory QuizCategory { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
         public ICollection<Question> Questions { get; set; }
+        public bool IsActive { get; set; } = true;
     }
 }

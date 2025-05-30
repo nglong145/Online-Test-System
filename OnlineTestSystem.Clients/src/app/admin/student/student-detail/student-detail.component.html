@@ -1,215 +1,341 @@
 <div class="container">
+  <!-- Header section with back button -->
+  <div class="back-btn-container">
+    <button
+      mat-stroked-button
+      color="primary"
+      (click)="goBack()"
+      [attr.aria-label]="'Go back to student list'"
+    >
+      <mat-icon>arrow_back</mat-icon>
+      Quay lại
+    </button>
+  </div>
+
   <div class="header">
-    <h2>Student Detail</h2>
+    <h1>Thông tin chi tiết sinh viên</h1>
   </div>
 
-  <!-- Phần thông tin sinh viên -->
-  <div class="student-info">
-    <h3>Student Information</h3>
-    <form>
-      <div class="form-group">
-        <label for="studentCode">Student Code</label>
-        <input
-          id="studentCode"
-          [(ngModel)]="student.studentCode"
-          name="studentCode"
-          type="text"
-          class="form-control"
-        />
-      </div>
-      <div class="form-group">
-        <label for="firstName">First Name</label>
-        <input
-          id="firstName"
-          [(ngModel)]="student.firstName"
-          name="firstName"
-          type="text"
-          class="form-control"
-        />
-      </div>
-      <div class="form-group">
-        <label for="lastName">Last Name</label>
-        <input
-          id="lastName"
-          [(ngModel)]="student.lastName"
-          name="lastName"
-          type="text"
-          class="form-control"
-        />
-      </div>
-      <div class="form-group">
-        <label for="email">Email</label>
-        <input
-          id="email"
-          [value]="student.email"
-          name="email"
-          type="email"
-          class="form-control"
-          readonly
-        />
-      </div>
-      <div class="form-group">
-        <label for="phoneNumber">Phone Number</label>
-        <input
-          id="phoneNumber"
-          [(ngModel)]="student.phoneNumber"
-          name="phoneNumber"
-          type="text"
-          class="form-control"
-        />
-      </div>
-      <div class="form-group">
-        <label for="address">Address</label>
-        <input
-          id="address"
-          [(ngModel)]="student.address"
-          name="address"
-          type="text"
-          class="form-control"
-        />
-      </div>
-      <div class="form-group">
-        <label for="dateOfBirth">Date of Birth</label>
-        <input
-          id="dateOfBirth"
-          [(ngModel)]="student.dateOfBirth"
-          name="dateOfBirth"
-          [matDatepicker]="picker"
-          (dateChange)="onDateChange($event)"
-          class="form-control"
-        />
-        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-        <mat-datepicker #picker></mat-datepicker>
-      </div>
-      <div class="form-group">
-        <label for="status">Status</label>
-        <select
-          id="status"
-          [(ngModel)]="student.isActive"
-          name="status"
-          class="form-control"
-        >
-          <option [ngValue]="true">Active</option>
-          <option [ngValue]="false">Inactive</option>
-        </select>
-      </div>
-      <!-- Nút cập nhật -->
-      <button mat-raised-button color="primary" (click)="updateStudent()">
-        Update
-      </button>
-    </form>
-  </div>
+  <div class="row">
+    <!-- Student Information Column -->
+    <div class="col">
+      <div class="student-info">
+        <h3>Thông tin cá nhân</h3>
 
-  <!-- Phần danh sách bài thi đã làm -->
-  <div class="student-exams">
-    <h3>Exams Taken</h3>
+        <form #formRef="ngForm">
+          <!-- Personal information fields -->
+          <div class="form-group">
+            <label for="studentCode">Mã sinh viên</label>
+            <input
+              id="studentCode"
+              [(ngModel)]="student.studentCode"
+              name="studentCode"
+              type="text"
+              class="form-control"
+              placeholder="Nhập mã sinh viên"
+              required
+              #codeModel="ngModel"
+            />
+            <div
+              *ngIf="
+                codeModel.invalid && (codeModel.touched || codeModel.dirty)
+              "
+              class="text-danger"
+            >
+              <span *ngIf="codeModel.errors?.['required']" class="error"
+                >Mã sinh viên là bắt buộc</span
+              >
+            </div>
+          </div>
 
-    <!-- Các ô lọc -->
-    <div class="filter-container">
-      <div class="form-group">
-        <label for="examNameFilter">Filter by Exam Name</label>
-        <input
-          id="examNameFilter"
-          [(ngModel)]="examNameFilter"
-          (input)="applyFilter()"
-          type="text"
-          class="form-control"
-          placeholder="Enter exam name"
-        />
-      </div>
+          <div class="form-group">
+            <label for="lastName">Họ và tên đệm</label>
+            <input
+              id="lastName"
+              [(ngModel)]="student.lastName"
+              name="lastName"
+              type="text"
+              class="form-control"
+              placeholder="Nhập họ và tên đệm"
+              required
+              #lastNameModel="ngModel"
+            />
+            <div
+              *ngIf="
+                lastNameModel.invalid &&
+                (lastNameModel.touched || lastNameModel.dirty)
+              "
+              class="text-danger"
+            >
+              <span *ngIf="lastNameModel.errors?.['required']" class="error"
+                >Họ và tên đệm là bắt buộc</span
+              >
+            </div>
+          </div>
 
-      <div class="form-group">
-        <label for="examPeriodFilter">Filter by Exam Period</label>
-        <input
-          id="examPeriodFilter"
-          [(ngModel)]="examPeriodFilter"
-          (input)="applyFilter()"
-          type="text"
-          class="form-control"
-          placeholder="Enter exam period"
-        />
-      </div>
+          <div class="form-group">
+            <label for="firstName">Tên</label>
+            <input
+              id="firstName"
+              [(ngModel)]="student.firstName"
+              name="firstName"
+              type="text"
+              class="form-control"
+              placeholder="Nhập tên"
+              required
+              #firstNameModel="ngModel"
+            />
+            <div
+              *ngIf="
+                firstNameModel.invalid &&
+                (firstNameModel.touched || firstNameModel.dirty)
+              "
+              class="text-danger"
+            >
+              <span *ngIf="firstNameModel.errors?.['required']" class="error"
+                >Tên là bắt buộc</span
+              >
+            </div>
+          </div>
 
-      <div class="form-group">
-        <label for="startDateFilter">Filter by Start Date</label>
-        <input
-          id="startDateFilter"
-          [(ngModel)]="startDateFilter"
-          (dateChange)="applyFilter()"
-          [matDatepicker]="startDatePicker"
-          class="form-control"
-        />
-        <mat-datepicker #startDatePicker></mat-datepicker>
-      </div>
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input
+              id="email"
+              [(ngModel)]="student.email"
+              name="email"
+              type="email"
+              class="form-control"
+              placeholder="Nhập địa chỉ email"
+              required
+              pattern="^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$"
+              #emailModel="ngModel"
+            />
+            <div
+              *ngIf="
+                emailModel.invalid && (emailModel.touched || emailModel.dirty)
+              "
+              class="text-danger"
+            >
+              <span *ngIf="emailModel.errors?.['required']" class="error"
+                >Email là bắt buộc</span
+              >
+              <span *ngIf="emailModel.errors?.['pattern']" class="error"
+                >Email không hợp lệ</span
+              >
+            </div>
+          </div>
 
-      <div class="form-group">
-        <label for="endDateFilter">Filter by End Date</label>
-        <input
-          id="endDateFilter"
-          [(ngModel)]="endDateFilter"
-          (dateChange)="applyFilter()"
-          [matDatepicker]="endDatePicker"
-          class="form-control"
-        />
-        <mat-datepicker #endDatePicker></mat-datepicker>
-      </div>
+          <div class="form-group">
+            <label for="phoneNumber">Số điện thoại</label>
+            <input
+              id="phoneNumber"
+              [(ngModel)]="student.phoneNumber"
+              name="phoneNumber"
+              type="text"
+              class="form-control"
+              placeholder="Nhập số điện thoại"
+              pattern="^(\+?\d{1,4}[-\s]?)?(\(?\d{1,5}\)?[-\s]?)?[\d-\s]{6,15}$"
+              #phoneModel="ngModel"
+            />
+            <div
+              *ngIf="
+                phoneModel.invalid && (phoneModel.touched || phoneModel.dirty)
+              "
+              class="text-danger"
+            >
+              <span *ngIf="phoneModel.errors?.['pattern']" class="error"
+                >Số điện thoại không hợp lệ</span
+              >
+            </div>
+          </div>
 
-      <div class="form-group">
-        <label for="scoreFilter">Filter by Score</label>
-        <input
-          id="scoreFilter"
-          [(ngModel)]="scoreFilter"
-          (input)="applyFilter()"
-          type="number"
-          class="form-control"
-          placeholder="Enter score"
-        />
+          <div class="form-group">
+            <label for="address">Địa chỉ</label>
+            <textarea
+              id="address"
+              [(ngModel)]="student.address"
+              name="address"
+              class="form-control"
+              placeholder="Nhập địa chỉ"
+              rows="3"
+            ></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="dateOfBirth">Ngày sinh</label>
+            <input
+              id="dateOfBirth"
+              [ngModel]="studentDateOfBirth"
+              (ngModelChange)="onDateChange($event)"
+              name="dateOfBirth"
+              [matDatepicker]="picker"
+              class="form-control"
+              placeholder="DD/MM/YYYY"
+            />
+            <mat-datepicker-toggle
+              matSuffix
+              [for]="picker"
+            ></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+          </div>
+
+          <div class="form-group">
+            <label for="status">Trạng thái</label>
+            <select
+              id="status"
+              [(ngModel)]="student.isActive"
+              name="status"
+              class="form-control"
+            >
+              <option [ngValue]="true">Hoạt động</option>
+              <option [ngValue]="false">Ngừng hoạt động</option>
+            </select>
+          </div>
+
+          <!-- Update button -->
+          <button
+            mat-raised-button
+            color="primary"
+            (click)="updateStudent()"
+            [disabled]="!formRef.form.valid || !hasUnsavedChanges()"
+          >
+            <mat-icon>save</mat-icon>
+            Cập nhật thông tin
+          </button>
+        </form>
       </div>
     </div>
 
-    <!-- Bảng danh sách bài thi -->
-    <mat-table [dataSource]="filteredExamDataSource" matSort>
-      <ng-container matColumnDef="examName">
-        <mat-header-cell *matHeaderCellDef mat-sort-header
-          >Exam Name</mat-header-cell
-        >
-        <mat-cell *matCellDef="let exam">{{ exam.examName }}</mat-cell>
-      </ng-container>
+    <!-- Exams Column -->
+    <div class="col">
+      <div class="student-exams">
+        <h3>Danh sách bài thi đã làm</h3>
 
-      <ng-container matColumnDef="quizName">
-        <mat-header-cell *matHeaderCellDef>Quiz</mat-header-cell>
-        <mat-cell *matCellDef="let exam">{{ exam.quizName || "N/A" }}</mat-cell>
-      </ng-container>
+        <!-- Filter section -->
+        <div class="filter-container">
+          <mat-form-field appearance="outline" class="filter-input">
+            <mat-label>Kỳ thi</mat-label>
+            <input
+              matInput
+              placeholder="Nhập tên kỳ thi"
+              [(ngModel)]="examFilter.examName"
+              (keyup.enter)="applyFilter()"
+            />
+            <mat-icon matSuffix>search</mat-icon>
+          </mat-form-field>
 
-      <ng-container matColumnDef="startedAt">
-        <mat-header-cell *matHeaderCellDef>Start Date</mat-header-cell>
-        <mat-cell *matCellDef="let exam">{{
-          exam.startedAt | date : "dd/MM/yyyy HH:mm"
-        }}</mat-cell>
-      </ng-container>
+          <mat-form-field appearance="outline" class="filter-input">
+            <mat-label>Đề thi</mat-label>
+            <input
+              matInput
+              placeholder="Nhập tên đề thi"
+              [(ngModel)]="examFilter.quizName"
+              (keyup.enter)="applyFilter()"
+            />
+            <mat-icon matSuffix>description</mat-icon>
+          </mat-form-field>
 
-      <ng-container matColumnDef="finishedAt">
-        <mat-header-cell *matHeaderCellDef>End Date</mat-header-cell>
-        <mat-cell *matCellDef="let exam">{{
-          exam.finishedAt | date : "dd/MM/yyyy HH:mm"
-        }}</mat-cell>
-      </ng-container>
+          <mat-form-field appearance="outline" class="filter-input">
+            <mat-label>Điểm</mat-label>
+            <input
+              matInput
+              placeholder="Nhập điểm"
+              [(ngModel)]="examFilter.score"
+              (keyup.enter)="applyFilter()"
+            />
+            <mat-icon matSuffix>grade</mat-icon>
+          </mat-form-field>
 
-      <ng-container matColumnDef="score">
-        <mat-header-cell *matHeaderCellDef>Score</mat-header-cell>
-        <mat-cell *matCellDef="let exam">{{ exam.score }}</mat-cell>
-      </ng-container>
+          <!-- Action buttons -->
+          <div class="filter-buttons">
+            <button mat-raised-button color="primary" (click)="applyFilter()">
+              <mat-icon>search</mat-icon>
+              Tìm kiếm
+            </button>
+            <button mat-stroked-button color="warn" (click)="clearFilter()">
+              <mat-icon>filter_alt_off</mat-icon>
+              Xóa bộ lọc
+            </button>
+          </div>
+        </div>
 
-      <mat-header-row *matHeaderRowDef="examDisplayedColumns"></mat-header-row>
-      <mat-row *matRowDef="let row; columns: examDisplayedColumns"></mat-row>
-    </mat-table>
+        <!-- Exams table -->
+        <mat-table [dataSource]="filteredExamDataSource" matSort>
+          <ng-container matColumnDef="examName">
+            <mat-header-cell *matHeaderCellDef mat-sort-header
+              >Tên kỳ thi</mat-header-cell
+            >
+            <mat-cell *matCellDef="let exam">{{ exam.examName }}</mat-cell>
+          </ng-container>
 
-    <!-- Phân trang -->
-    <mat-paginator
-      [length]="totalExams"
-      [pageSize]="pageSize"
-      [pageSizeOptions]="[1, 5, 10, 25, 100]"
-      (page)="pageChanged($event)"
-    ></mat-paginator>
+          <ng-container matColumnDef="quizName">
+            <mat-header-cell *matHeaderCellDef>Đề thi</mat-header-cell>
+            <mat-cell *matCellDef="let exam">{{
+              exam.quizName || "N/A"
+            }}</mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="startedAt">
+            <mat-header-cell *matHeaderCellDef
+              >Thời gian bắt đầu</mat-header-cell
+            >
+            <mat-cell *matCellDef="let exam">{{
+              exam.startedAt | date : "dd/MM/yyyy HH:mm"
+            }}</mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="finishedAt">
+            <mat-header-cell *matHeaderCellDef
+              >Thời gian kết thúc</mat-header-cell
+            >
+            <mat-cell *matCellDef="let exam">{{
+              exam.finishedAt | date : "dd/MM/yyyy HH:mm"
+            }}</mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="score">
+            <mat-header-cell *matHeaderCellDef>Điểm</mat-header-cell>
+            <mat-cell *matCellDef="let exam">
+              <span
+                [ngStyle]="{
+                  color: exam.score >= 5 ? '#4caf50' : '#f44336',
+                  'font-weight': '500'
+                }"
+              >
+                {{ exam.score }}
+              </span>
+            </mat-cell>
+          </ng-container>
+
+          <mat-header-row
+            *matHeaderRowDef="examDisplayedColumns"
+          ></mat-header-row>
+          <mat-row
+            *matRowDef="let row; columns: examDisplayedColumns"
+          ></mat-row>
+        </mat-table>
+
+        <!-- Empty state when no exams -->
+        <div class="no-data" *ngIf="filteredExamDataSource.length === 0">
+          <mat-icon class="empty-icon">quiz</mat-icon>
+          <p class="empty-title">Không có bài thi nào</p>
+          <p class="empty-message">
+            Sinh viên chưa tham gia bài thi nào hoặc không có kết quả phù hợp
+            với bộ lọc.
+          </p>
+        </div>
+
+        <!-- Pagination -->
+        <mat-paginator
+          [length]="totalExams"
+          [pageSize]="pageSize"
+          [pageSizeOptions]="[5, 10, 25, 100]"
+          (page)="pageChanged($event)"
+          [showFirstLastButtons]="true"
+          aria-label="Chọn trang"
+        ></mat-paginator>
+      </div>
+    </div>
   </div>
 </div>

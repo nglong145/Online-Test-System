@@ -1,138 +1,192 @@
 <!-- list-user.component.html -->
 <div class="container">
   <div class="header">
-    <h1>Danh sách học viên</h1>
-    <!-- Add New Button -->
+    <div class="title-section">
+      <h1>Danh sách sinh viên</h1>
+      <p class="subtitle">Quản lý thông tin sinh viên trong hệ thống</p>
+    </div>
     <button
       mat-raised-button
       color="primary"
       class="add-new-btn"
       (click)="openAddModal()"
     >
-      Thêm mới
+      <mat-icon>add</mat-icon>
+      <span>Thêm mới</span>
     </button>
   </div>
 
   <!-- Filter Inputs -->
-  <div class="filter-container">
-    <mat-form-field appearance="outline" class="filter-input">
-      <mat-label>Mã Học viên</mat-label>
-      <input
-        matInput
-        placeholder="Nhập mã học viên"
-        [(ngModel)]="filter.studentCode"
-        (keyup.enter)="applyFilter()"
-      />
-    </mat-form-field>
-    <mat-form-field appearance="outline" class="filter-input">
-      <mat-label>Họ và tên</mat-label>
-      <input
-        matInput
-        placeholder="Nhập họ hoặc tên"
-        [(ngModel)]="filter.name"
-        (keyup.enter)="applyFilter()"
-      />
-    </mat-form-field>
+  <div class="filter-section">
+    <h2 class="filter-title">Bộ lọc tìm kiếm</h2>
+    <div class="filter-container">
+      <mat-form-field appearance="outline" class="filter-input">
+        <mat-label>Mã sinh viên</mat-label>
+        <input
+          matInput
+          placeholder="Nhập mã sinh viên"
+          [(ngModel)]="filter.studentCode"
+          (keyup.enter)="applyFilter()"
+        />
+        <mat-icon matSuffix>badge</mat-icon>
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="filter-input">
+        <mat-label>Họ và tên</mat-label>
+        <input
+          matInput
+          placeholder="Nhập họ hoặc tên"
+          [(ngModel)]="filter.name"
+          (keyup.enter)="applyFilter()"
+        />
+        <mat-icon matSuffix>person</mat-icon>
+      </mat-form-field>
 
-    <mat-form-field appearance="outline" class="filter-input">
-      <mat-label>Email</mat-label>
-      <input
-        matInput
-        placeholder="Nhập email"
-        [(ngModel)]="filter.email"
-        (keyup.enter)="applyFilter()"
-      />
-    </mat-form-field>
+      <mat-form-field appearance="outline" class="filter-input">
+        <mat-label>Email</mat-label>
+        <input
+          matInput
+          placeholder="Nhập email"
+          [(ngModel)]="filter.email"
+          (keyup.enter)="applyFilter()"
+        />
+        <mat-icon matSuffix>email</mat-icon>
+      </mat-form-field>
 
-    <mat-form-field appearance="outline" class="filter-input">
-      <mat-label>Địa chỉ</mat-label>
-      <input
-        matInput
-        placeholder="Nhập địa chỉ"
-        [(ngModel)]="filter.address"
-        (keyup.enter)="applyFilter()"
-      />
-    </mat-form-field>
+      <mat-form-field appearance="outline" class="filter-input">
+        <mat-label>Địa chỉ</mat-label>
+        <input
+          matInput
+          placeholder="Nhập địa chỉ"
+          [(ngModel)]="filter.address"
+          (keyup.enter)="applyFilter()"
+        />
+        <mat-icon matSuffix>home</mat-icon>
+      </mat-form-field>
 
-    <!-- Nút tìm kiếm và xóa bộ lọc -->
-    <div class="filter-buttons">
-      <button mat-raised-button color="primary" (click)="applyFilter()">
-        Tìm kiếm
-      </button>
-      <button mat-stroked-button color="warn" (click)="clearFilter()">
-        Xóa bộ lọc
-      </button>
+      <!-- Nút tìm kiếm và xóa bộ lọc -->
+      <div class="filter-buttons">
+        <button mat-raised-button color="primary" (click)="applyFilter()">
+          <mat-icon>search</mat-icon>
+          Tìm kiếm
+        </button>
+        <button mat-stroked-button color="warn" (click)="clearFilter()">
+          <mat-icon>filter_alt_off</mat-icon>
+          Xóa bộ lọc
+        </button>
+      </div>
     </div>
   </div>
 
-  <!-- User List Table for studnet -->
-  <mat-table [dataSource]="studentDataSource" matSort>
-    <ng-container matColumnDef="studentCode">
-      <mat-header-cell *matHeaderCellDef mat-sort-header>
-        Mã học viên
-      </mat-header-cell>
-      <mat-cell *matCellDef="let user">
-        <!-- Thêm liên kết vào tên -->
-        <a [routerLink]="['/admin/student', user.id]">{{ user.studentCode }}</a>
-      </mat-cell>
-    </ng-container>
-    <ng-container matColumnDef="name">
-      <mat-header-cell *matHeaderCellDef mat-sort-header>
-        Họ và tên
-      </mat-header-cell>
-      <mat-cell *matCellDef="let user">
-        {{ user.firstName }} {{ user.lastName }}
-      </mat-cell>
-    </ng-container>
+  <div class="table-container">
+    <!-- Loading overlay -->
+    <div class="loading-overlay" *ngIf="isLoading">
+      <mat-spinner diameter="40"></mat-spinner>
+      <span>Đang tải dữ liệu...</span>
+    </div>
 
-    <ng-container matColumnDef="dateOfBirth">
-      <mat-header-cell *matHeaderCellDef mat-sort-header>
-        Ngày tháng năm sinh
-      </mat-header-cell>
-      <mat-cell *matCellDef="let user">{{
-        user.dateOfBirth | date : "dd/MM/yyyy"
-      }}</mat-cell>
-    </ng-container>
+    <!-- User List Table for Students -->
+    <mat-table
+      [dataSource]="studentDataSource"
+      matSort
+      matSortActive="createdAt"
+      matSortDirection="desc"
+      [class.blur-on-loading]="isLoading"
+    >
+      <ng-container matColumnDef="studentCode">
+        <mat-header-cell *matHeaderCellDef mat-sort-header>
+          Mã sinh viên
+        </mat-header-cell>
+        <mat-cell *matCellDef="let user">
+          <div class="student-code">
+            <a [routerLink]="['/admin/student', user.id]">{{
+              user.studentCode
+            }}</a>
+          </div>
+        </mat-cell>
+      </ng-container>
+      <ng-container matColumnDef="firstName">
+        <mat-header-cell *matHeaderCellDef mat-sort-header>
+          Họ và tên
+        </mat-header-cell>
+        <mat-cell *matCellDef="let user">
+          <div class="student-name">
+            {{ user.lastName }} {{ user.firstName }}
+          </div>
+        </mat-cell>
+      </ng-container>
 
-    <ng-container matColumnDef="email">
-      <mat-header-cell *matHeaderCellDef> Email </mat-header-cell>
-      <mat-cell *matCellDef="let user">{{ user.email }}</mat-cell>
-    </ng-container>
+      <ng-container matColumnDef="email">
+        <mat-header-cell *matHeaderCellDef>Email</mat-header-cell>
+        <mat-cell *matCellDef="let user" class="email-cell">
+          <div class="ellipsis" matTooltip="{{ user.email }}">
+            {{ user.email }}
+          </div>
+        </mat-cell>
+      </ng-container>
 
-    <ng-container matColumnDef="phoneNumber">
-      <mat-header-cell *matHeaderCellDef> Số điện thoại </mat-header-cell>
-      <mat-cell *matCellDef="let user">{{ user.phoneNumber }}</mat-cell>
-    </ng-container>
+      <ng-container matColumnDef="phoneNumber">
+        <mat-header-cell *matHeaderCellDef>Số điện thoại</mat-header-cell>
+        <mat-cell *matCellDef="let user">
+          {{ user.phoneNumber || "Chưa cập nhật" }}
+        </mat-cell>
+      </ng-container>
 
-    <ng-container matColumnDef="address">
-      <mat-header-cell *matHeaderCellDef> Địa chỉ </mat-header-cell>
-      <mat-cell *matCellDef="let user">{{ user.address }}</mat-cell>
-    </ng-container>
+      <ng-container matColumnDef="address">
+        <mat-header-cell *matHeaderCellDef>Địa chỉ</mat-header-cell>
+        <mat-cell *matCellDef="let user" class="address-cell">
+          <div class="ellipsis" matTooltip="{{ user.address }}">
+            {{ user.address || "Chưa cập nhật" }}
+          </div>
+        </mat-cell>
+      </ng-container>
 
-    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
-    <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
-  </mat-table>
+      <ng-container matColumnDef="isActive">
+        <mat-header-cell *matHeaderCellDef>Trạng thái</mat-header-cell>
+        <mat-cell *matCellDef="let user">
+          <span
+            class="status-badge"
+            [ngClass]="user.isActive ? 'active-badge' : 'inactive-badge'"
+          >
+            <mat-icon>{{ user.isActive ? "check_circle" : "cancel" }}</mat-icon>
+            {{ user.isActive ? "Đang hoạt động" : "Ngừng hoạt động" }}
+          </span>
+        </mat-cell>
+      </ng-container>
 
-  <div
-    class="no-data"
-    *ngIf="studentDataSource.length === 0"
-    style="
-      text-align: center;
-      margin: 20px 0;
-      padding: 16px;
-      font-style: italic;
-      color: #999;
-    "
-  >
-    Không có dữ liệu phù hợp
+      <mat-header-row
+        *matHeaderRowDef="displayedColumns; sticky: true"
+      ></mat-header-row>
+      <mat-row
+        *matRowDef="let row; columns: displayedColumns"
+        (click)="goToDetail(row)"
+        class="table-row"
+      ></mat-row>
+    </mat-table>
+
+    <!-- Empty state -->
+    <div
+      class="empty-state"
+      *ngIf="studentDataSource?.data?.length === 0 && !isLoading"
+    >
+      <mat-icon>person_off</mat-icon>
+      <h3>Không tìm thấy sinh viên</h3>
+      <p>Không có dữ liệu phù hợp với tiêu chí tìm kiếm</p>
+      <button mat-stroked-button color="primary" (click)="clearFilter()">
+        <mat-icon>refresh</mat-icon>
+        Làm mới tìm kiếm
+      </button>
+    </div>
+
+    <!-- Pagination -->
+    <mat-paginator
+      class="paginator"
+      [length]="totalUsers"
+      [pageSize]="pageSize"
+      [pageSizeOptions]="[5, 10, 25, 100]"
+      (page)="pageChanged($event)"
+      [showFirstLastButtons]="true"
+      aria-label="Chọn trang kết quả"
+    >
+    </mat-paginator>
   </div>
-
-  <!-- Pagination -->
-  <mat-paginator
-    [length]="totalUsers"
-    [pageSize]="pageSize"
-    [pageSizeOptions]="[5, 10, 25, 100]"
-    (page)="pageChanged($event)"
-  >
-  </mat-paginator>
 </div>

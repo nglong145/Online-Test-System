@@ -1,43 +1,122 @@
-.snackbar-success {
-  .mat-simple-snackbar {
-    color: #fff;
-  }
-  background-color: #4caf50 !important;
+.mat-mdc-snack-bar-container {
+  &.snackbar-success {
+    --mdc-snackbar-container-color: rgba(67, 160, 71, 0.95);
+    --mat-mdc-snack-bar-button-color: #fff;
+    --mdc-snackbar-supporting-text-color: #fff;
 
-  .mat-simple-snackbar-action {
-    color: #fff;
+    .mdc-snackbar__surface {
+      box-shadow: 0 6px 16px rgba(67, 160, 71, 0.25);
+      border-radius: 8px;
+      border-left: 4px solid #378d3c;
+    }
+
+    .mat-mdc-button {
+      font-weight: 600;
+      letter-spacing: 0.2px;
+    }
+  }
+
+  &.snackbar-error {
+    --mdc-snackbar-container-color: rgba(235, 87, 87, 0.95);
+    --mat-mdc-snack-bar-button-color: #fff;
+    --mdc-snackbar-supporting-text-color: #fff;
+
+    .mdc-snackbar__surface {
+      box-shadow: 0 6px 16px rgba(235, 87, 87, 0.25);
+      border-radius: 8px;
+      border-left: 4px solid #d32f2f;
+    }
+
+    .mat-mdc-button {
+      font-weight: 600;
+      letter-spacing: 0.2px;
+    }
+  }
+
+  &.snackbar-warning {
+    --mdc-snackbar-container-color: rgba(255, 152, 0, 0.95);
+    --mat-mdc-snack-bar-button-color: #fff;
+    --mdc-snackbar-supporting-text-color: #fff;
+
+    .mdc-snackbar__surface {
+      box-shadow: 0 6px 16px rgba(255, 152, 0, 0.25);
+      border-radius: 8px;
+      border-left: 4px solid #e68900;
+    }
+
+    .mat-mdc-button {
+      font-weight: 600;
+      letter-spacing: 0.2px;
+    }
+  }
+
+  &.snackbar-info {
+    --mdc-snackbar-container-color: rgba(47, 128, 237, 0.95);
+    --mat-mdc-snack-bar-button-color: #fff;
+    --mdc-snackbar-supporting-text-color: #fff;
+
+    .mdc-snackbar__surface {
+      box-shadow: 0 6px 16px rgba(47, 128, 237, 0.25);
+      border-radius: 8px;
+      border-left: 4px solid #1976d2;
+    }
+
+    .mat-mdc-button {
+      font-weight: 600;
+      letter-spacing: 0.2px;
+    }
+  }
+
+  // Cải thiện chung cho tất cả snackbar
+  .mdc-snackbar__surface {
+    padding: 6px 8px;
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+  }
+
+  .mdc-snackbar__label {
+    font-weight: 500;
+    padding: 14px 16px;
+    font-size: 14px;
+    letter-spacing: 0.1px;
+  }
+
+  // Animation hiện snackbar
+  @keyframes slideInRight {
+    from {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  // animation: slideInRight 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+
+  // Icon nếu có
+  .mat-icon {
+    margin-right: 8px;
+    vertical-align: middle;
   }
 }
 
-.snackbar-error {
-  .mat-simple-snackbar {
-    color: #fff;
-  }
-  background-color: #f44336 !important;
+// Đảm bảo responsive trên mobile
+@media (max-width: 576px) {
+  .mat-mdc-snack-bar-container {
+    width: 96vw;
+    max-width: 320px;
+    margin: 8px;
 
-  .mat-simple-snackbar-action {
-    color: #fff;
-  }
-}
+    .mdc-snackbar__label {
+      padding: 12px 12px;
+      font-size: 13px;
+    }
 
-.snackbar-warning {
-  .mat-simple-snackbar {
-    color: #000;
-  }
-  background-color: #ffc107 !important;
-
-  .mat-simple-snackbar-action {
-    color: #000;
-  }
-}
-
-.snackbar-info {
-  .mat-simple-snackbar {
-    color: #fff;
-  }
-  background-color: #2196f3 !important;
-
-  .mat-simple-snackbar-action {
-    color: #fff;
+    .mdc-snackbar__action {
+      padding: 0 8px;
+    }
   }
 }

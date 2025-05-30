@@ -55,10 +55,12 @@ namespace OnlineTestSystem.Presentation.Controllers
         }
 
 
-        [HttpPost("filter-by-manager/{id}")]
-        public async Task<IActionResult> GetGroupByManager(Guid id,[FromQuery] int pageIndex,
-                                                  [FromQuery] int pageSize,
-                                                  [FromBody] string? name)
+        [HttpPost("filter-by-manager")]
+        public async Task<IActionResult> GetGroupByManager([FromQuery] int pageIndex,
+                                                   [FromQuery] int pageSize,
+                                                   [FromBody] FilterGroupVm filterRequest,
+                                                   [FromQuery] string sortBy = "name",
+                                                   [FromQuery] string sortOrder = "desc")
         {
             if(pageIndex <= 0 || pageSize <= 0)
             {
@@ -67,7 +69,7 @@ namespace OnlineTestSystem.Presentation.Controllers
 
             try
             {
-                var groups = await _groupService.GetGroupByManagerAsync(id, pageIndex, pageSize,name);
+                var groups = await _groupService.GetGroupByManagerAsync(filterRequest, pageIndex, pageSize, sortBy, sortOrder);
                 return Ok(groups);
             }
             catch (Exception ex)
@@ -111,8 +113,12 @@ namespace OnlineTestSystem.Presentation.Controllers
                 IsActive = addGroupVm.IsActive,
                 UserManager = addGroupVm.UserManager,
             };
-            await _groupService.AddAsync(group);
-            return Ok(group);
+            var result = await _groupService.AddAsync(group);
+            if (result > 0)
+            {
+                return Ok(new { message = "Group created successfully." });
+            }
+            return BadRequest(new { message = "Failed to created group" });
         }
 
         [HttpPut("{id}")]
@@ -126,10 +132,14 @@ namespace OnlineTestSystem.Presentation.Controllers
                 group.IsActive = addGroupVm.IsActive;
                 group.UserManager = addGroupVm.UserManager;
 
-                await _groupService.UpdateAsync(group);
-                return Ok(group);
+                var result = await _groupService.UpdateAsync(group);
+                if (result > 0)
+                {
+                    return Ok(new { message = "Group updated successfully." });
+                }
+                return BadRequest(new { message = "Failed to updated group" });
             }
-            return BadRequest("The group does not exist!");
+            return NotFound(new { message = "The group does not exist!" });
         }
 
         [HttpDelete("{id}")]

@@ -9,6 +9,7 @@
         public DateTime StartTime { get; set; }
         public DateTime? EndTime { get; set; }
         public bool IsActive { get; set; } = true;
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
 
         public  ICollection<ExamQuiz> ExamQuizzes { get; set; }
         public   ICollection<ExamParticipant> Participants { get; set; }

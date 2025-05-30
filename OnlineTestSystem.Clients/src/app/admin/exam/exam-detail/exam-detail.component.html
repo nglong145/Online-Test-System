@@ -1,6 +1,19 @@
 <div class="container">
+  <!-- Header section with back button -->
+  <div class="back-btn-container">
+    <button
+      mat-stroked-button
+      color="primary"
+      (click)="goBack()"
+      [attr.aria-label]="'Quay lại danh sách kỳ thi'"
+    >
+      <mat-icon>arrow_back</mat-icon>
+      Quay lại
+    </button>
+  </div>
+
   <div class="header">
-    <h2>Exam Detail</h2>
+    <h1>Thông tin chi tiết kỳ thi</h1>
   </div>
 
   <!-- Phần thông tin chi tiết Exam và danh sách bài thi đã thêm -->
@@ -8,265 +21,719 @@
     <!-- Phần thông tin chi tiết Exam -->
     <div class="col">
       <div class="exam-info">
-        <h3>Exam Information</h3>
-        <form>
+        <h3>Thông tin kỳ thi</h3>
+
+        <form #examForm="ngForm" (ngSubmit)="updateExam(examForm)" novalidate>
           <div class="form-group">
-            <label for="name">Exam Name</label>
+            <label for="name">Tên kỳ thi</label>
             <input
               id="name"
               [(ngModel)]="exam.name"
               name="name"
               type="text"
               class="form-control"
+              placeholder="Nhập tên kỳ thi"
+              required
+              #name="ngModel"
             />
+            <div
+              class="error-message"
+              *ngIf="name.invalid && (name.dirty || name.touched)"
+            >
+              Tên kỳ thi là bắt buộc
+            </div>
           </div>
+
           <div class="form-group">
-            <label for="accessCode">Access Code</label>
+            <label for="accessCode">Mã truy cập</label>
             <input
               id="accessCode"
               [(ngModel)]="exam.accessCode"
               name="accessCode"
               type="text"
               class="form-control"
+              placeholder="Nhập mã truy cập"
+              required
+              #accessCode="ngModel"
             />
+            <div
+              class="error-message"
+              *ngIf="
+                accessCode.invalid && (accessCode.dirty || accessCode.touched)
+              "
+            >
+              Mã truy cập là bắt buộc
+            </div>
           </div>
+
           <div class="form-group">
-            <label for="description">Description</label>
+            <label for="description">Mô tả</label>
             <textarea
               id="description"
               [(ngModel)]="exam.description"
               name="description"
               class="form-control"
+              placeholder="Nhập mô tả kỳ thi (không bắt buộc)"
+              rows="3"
             ></textarea>
           </div>
 
           <div class="form-group">
-            <label for="startTime">Start Time</label>
+            <label for="startTime">Thời điểm bắt đầu</label>
             <input
               id="startTime"
               [(ngModel)]="exam.startTime"
               name="startTime"
               type="datetime-local"
               class="form-control"
-              [value]="exam.startTime | date : 'yyyy-MM-ddTHH:mm'"
+              required
+              #startTime="ngModel"
             />
+            <div
+              class="error-message"
+              *ngIf="
+                startTime.invalid && (startTime.dirty || startTime.touched)
+              "
+            >
+              Thời điểm bắt đầu là bắt buộc
+            </div>
           </div>
 
           <div class="form-group">
-            <label for="endTime">End Time</label>
+            <label for="endTime">Thời điểm kết thúc</label>
             <input
               id="endTime"
               [(ngModel)]="exam.endTime"
               name="endTime"
               type="datetime-local"
               class="form-control"
+              required
+              #endTime="ngModel"
               [value]="exam.endTime | date : 'yyyy-MM-ddTHH:mm'"
             />
+            <div
+              class="error-message"
+              *ngIf="endTime.invalid && (endTime.dirty || endTime.touched)"
+            >
+              Thời điểm kết thúc là bắt buộc
+            </div>
+            <div
+              class="error-message"
+              *ngIf="!isEndTimeValid() && (endTime.dirty || endTime.touched)"
+            >
+              Thời điểm kết thúc phải lớn hơn thời điểm bắt đầu ít nhất 1 giờ
+            </div>
           </div>
 
-          <div class="form-group">
-            <label for="isActive">Active Status</label>
-            <select
-              id="isActive"
-              [(ngModel)]="exam.isActive"
-              name="isActive"
-              class="form-control"
+          <div class="bottom-info">
+            <button
+              type="button"
+              mat-raised-button
+              color="primary"
+              (click)="navigateToQuizList()"
+              [disabled]="isExamUpdateLoading"
             >
-              <option [ngValue]="true">Active</option>
-              <option [ngValue]="false">Inactive</option>
-            </select>
+              <mat-icon>quiz</mat-icon>
+              Danh sách đề thi
+            </button>
+
+            <button
+              type="submit"
+              mat-raised-button
+              color="primary"
+              [disabled]="examForm.invalid || !isExamInfoChanged()"
+              class="update-btn"
+            >
+              <div class="button-content">
+                <mat-spinner
+                  *ngIf="isExamUpdateLoading"
+                  diameter="20"
+                ></mat-spinner>
+                <mat-icon *ngIf="!isExamUpdateLoading">save</mat-icon>
+                <span>{{
+                  isExamUpdateLoading
+                    ? "Đang cập nhật..."
+                    : "Cập nhật thông tin"
+                }}</span>
+              </div>
+            </button>
           </div>
-          <!-- Nút cập nhật -->
-          <button mat-raised-button color="primary" (click)="updateExam()">
-            Update
-          </button>
         </form>
       </div>
     </div>
 
-    <!-- Phần danh sách bài thi đã thêm vào Exam -->
     <div class="col">
-      <div class="exam-questions">
-        <h3>Quiz Added</h3>
+      <mat-accordion multi="true">
+        <mat-expansion-panel>
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              <mat-icon>group</mat-icon>
+              Danh sách nhóm
+            </mat-panel-title>
+          </mat-expansion-panel-header>
 
-        <!-- Ô lọc theo title -->
-        <div class="form-group">
-          <label for="titleFilter">Filter by Title</label>
-          <input
-            id="titleFilter"
-            [(ngModel)]="titleFilter"
-            (input)="applyFilter()"
-            type="text"
-            class="form-control"
-            placeholder="Enter title"
-          />
-        </div>
+          <div class="exam-groups">
+            <h3>Quản lý nhóm tham gia</h3>
 
-        <!-- Bảng danh sách các câu hỏi -->
-        <mat-table [dataSource]="filteredExamQuizDataSource" matSort>
-          <ng-container matColumnDef="title">
-            <mat-header-cell *matHeaderCellDef mat-sort-header
-              >Title</mat-header-cell
+            <!-- Filter Inputs -->
+            <div class="filter-container">
+              <mat-form-field appearance="outline" class="filter-input">
+                <mat-label>Tên nhóm</mat-label>
+                <input
+                  matInput
+                  placeholder="Nhập tên nhóm"
+                  [(ngModel)]="filterExamGroup.groupName"
+                  (keyup.enter)="applyExamGroupFilter()"
+                />
+                <mat-icon matSuffix>group</mat-icon>
+              </mat-form-field>
+
+              <!-- Nút tìm kiếm và xóa bộ lọc -->
+              <div class="filter-buttons">
+                <button
+                  mat-raised-button
+                  color="primary"
+                  (click)="applyExamGroupFilter()"
+                >
+                  <mat-icon>search</mat-icon>
+                  Tìm kiếm
+                </button>
+                <button
+                  mat-stroked-button
+                  color="warn"
+                  (click)="clearExamGroupFilter()"
+                >
+                  <mat-icon>filter_alt_off</mat-icon>
+                  Xóa bộ lọc
+                </button>
+              </div>
+            </div>
+
+            <!-- Bảng danh sách nhóm lớp -->
+            <mat-table [dataSource]="filteredExamGroupDataSource">
+              <ng-container matColumnDef="name">
+                <mat-header-cell *matHeaderCellDef>Tên nhóm</mat-header-cell>
+                <mat-cell *matCellDef="let group">
+                  <a [routerLink]="['/admin/group', group.groupId]">{{
+                    group.groupName
+                  }}</a>
+                </mat-cell>
+              </ng-container>
+
+              <ng-container matColumnDef="manager">
+                <mat-header-cell *matHeaderCellDef>
+                  Giáo viên quản lý
+                </mat-header-cell>
+                <mat-cell *matCellDef="let group">{{
+                  group.userManagerName
+                }}</mat-cell>
+              </ng-container>
+
+              <ng-container matColumnDef="actions">
+                <mat-header-cell *matHeaderCellDef>Hành động</mat-header-cell>
+                <mat-cell *matCellDef="let group">
+                  <button
+                    mat-icon-button
+                    color="warn"
+                    class="action-btn delete-btn"
+                    (click)="
+                      removeGroupFromExam(group); $event.stopPropagation()
+                    "
+                    [attr.aria-label]="'Xóa nhóm ' + group.groupName"
+                    matTooltip="Xóa nhóm"
+                    [disabled]="isItemLoading('group', group.groupId)"
+                  >
+                    <mat-spinner
+                      *ngIf="isItemLoading('group', group.groupId)"
+                      diameter="20"
+                    ></mat-spinner>
+                    <mat-icon *ngIf="!isItemLoading('group', group.groupId)"
+                      >delete</mat-icon
+                    >
+                  </button>
+                </mat-cell>
+              </ng-container>
+
+              <mat-header-row
+                *matHeaderRowDef="examGroupDisplayedColumns"
+              ></mat-header-row>
+              <mat-row
+                *matRowDef="let row; columns: examGroupDisplayedColumns"
+              ></mat-row>
+            </mat-table>
+
+            <!-- Empty state when no groups -->
+            <div
+              class="no-data"
+              *ngIf="filteredExamGroupDataSource.length === 0"
             >
-            <mat-cell *matCellDef="let quiz">{{ quiz.title }}</mat-cell>
-          </ng-container>
+              <mat-icon class="empty-icon">group_off</mat-icon>
+              <p class="empty-title">Không có nhóm nào</p>
+              <p class="empty-message">
+                Chưa có nhóm tham gia kỳ thi này hoặc không có kết quả phù hợp
+                với bộ lọc.
+              </p>
+            </div>
 
-          <ng-container matColumnDef="totalQuestion">
-            <mat-header-cell *matHeaderCellDef>Question</mat-header-cell>
-            <mat-cell *matCellDef="let quiz">{{ quiz.totalQuestion }}</mat-cell>
-          </ng-container>
+            <div style="margin-top: 16px">
+              <button
+                mat-raised-button
+                color="primary"
+                *ngIf="!showAddGroupRow"
+                (click)="showAddGroupRow = true"
+              >
+                Thêm nhóm
+              </button>
+            </div>
 
-          <ng-container matColumnDef="duration">
-            <mat-header-cell *matHeaderCellDef>Duration</mat-header-cell>
-            <mat-cell *matCellDef="let quiz"
-              >{{ quiz.duration }} minutes</mat-cell
+            <!-- Form thêm nhóm -->
+            <div *ngIf="showAddGroupRow" class="add-user-row">
+              <mat-form-field appearance="outline">
+                <mat-label>Chọn nhóm</mat-label>
+                <mat-select
+                  [(ngModel)]="selectedAddgroupId"
+                  [compareWith]="compareGroupIds"
+                  (openedChange)="onGroupSelectOpen($event)"
+                  placeholder="Chọn nhóm cần thêm vào kỳ thi"
+                  [disabled]="isAddGroupLoading"
+                >
+                  <mat-option>
+                    <ngx-mat-select-search
+                      [formControl]="groupAddFilterCtrl"
+                      placeholderLabel="Tìm kiếm nhóm..."
+                      noEntriesFoundLabel="Không tìm thấy nhóm"
+                    ></ngx-mat-select-search>
+                  </mat-option>
+                  <mat-option *ngFor="let g of groupAddOptions" [value]="g.id">
+                    {{ g.name }} - {{ g.managerLastName + g.managerFisrtName }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+
+              <button
+                mat-flat-button
+                color="primary"
+                (click)="confirmAddGroup()"
+                [disabled]="!selectedAddgroupId"
+                class="confirm-add-btn"
+              >
+                <div class="button-content">
+                  <mat-spinner
+                    *ngIf="isAddGroupLoading"
+                    diameter="20"
+                  ></mat-spinner>
+                  <mat-icon *ngIf="!isAddGroupLoading">group_add</mat-icon>
+                  <span>{{
+                    isAddGroupLoading ? "Đang thêm..." : "Xác nhận"
+                  }}</span>
+                </div>
+              </button>
+              <button
+                mat-stroked-button
+                color="warn"
+                (click)="cancelAddGroup()"
+                [disabled]="isAddGroupLoading"
+              >
+                Hủy
+              </button>
+            </div>
+
+            <!-- Phân trang -->
+            <mat-paginator
+              [length]="totalExamGroups"
+              [pageSize]="pageSizeExamGroup"
+              [pageSizeOptions]="[5, 10, 25, 100]"
+              (page)="pageChangedExamGroup($event)"
+              [showFirstLastButtons]="true"
+              aria-label="Chọn trang"
             >
-          </ng-container>
+            </mat-paginator>
+          </div>
+        </mat-expansion-panel>
 
-          <mat-header-row
-            *matHeaderRowDef="examQuizDisplayedColumns"
-          ></mat-header-row>
-          <mat-row
-            *matRowDef="let row; columns: examQuizDisplayedColumns"
-          ></mat-row>
-        </mat-table>
+        <mat-expansion-panel>
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              <mat-icon>people</mat-icon>
+              Danh sách thành viên
+            </mat-panel-title>
+          </mat-expansion-panel-header>
 
-        <!-- Phân trang -->
-        <mat-paginator
-          [length]="totalExamQuizzes"
-          [pageSize]="pageSizeExamQuiz"
-          [pageSizeOptions]="[5, 10, 25, 100]"
-          (page)="pageChangedExamQuiz($event)"
-        ></mat-paginator>
-      </div>
+          <div class="exam-users">
+            <h3>Quản lý thành viên tham gia</h3>
+
+            <button
+              mat-raised-button
+              color="primary"
+              (click)="exportExamParticipants()"
+              [disabled]="isExportingParticipants"
+              class="export-btn"
+            >
+              <div class="button-content">
+                <mat-spinner
+                  *ngIf="isExportingParticipants"
+                  diameter="20"
+                ></mat-spinner>
+                <mat-icon *ngIf="!isExportingParticipants">download</mat-icon>
+                <span>{{
+                  isExportingParticipants
+                    ? "Đang xuất..."
+                    : "Xuất Excel thành viên"
+                }}</span>
+              </div>
+            </button>
+
+            <!-- Filter Inputs -->
+            <div class="filter-container">
+              <mat-form-field appearance="outline" class="filter-input">
+                <mat-label>Họ tên sinh viên</mat-label>
+                <input
+                  matInput
+                  placeholder="Nhập họ tên sinh viên"
+                  [(ngModel)]="filterExamUser.fullName"
+                  (keyup.enter)="applyExamUserFilter()"
+                />
+                <mat-icon matSuffix>person</mat-icon>
+              </mat-form-field>
+
+              <!-- Nút tìm kiếm và xóa bộ lọc -->
+              <div class="filter-buttons">
+                <button
+                  mat-raised-button
+                  color="primary"
+                  (click)="applyExamUserFilter()"
+                >
+                  <mat-icon>search</mat-icon>
+                  Tìm kiếm
+                </button>
+                <button
+                  mat-stroked-button
+                  color="warn"
+                  (click)="clearExamUserFilter()"
+                >
+                  <mat-icon>filter_alt_off</mat-icon>
+                  Xóa bộ lọc
+                </button>
+              </div>
+            </div>
+
+            <!-- Bảng danh sách thành viên -->
+            <mat-table [dataSource]="filteredExamUserDataSource">
+              <ng-container matColumnDef="studentCode">
+                <mat-header-cell *matHeaderCellDef>
+                  Mã sinh viên
+                </mat-header-cell>
+                <mat-cell *matCellDef="let user">
+                  {{ user.studentCode }}
+                </mat-cell>
+              </ng-container>
+
+              <ng-container matColumnDef="fullName">
+                <mat-header-cell *matHeaderCellDef>Họ tên</mat-header-cell>
+                <mat-cell *matCellDef="let user">{{ user.fullName }}</mat-cell>
+              </ng-container>
+
+              <ng-container matColumnDef="actions">
+                <mat-header-cell *matHeaderCellDef>Hành động</mat-header-cell>
+                <mat-cell *matCellDef="let user">
+                  <button
+                    mat-icon-button
+                    color="warn"
+                    class="action-btn delete-btn"
+                    (click)="removeUserFromExam(user); $event.stopPropagation()"
+                    [attr.aria-label]="'Xóa ' + user.fullName"
+                    matTooltip="Xóa thành viên"
+                    [disabled]="isItemLoading('user', user.userId)"
+                  >
+                    <mat-spinner
+                      *ngIf="isItemLoading('user', user.userId)"
+                      diameter="20"
+                    ></mat-spinner>
+                    <mat-icon *ngIf="!isItemLoading('user', user.userId)"
+                      >delete</mat-icon
+                    >
+                  </button>
+                </mat-cell>
+              </ng-container>
+
+              <mat-header-row
+                *matHeaderRowDef="examUserDisplayedColumns"
+              ></mat-header-row>
+              <mat-row
+                *matRowDef="let row; columns: examUserDisplayedColumns"
+              ></mat-row>
+            </mat-table>
+
+            <!-- Empty state when no users -->
+            <div
+              class="no-data"
+              *ngIf="filteredExamUserDataSource.length === 0"
+            >
+              <mat-icon class="empty-icon">people_outline</mat-icon>
+              <p class="empty-title">Không có thành viên nào</p>
+              <p class="empty-message">
+                Chưa có thành viên tham gia kỳ thi này hoặc không có kết quả phù
+                hợp với bộ lọc.
+              </p>
+            </div>
+
+            <div style="margin-top: 16px">
+              <button
+                mat-raised-button
+                color="primary"
+                *ngIf="!showAddUserRow"
+                (click)="showAddUserRow = true"
+              >
+                Thêm thành viên
+              </button>
+            </div>
+
+            <!-- Form thêm thành viên -->
+            <div *ngIf="showAddUserRow" class="add-user-row">
+              <mat-form-field appearance="outline">
+                <mat-label>Chọn sinh viên</mat-label>
+                <mat-select
+                  [(ngModel)]="selectedAddUserId"
+                  [compareWith]="compareStudentIds"
+                  (openedChange)="onStudentSelectOpen($event)"
+                  placeholder="Chọn sinh viên cần thêm vào kỳ thi"
+                  [disabled]="isAddUserLoading"
+                >
+                  <mat-option>
+                    <ngx-mat-select-search
+                      [formControl]="studentAddFilterCtrl"
+                      placeholderLabel="Tìm kiếm sinh viên..."
+                      noEntriesFoundLabel="Không tìm thấy sinh viên"
+                    ></ngx-mat-select-search>
+                  </mat-option>
+                  <mat-option
+                    *ngFor="let sv of studentAddOptions"
+                    [value]="sv.id"
+                  >
+                    {{ sv.studentCode }} - {{ sv.lastName }} {{ sv.firstName }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+
+              <button
+                mat-flat-button
+                color="primary"
+                (click)="confirmAddUser()"
+                [disabled]="!selectedAddUserId"
+                class="confirm-add-btn"
+              >
+                <div class="button-content">
+                  <mat-spinner
+                    *ngIf="isAddUserLoading"
+                    diameter="20"
+                  ></mat-spinner>
+                  <mat-icon *ngIf="!isAddUserLoading">person_add</mat-icon>
+                  <span>{{
+                    isAddUserLoading ? "Đang thêm..." : "Xác nhận"
+                  }}</span>
+                </div>
+              </button>
+              <button
+                mat-stroked-button
+                color="warn"
+                (click)="cancelAddUser()"
+                [disabled]="isAddUserLoading"
+              >
+                Hủy
+              </button>
+            </div>
+
+            <!-- Phân trang -->
+            <mat-paginator
+              [length]="totalExamUsers"
+              [pageSize]="pageSizeExamUser"
+              [pageSizeOptions]="[5, 10, 25, 100]"
+              (page)="pageChangedExamUser($event)"
+              [showFirstLastButtons]="true"
+              aria-label="Chọn trang"
+            >
+            </mat-paginator>
+          </div>
+        </mat-expansion-panel>
+      </mat-accordion>
     </div>
   </div>
 
-  <!-- Phần danh sách bài thi đã nộp -->
-  <div class="student-exams">
-    <h3>Exams Submitted</h3>
+  <div class="row">
+    <div class="user-quizzes">
+      <h2>Danh sách bài thi đã nộp</h2>
 
-    <!-- Các ô lọc -->
-    <div class="filter-container">
-      <div class="form-group">
-        <label for="examPeriodFilter">Filter by Exam Period</label>
-        <input
-          id="examPeriodFilter"
-          [(ngModel)]="examPeriodFilter"
-          (input)="applyFilter()"
-          type="text"
-          class="form-control"
-          placeholder="Enter exam period"
-        />
+      <button
+        mat-raised-button
+        color="primary"
+        (click)="exportUserQuizzes()"
+        [disabled]="isExportingScores"
+        class="export-btn"
+      >
+        <div class="button-content">
+          <mat-spinner *ngIf="isExportingScores" diameter="20"></mat-spinner>
+          <mat-icon *ngIf="!isExportingScores">download</mat-icon>
+          <span>{{
+            isExportingScores ? "Đang xuất..." : "Xuất Excel bảng điểm"
+          }}</span>
+        </div>
+      </button>
+
+      <!-- Filter Inputs -->
+      <div class="filter-container">
+        <mat-form-field appearance="outline" class="filter-input">
+          <mat-label>Mã sinh viên</mat-label>
+          <input
+            matInput
+            placeholder="Nhập mã sinh viên"
+            [(ngModel)]="filterUserQuiz.studentCode"
+            (keyup.enter)="applyUserQuizFilter()"
+          />
+          <mat-icon matSuffix>badge</mat-icon>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="filter-input">
+          <mat-label>Họ tên</mat-label>
+          <input
+            matInput
+            placeholder="Nhập họ tên"
+            [(ngModel)]="filterUserQuiz.fullName"
+            (keyup.enter)="applyUserQuizFilter()"
+          />
+          <mat-icon matSuffix>person</mat-icon>
+        </mat-form-field>
+
+        <div class="filter-buttons">
+          <button
+            mat-raised-button
+            color="primary"
+            (click)="applyUserQuizFilter()"
+          >
+            <mat-icon>search</mat-icon>
+            Tìm kiếm
+          </button>
+          <button
+            mat-stroked-button
+            color="warn"
+            (click)="clearUserQuizFilter()"
+          >
+            <mat-icon>filter_alt_off</mat-icon>
+            Xóa bộ lọc
+          </button>
+        </div>
       </div>
 
-      <div class="form-group">
-        <label for="examNameFilter">Filter by Exam Name</label>
-        <input
-          id="examNameFilter"
-          [(ngModel)]="examNameFilter"
-          (input)="applyFilter()"
-          type="text"
-          class="form-control"
-          placeholder="Enter exam name"
-        />
+      <!-- Bảng danh sách bài thi -->
+      <mat-table [dataSource]="filteredUserQuizDataSource">
+        <ng-container matColumnDef="quizName">
+          <mat-header-cell *matHeaderCellDef>Đề thi</mat-header-cell>
+          <mat-cell *matCellDef="let quiz">{{ quiz.quizName }}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="studentCode">
+          <mat-header-cell *matHeaderCellDef>Mã sinh viên</mat-header-cell>
+          <mat-cell *matCellDef="let quiz">{{ quiz.studentCode }}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="fullName">
+          <mat-header-cell *matHeaderCellDef>Họ và tên</mat-header-cell>
+          <mat-cell *matCellDef="let quiz">
+            {{ quiz.lastName }} {{ quiz.firstName }}
+          </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="startedAt">
+          <mat-header-cell *matHeaderCellDef>Thời gian bắt đầu</mat-header-cell>
+          <mat-cell *matCellDef="let quiz">
+            {{ quiz.startedAt | date : "dd/MM/yyyy HH:mm" }}
+          </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="finishedAt">
+          <mat-header-cell *matHeaderCellDef
+            >Thời gian kết thúc</mat-header-cell
+          >
+          <mat-cell *matCellDef="let quiz">
+            {{ quiz.finishedAt | date : "dd/MM/yyyy HH:mm" }}
+          </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="score">
+          <mat-header-cell *matHeaderCellDef>Điểm</mat-header-cell>
+          <mat-cell *matCellDef="let quiz">
+            <span
+              [ngStyle]="{
+                color: quiz.score >= 5 ? '#4caf50' : '#f44336',
+                'font-weight': '500'
+              }"
+            >
+              {{ quiz.score }}
+            </span>
+          </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="actions">
+          <mat-header-cell *matHeaderCellDef>Thao tác</mat-header-cell>
+          <mat-cell *matCellDef="let quiz">
+            <button
+              mat-icon-button
+              color="warn"
+              class="cancel-quiz-btn"
+              (click)="openDeleteConfirmDialog(quiz); $event.stopPropagation()"
+              [attr.aria-label]="
+                'Hủy bài thi ' +
+                quiz.quizName +
+                ' của ' +
+                quiz.firstName +
+                ' ' +
+                quiz.lastName
+              "
+              matTooltip="Hủy bài thi"
+              [disabled]="isItemLoading('quiz', quiz.id)"
+            >
+              <div class="button-content">
+                <mat-spinner
+                  *ngIf="isItemLoading('quiz', quiz.id)"
+                  diameter="18"
+                ></mat-spinner>
+                <mat-icon *ngIf="!isItemLoading('quiz', quiz.id)"
+                  >cancel</mat-icon
+                >
+                <span>{{
+                  isItemLoading("quiz", quiz.id) ? "Đang hủy..." : "Hủy bài thi"
+                }}</span>
+              </div>
+            </button>
+          </mat-cell>
+        </ng-container>
+
+        <mat-header-row
+          *matHeaderRowDef="userQuizDisplayedColumns"
+        ></mat-header-row>
+        <mat-row
+          *matRowDef="let row; columns: userQuizDisplayedColumns"
+        ></mat-row>
+      </mat-table>
+
+      <!-- Empty state when no quiz results -->
+      <div class="no-data" *ngIf="filteredUserQuizDataSource.length === 0">
+        <mat-icon class="empty-icon">quiz</mat-icon>
+        <p class="empty-title">Không có bài thi nào</p>
+        <p class="empty-message">
+          Chưa có ai nộp bài thi hoặc không có kết quả phù hợp với bộ lọc.
+        </p>
       </div>
 
-      <div class="form-group">
-        <label for="startDateFilter">Filter by Start Date</label>
-        <input
-          id="startDateFilter"
-          [(ngModel)]="startDateFilter"
-          (dateChange)="applyFilter()"
-          class="form-control"
-          type="datetime-local"
-        />
-      </div>
-
-      <div class="form-group">
-        <label for="endDateFilter">Filter by End Date</label>
-        <input
-          id="endDateFilter"
-          [(ngModel)]="endDateFilter"
-          (dateChange)="applyFilter()"
-          class="form-control"
-          type="datetime-local"
-        />
-      </div>
-
-      <div class="form-group">
-        <label for="scoreFilter">Filter by Score</label>
-        <input
-          id="scoreFilter"
-          [(ngModel)]="scoreFilter"
-          (input)="applyFilter()"
-          type="number"
-          class="form-control"
-          placeholder="Enter score"
-        />
-      </div>
+      <!-- Pagination -->
+      <mat-paginator
+        [length]="totalUserQuizzes"
+        [pageSize]="pageSizeUserQuiz"
+        [pageSizeOptions]="[5, 10, 25, 100]"
+        (page)="pageChangedUserQuiz($event)"
+        [showFirstLastButtons]="true"
+        aria-label="Chọn trang"
+      >
+      </mat-paginator>
     </div>
-
-    <!-- Bảng danh sách bài thi đã nộp -->
-    <mat-table [dataSource]="filteredUserQuizDataSource" matSort>
-      <ng-container matColumnDef="studentCode">
-        <mat-header-cell *matHeaderCellDef mat-sort-header
-          >Student Code</mat-header-cell
-        >
-        <mat-cell *matCellDef="let userQuiz">{{
-          userQuiz.studentCode
-        }}</mat-cell>
-      </ng-container>
-
-      <ng-container matColumnDef="name">
-        <mat-header-cell *matHeaderCellDef mat-sort-header
-          >Full Name</mat-header-cell
-        >
-        <mat-cell *matCellDef="let userQuiz"
-          >{{ userQuiz.firstName }} {{ userQuiz.lastName }}</mat-cell
-        >
-      </ng-container>
-
-      <ng-container matColumnDef="quizName">
-        <mat-header-cell *matHeaderCellDef>Quiz</mat-header-cell>
-        <mat-cell *matCellDef="let userQuiz">{{
-          userQuiz.quizName || "N/A"
-        }}</mat-cell>
-      </ng-container>
-
-      <ng-container matColumnDef="startedAt">
-        <mat-header-cell *matHeaderCellDef>Start Time</mat-header-cell>
-        <mat-cell *matCellDef="let userQuiz">{{
-          userQuiz.startedAt | date : "dd/MM/yyyy HH:mm"
-        }}</mat-cell>
-      </ng-container>
-
-      <ng-container matColumnDef="finishedAt">
-        <mat-header-cell *matHeaderCellDef>End Time</mat-header-cell>
-        <mat-cell *matCellDef="let userQuiz">{{
-          userQuiz.finishedAt | date : "dd/MM/yyyy HH:mm"
-        }}</mat-cell>
-      </ng-container>
-
-      <ng-container matColumnDef="score">
-        <mat-header-cell *matHeaderCellDef>Score</mat-header-cell>
-        <mat-cell *matCellDef="let userQuiz">{{ userQuiz.score }}</mat-cell>
-      </ng-container>
-
-      <mat-header-row
-        *matHeaderRowDef="userQuizDisplayedColumns"
-      ></mat-header-row>
-      <mat-row
-        *matRowDef="let row; columns: userQuizDisplayedColumns"
-      ></mat-row>
-    </mat-table>
-
-    <!-- Phân trang -->
-    <mat-paginator
-      [length]="totalUserQuizzes"
-      [pageSize]="pageSizeUserQuiz"
-      [pageSizeOptions]="[5, 10, 25, 100]"
-      (page)="pageChangedUserQuiz($event)"
-    ></mat-paginator>
   </div>
 </div>

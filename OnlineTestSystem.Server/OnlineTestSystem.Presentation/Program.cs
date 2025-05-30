@@ -4,11 +4,14 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using OfficeOpenXml;
 using OnlineTestSystem.BLL.Services.AnswerService;
 using OnlineTestSystem.BLL.Services.AuthenticationService;
+using OnlineTestSystem.BLL.Services.Dashboard;
 using OnlineTestSystem.BLL.Services.DoQuizService;
 using OnlineTestSystem.BLL.Services.ExamService;
 using OnlineTestSystem.BLL.Services.GroupService;
+using OnlineTestSystem.BLL.Services.MailService;
 using OnlineTestSystem.BLL.Services.QuestionBankService;
 using OnlineTestSystem.BLL.Services.QuestionService;
 using OnlineTestSystem.BLL.Services.QuizCategoryService;
@@ -17,10 +20,11 @@ using OnlineTestSystem.BLL.Services.UserService;
 using OnlineTestSystem.DAL.Data;
 using OnlineTestSystem.DAL.Infrastructure;
 using OnlineTestSystem.DAL.Models;
+using System.ComponentModel;
 using System.Text;
 
-var builder = WebApplication.CreateBuilder(args);
 
+var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddDbContext<TestSystemDbContext>(options =>
@@ -67,6 +71,7 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 builder.Services.AddScoped<IUserService, UserService>();
 
@@ -88,8 +93,9 @@ builder.Services.AddScoped<IExamGroupService, ExamGroupService>();
 builder.Services.AddScoped<IExamQuizService, ExamQuizService>();
 builder.Services.AddScoped<IExamParticipantService, ExamParticipantService>();
 
-builder.Services.AddScoped<IUserQuizService, UserQuizService>();
+builder.Services.AddScoped<IDoQuizService, UserQuizService>();
 builder.Services.AddScoped<IUserAnswerService, UserAnswerService>();
+builder.Services.AddScoped<IDashboardService, DashboardService>();
 
 
 builder.Services.AddIdentity<User, Role>()

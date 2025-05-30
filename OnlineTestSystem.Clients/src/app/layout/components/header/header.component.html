@@ -1,13 +1,49 @@
-<mat-toolbar color="primary">
+<mat-toolbar class="header">
   <div class="header-container">
     <div class="header-left">
-      <h1>SchoolHub</h1>
+      <!-- Mobile menu button -->
+      <button
+        mat-icon-button
+        class="mobile-menu-button"
+        (click)="toggleMobileMenu()"
+        [attr.aria-label]="'Toggle navigation menu'"
+      >
+        <mat-icon>menu</mat-icon>
+      </button>
+
+      <div
+        class="logo"
+        (click)="navigateHome()"
+        [attr.aria-label]="'Navigate to home'"
+      >
+        <mat-icon class="logo-icon">school</mat-icon>
+        <h1>MokuTest</h1>
+      </div>
     </div>
+
     <div class="header-right">
-      <mat-icon>search</mat-icon>
-      <mat-icon>notifications</mat-icon>
-      <span>{{ username }}</span>
-      <mat-icon>account_circle</mat-icon>
+      <!-- User profile button -->
+      <button mat-button [matMenuTriggerFor]="userMenu" class="user-button">
+        <div class="user-info">
+          <span class="username">{{ username || "User" }}</span>
+          <span class="role">{{ userRole || "QUẢN TRỊ VIÊN" }}</span>
+        </div>
+        <mat-icon class="user-avatar">account_circle</mat-icon>
+      </button>
+
+      <mat-menu #userMenu="matMenu" xPosition="before" class="user-menu">
+        <button mat-menu-item (click)="openChangePasswordModal()">
+          <mat-icon>vpn_key</mat-icon>
+          <span>Đổi mật khẩu</span>
+        </button>
+
+        <mat-divider></mat-divider>
+
+        <button mat-menu-item (click)="logout()">
+          <mat-icon>exit_to_app</mat-icon>
+          <span>Đăng xuất</span>
+        </button>
+      </mat-menu>
     </div>
   </div>
 </mat-toolbar>

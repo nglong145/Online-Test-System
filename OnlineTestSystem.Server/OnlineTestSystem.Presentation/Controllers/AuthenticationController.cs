@@ -92,57 +92,5 @@ namespace OnlineTestSystem.Presentation.Controllers
                 return BadRequest(new { Message = ex.Message });
             }
         }
-
-        //[Authorize]
-        //[HttpPut("update-user-info")]
-        //public async Task<IActionResult> UpdateUserInfo([FromBody] UpdateUserVm updateUserVm)
-        //{
-        //    try
-        //    {
-        //        var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-        //        if (string.IsNullOrEmpty(userId))
-        //        {
-        //            return Unauthorized(new { Message = "User is not authenticated." });
-        //        }
-
-        //        var isUpdated = await _authenticationService.UpdateUserInfoAsync(Guid.Parse(userId), updateUserVm);
-        //        if (!isUpdated)
-        //        {
-        //            return BadRequest(new { Message = "Failed to update user information." });
-        //        }
-
-        //        return Ok(new { Message = "User information updated successfully." });
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return BadRequest(new { Message = ex.Message });
-        //    }
-        //}
-
-        //[Authorize]
-        //[HttpPut("Change-Password")]
-        //public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordVm passwordVm)
-        //{
-        //    try
-        //    {
-        //        var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-        //        if (string.IsNullOrEmpty(userId))
-        //        {
-        //            return Unauthorized(new { Message = "User is not authenticated." });
-        //        }
-
-        //        var isUpdated = await _authenticationService.ChangePasswordAsync(Guid.Parse(userId), passwordVm);
-        //        if (!isUpdated)
-        //        {
-        //            return BadRequest(new { Message = "Failed to update user information." });
-        //        }
-
-        //        return Ok(new { Message = "User information updated successfully." });
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return BadRequest(new { Message = ex.Message });
-        //    }
-        //}
     }
 }

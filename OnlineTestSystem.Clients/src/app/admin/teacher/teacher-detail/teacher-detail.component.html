@@ -1,24 +1,54 @@
 <div class="container">
+  <!-- Header section with back button -->
+  <div class="back-btn-container">
+    <button
+      mat-stroked-button
+      color="primary"
+      (click)="goBack()"
+      [attr.aria-label]="'Go back to teacher list'"
+    >
+      <mat-icon>arrow_back</mat-icon>
+      Quay lại
+    </button>
+  </div>
+
   <div class="header">
-    <h2>
-      Thông tin chi tiết GV {{ teacher.lastName }} {{ teacher.firstName }}
-    </h2>
+    <h1>Thông tin chi tiết giáo viên</h1>
   </div>
 
   <div class="row">
+    <!-- Teacher Information Column -->
     <div class="col">
       <div class="teacher-info">
-        <form>
+        <h3>Thông tin cá nhân</h3>
+
+        <form #formRef="ngForm">
+          <!-- Personal information fields -->
           <div class="form-group">
-            <label for="lastName">Họ</label>
+            <label for="lastName">Họ và tên đệm</label>
             <input
               id="lastName"
               [(ngModel)]="teacher.lastName"
               name="lastName"
               type="text"
               class="form-control"
+              placeholder="Nhập họ và tên đệm"
+              required
+              #lastNameModel="ngModel"
             />
+            <div
+              *ngIf="
+                lastNameModel.invalid &&
+                (lastNameModel.touched || lastNameModel.dirty)
+              "
+              class="text-danger"
+            >
+              <span *ngIf="lastNameModel.errors?.['required']" class="error"
+                >Họ và tên đệm là bắt buộc</span
+              >
+            </div>
           </div>
+
           <div class="form-group">
             <label for="firstName">Tên</label>
             <input
@@ -27,20 +57,51 @@
               name="firstName"
               type="text"
               class="form-control"
+              placeholder="Nhập tên"
+              required
+              #firstNameModel="ngModel"
             />
+            <div
+              *ngIf="
+                firstNameModel.invalid &&
+                (firstNameModel.touched || firstNameModel.dirty)
+              "
+              class="text-danger"
+            >
+              <span *ngIf="firstNameModel.errors?.['required']" class="error"
+                >Tên là bắt buộc</span
+              >
+            </div>
           </div>
 
           <div class="form-group">
             <label for="email">Email</label>
             <input
               id="email"
-              [value]="teacher.email"
+              [(ngModel)]="teacher.email"
               name="email"
               type="email"
               class="form-control"
-              readonly
+              placeholder="Nhập địa chỉ email"
+              required
+              pattern="^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$"
+              #emailModel="ngModel"
             />
+            <div
+              *ngIf="
+                emailModel.invalid && (emailModel.touched || emailModel.dirty)
+              "
+              class="text-danger"
+            >
+              <span *ngIf="emailModel.errors?.['required']" class="error"
+                >Email là bắt buộc</span
+              >
+              <span *ngIf="emailModel.errors?.['pattern']" class="error"
+                >Email không hợp lệ</span
+              >
+            </div>
           </div>
+
           <div class="form-group">
             <label for="phoneNumber">Số điện thoại</label>
             <input
@@ -49,27 +110,44 @@
               name="phoneNumber"
               type="text"
               class="form-control"
+              placeholder="Nhập số điện thoại"
+              pattern="^(\+?\d{1,4}[-\s]?)?(\(?\d{1,5}\)?[-\s]?)?[\d-\s]{6,15}$"
+              #phoneModel="ngModel"
             />
+            <div
+              *ngIf="
+                phoneModel.invalid && (phoneModel.touched || phoneModel.dirty)
+              "
+              class="text-danger"
+            >
+              <span *ngIf="phoneModel.errors?.['pattern']" class="error"
+                >Số điện thoại không hợp lệ</span
+              >
+            </div>
           </div>
+
           <div class="form-group">
             <label for="address">Địa chỉ</label>
-            <input
+            <textarea
               id="address"
               [(ngModel)]="teacher.address"
               name="address"
-              type="text"
               class="form-control"
-            />
+              placeholder="Nhập địa chỉ"
+              rows="3"
+            ></textarea>
           </div>
+
           <div class="form-group">
             <label for="dateOfBirth">Ngày sinh</label>
             <input
               id="dateOfBirth"
-              [(ngModel)]="teacher.dateOfBirth"
+              [ngModel]="teacherDateOfBirth"
+              (ngModelChange)="onDateChange($event)"
               name="dateOfBirth"
               [matDatepicker]="picker"
-              (dateChange)="onDateChange($event)"
               class="form-control"
+              placeholder="DD/MM/YYYY"
             />
             <mat-datepicker-toggle
               matSuffix
@@ -77,6 +155,7 @@
             ></mat-datepicker-toggle>
             <mat-datepicker #picker></mat-datepicker>
           </div>
+
           <div class="form-group">
             <label for="status">Trạng thái</label>
             <select
@@ -84,82 +163,97 @@
               [(ngModel)]="teacher.isActive"
               name="status"
               class="form-control"
-              (ngModelChange)="logStatus()"
             >
               <option [ngValue]="true">Hoạt động</option>
               <option [ngValue]="false">Ngừng hoạt động</option>
             </select>
           </div>
-          <!-- Nút cập nhật -->
-          <button mat-raised-button color="primary" (click)="updateTeacher()">
+
+          <!-- Update button -->
+          <button
+            mat-raised-button
+            color="primary"
+            (click)="updateTeacher()"
+            [disabled]="!formRef.form.valid || !hasUnsavedChanges()"
+          >
+            <mat-icon>save</mat-icon>
             Cập nhật thông tin
           </button>
         </form>
       </div>
     </div>
 
-    <!-- Phần danh sách nhóm lớp -->
+    <!-- Groups Management Column -->
     <div class="col">
       <div class="teacher-groups">
-        <h3>Managed Groups</h3>
+        <h3>Danh sách nhóm quản lý</h3>
 
-        <div *ngIf="filteredGroupDataSource.length === 0">
-          <p>Giáo viên chưa quản lý nhóm nào</p>
-        </div>
-
-        <div *ngIf="filteredGroupDataSource.length > 0">
-          <!-- Ô lọc theo tên nhóm -->
-          <div class="form-group">
-            <label for="groupFilter">Filter by Group Name</label>
+        <!-- Filter section -->
+        <div class="filter-container">
+          <mat-form-field appearance="outline" class="filter-input">
+            <mat-label>Tên nhóm</mat-label>
             <input
-              id="groupFilter"
-              [(ngModel)]="groupFilter"
-              (input)="applyFilter()"
-              type="text"
-              class="form-control"
-              placeholder="Enter group name to filter"
+              matInput
+              placeholder="Nhập tên nhóm cần tìm"
+              [(ngModel)]="groupFilter.name"
+              (keyup.enter)="applyFilter()"
             />
+            <mat-icon matSuffix>search</mat-icon>
+          </mat-form-field>
+
+          <!-- Action buttons -->
+          <div class="filter-buttons">
+            <button mat-raised-button color="primary" (click)="applyFilter()">
+              <mat-icon>search</mat-icon>
+              Tìm kiếm
+            </button>
+            <button mat-stroked-button color="warn" (click)="clearFilter()">
+              <mat-icon>filter_alt_off</mat-icon>
+              Xóa bộ lọc
+            </button>
           </div>
-
-          <!-- Bảng danh sách nhóm lớp -->
-          <mat-table [dataSource]="filteredGroupDataSource" matSort>
-            <ng-container matColumnDef="groupName">
-              <mat-header-cell *matHeaderCellDef mat-sort-header>
-                Group Name
-              </mat-header-cell>
-              <mat-cell *matCellDef="let group">
-                <a [routerLink]="['/admin/group', group.id]">{{
-                  group.name
-                }}</a>
-              </mat-cell>
-            </ng-container>
-
-            <ng-container matColumnDef="memberCount">
-              <mat-header-cell *matHeaderCellDef>
-                Member Count
-              </mat-header-cell>
-              <mat-cell *matCellDef="let group">{{
-                group.memeberCount
-              }}</mat-cell>
-            </ng-container>
-
-            <mat-header-row
-              *matHeaderRowDef="groupDisplayedColumns"
-            ></mat-header-row>
-            <mat-row
-              *matRowDef="let row; columns: groupDisplayedColumns"
-            ></mat-row>
-          </mat-table>
-
-          <!-- Phân trang -->
-          <mat-paginator
-            [length]="totalGroups"
-            [pageSize]="pageSize"
-            [pageSizeOptions]="[5, 10, 25, 100]"
-            (page)="pageChanged($event)"
-          >
-          </mat-paginator>
         </div>
+
+        <!-- Groups table -->
+        <mat-table [dataSource]="filteredGroupDataSource" matSort>
+          <ng-container matColumnDef="groupName">
+            <mat-header-cell *matHeaderCellDef mat-sort-header
+              >Tên nhóm</mat-header-cell
+            >
+            <mat-cell *matCellDef="let group">
+              <a [routerLink]="['/admin/group', group.id]">{{ group.name }}</a>
+            </mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="memberCount">
+            <mat-header-cell *matHeaderCellDef
+              >Số lượng thành viên</mat-header-cell
+            >
+            <mat-cell *matCellDef="let group">{{ group.memberCount }}</mat-cell>
+          </ng-container>
+
+          <mat-header-row
+            *matHeaderRowDef="groupDisplayedColumns"
+          ></mat-header-row>
+          <mat-row
+            *matRowDef="let row; columns: groupDisplayedColumns"
+            (click)="goToGroupDetail(row)"
+            [attr.aria-label]="'Nhóm ' + row.name"
+          ></mat-row>
+        </mat-table>
+
+        <!-- Empty state message when no groups -->
+        <div class="no-data" *ngIf="filteredGroupDataSource.length === 0"></div>
+
+        <!-- Pagination -->
+        <mat-paginator
+          [length]="totalGroups"
+          [pageSize]="pageSize"
+          [pageSizeOptions]="[5, 10, 25, 100]"
+          (page)="pageChanged($event)"
+          [showFirstLastButtons]="true"
+          aria-label="Chọn trang"
+        ></mat-paginator>
       </div>
     </div>
   </div>

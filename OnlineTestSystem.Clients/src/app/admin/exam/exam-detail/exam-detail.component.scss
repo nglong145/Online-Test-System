@@ -1,59 +1,1216 @@
+@use "../../../../styles.scss" as *;
+@use "sass:color";
+
 .container {
-  padding: 20px;
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 1.5rem;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.9),
+    rgba(255, 255, 255, 1)
+  );
+  border-radius: $card-radius;
+  box-shadow: $shadow;
+  color: $text-color;
+
+  @media (max-width: 768px) {
+    margin: 1rem;
+    padding: 1rem;
+  }
+}
+
+.back-btn-container {
+  margin-bottom: 1.5rem;
+
+  button {
+    display: flex;
+    align-items: center;
+    font-weight: 600;
+    font-size: 0.95rem;
+    border-radius: $button-radius;
+    padding: 0.5rem 1.25rem;
+    background: rgba($primary-color, 0.08);
+    color: $primary-color;
+    border: 1px solid rgba($primary-color, 0.3);
+    box-shadow: 0 1px 8px rgba($primary-color, 0.08);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+
+    mat-icon {
+      margin-right: 0.5rem;
+      color: inherit;
+      transition: transform 0.2s ease;
+    }
+
+    &:hover {
+      background: $primary-color;
+      color: white;
+      box-shadow: 0 4px 12px rgba($primary-color, 0.25);
+
+      mat-icon {
+        transform: translateX(-2px);
+      }
+    }
+
+    &:active {
+      transform: translateY(1px);
+      box-shadow: 0 2px 8px rgba($primary-color, 0.2);
+    }
+  }
 }
 
 .header {
-  margin-bottom: 20px;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid rgba($border-color, 0.5);
+  padding-bottom: 1rem;
+
+  h1 {
+    font-weight: 700;
+    font-size: 1.8rem;
+    margin: 0;
+    background: linear-gradient(
+      135deg,
+      $primary-color,
+      color.adjust($primary-color, $lightness: -15%)
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+
+    @media (max-width: 768px) {
+      font-size: 1.5rem;
+    }
+  }
 }
 
 .row {
   display: flex;
-  justify-content: space-between;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+
+  @media (max-width: 992px) {
+    flex-direction: column;
+  }
+
+  > .col:first-child {
+    flex: 0 0 50%;
+    max-width: 50%;
+    min-width: 300px;
+
+    @media (max-width: 992px) {
+      flex: 1;
+      max-width: 100%;
+    }
+  }
+
+  > .col:last-child {
+    flex: 0 0 50%;
+    max-width: 50%;
+    min-width: 340px;
+    display: flex;
+    flex-direction: column;
+
+    @media (max-width: 992px) {
+      flex: 1;
+      max-width: 100%;
+    }
+  }
 }
 
-.col {
-  width: 48%;
+.exam-info {
+  background: white;
+  border-radius: $card-radius;
+  padding: 1.5rem;
+  box-shadow: 0 1px 10px rgba(0, 0, 0, 0.05);
+
+  h3 {
+    color: $primary-color;
+    font-weight: 700;
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    font-size: 1.3rem;
+    position: relative;
+    display: flex;
+    align-items: center;
+
+    &::before {
+      content: "";
+      display: inline-block;
+      width: 4px;
+      height: 18px;
+      background: linear-gradient(to bottom, $primary-color, $secondary-color);
+      margin-right: 10px;
+      border-radius: 2px;
+    }
+  }
+
+  form {
+    .form-group {
+      margin-bottom: 1.25rem;
+      position: relative;
+
+      label {
+        font-weight: 600;
+        color: $text-color;
+        margin-bottom: 0.5rem;
+        display: block;
+      }
+
+      .error-message {
+        color: $error-color;
+        font-size: 0.85rem;
+        font-weight: 500;
+        margin-top: 0.25rem;
+        display: block;
+      }
+
+      input.form-control,
+      select.form-control,
+      textarea.form-control {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 1px solid rgba($border-color, 0.7);
+        border-radius: $input-radius;
+        font-size: 0.95rem;
+        color: $text-color;
+        background-color: white;
+        transition: all 0.25s ease;
+        font-family: inherit;
+        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+
+        &:hover {
+          border-color: rgba($primary-color, 0.5);
+        }
+
+        &:focus {
+          outline: none;
+          border-color: $primary-color;
+          box-shadow: 0 0 0 3px rgba($primary-color, 0.15);
+        }
+
+        &[readonly] {
+          background-color: rgba($background-color, 0.8);
+          cursor: not-allowed;
+        }
+
+        &.ng-invalid.ng-touched {
+          border-color: $error-color;
+
+          &:focus {
+            box-shadow: 0 0 0 3px rgba($error-color, 0.15);
+          }
+        }
+      }
+    }
+
+    .bottom-info {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-top: 1.5rem;
+
+      @media (max-width: 768px) {
+        flex-direction: column;
+      }
+
+      button {
+        background: linear-gradient(
+          135deg,
+          $primary-color,
+          color.adjust($primary-color, $lightness: -10%)
+        );
+        color: white;
+        font-weight: 600;
+        border-radius: $button-radius;
+        padding: 0.75rem 1.5rem;
+        border: none;
+        box-shadow: 0 3px 12px rgba($primary-color, 0.25);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        flex: 1;
+        justify-content: center;
+
+        &:hover {
+          background: linear-gradient(
+            135deg,
+            color.adjust($primary-color, $lightness: -5%),
+            color.adjust($primary-color, $lightness: -15%)
+          );
+          box-shadow: 0 4px 15px rgba($primary-color, 0.4);
+          transform: translateY(-2px);
+        }
+
+        &:active {
+          transform: translateY(1px);
+          box-shadow: 0 2px 8px rgba($primary-color, 0.3);
+        }
+
+        &:disabled {
+          background: color.adjust($border-color, $lightness: 10%);
+          color: $subtext-color;
+          box-shadow: none;
+          transform: none;
+          cursor: not-allowed;
+        }
+
+        mat-icon {
+          font-size: 18px;
+          width: 18px;
+          height: 18px;
+        }
+      }
+    }
+  }
 }
 
-.exam-info,
-.exam-questions,
-.student-exams {
-  margin-bottom: 30px;
+// Accordion styling
+mat-accordion {
+  width: 100%;
+
+  mat-expansion-panel {
+    background: white;
+    border-radius: $card-radius !important;
+    box-shadow: 0 1px 10px rgba(0, 0, 0, 0.05) !important;
+    margin-bottom: 1rem !important;
+    overflow: hidden;
+
+    &:last-child {
+      margin-bottom: 0 !important;
+    }
+
+    .mat-expansion-panel-header {
+      padding: 1rem 1.5rem;
+      background: rgba($primary-color, 0.05);
+      font-weight: 600;
+      color: $primary-color;
+
+      &:hover {
+        background: rgba($primary-color, 0.08);
+      }
+    }
+
+    .mat-expansion-panel-content .mat-expansion-panel-body {
+      padding: 1.5rem;
+    }
+  }
 }
 
+.exam-groups,
+.exam-users {
+  h3 {
+    color: $primary-color;
+    font-weight: 700;
+    margin: 0 0 1.5rem 0;
+    font-size: 1.2rem;
+    position: relative;
+    display: flex;
+    align-items: center;
+
+    &::before {
+      content: "";
+      display: inline-block;
+      width: 4px;
+      height: 18px;
+      background: linear-gradient(to bottom, $primary-color, $secondary-color);
+      margin-right: 10px;
+      border-radius: 2px;
+    }
+  }
+
+  // Export button styling
+  > button[mat-raised-button] {
+    background: linear-gradient(
+      135deg,
+      $success-color,
+      color.adjust($success-color, $lightness: -10%)
+    );
+    color: white;
+    font-weight: 600;
+    border-radius: $button-radius;
+    padding: 0.6rem 1.2rem;
+    border: none;
+    box-shadow: 0 3px 12px rgba($success-color, 0.25);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    &:hover {
+      background: linear-gradient(
+        135deg,
+        color.adjust($success-color, $lightness: -5%),
+        color.adjust($success-color, $lightness: -15%)
+      );
+      box-shadow: 0 4px 15px rgba($success-color, 0.4);
+      transform: translateY(-2px);
+    }
+
+    &:active {
+      transform: translateY(1px);
+      box-shadow: 0 2px 8px rgba($success-color, 0.3);
+    }
+
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+  }
+}
+
+// Filter container styling
 .filter-container {
   display: flex;
   flex-wrap: wrap;
-  gap: 15px;
-  margin-bottom: 20px;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  align-items: flex-start;
+
+  .filter-input {
+    flex: 1 1 200px;
+    min-width: 0;
+
+    ::ng-deep .mat-mdc-form-field-subscript-wrapper {
+      display: none;
+    }
+  }
+
+  .filter-buttons {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+    margin-top: 0.25rem;
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+      width: 100%;
+
+      button {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+
+    button {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 600;
+      border-radius: $button-radius;
+      padding: 0.6rem 1rem;
+      height: 42px;
+      min-width: 120px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      transition: all 0.2s ease;
+
+      mat-icon {
+        font-size: 18px;
+        height: 18px;
+        width: 18px;
+      }
+    }
+
+    button[color="primary"] {
+      background: linear-gradient(
+        135deg,
+        $primary-color,
+        color.adjust($primary-color, $lightness: -10%)
+      );
+      border: none;
+      color: white;
+
+      &:hover {
+        background: linear-gradient(
+          135deg,
+          color.adjust($primary-color, $lightness: -5%),
+          color.adjust($primary-color, $lightness: -15%)
+        );
+        box-shadow: 0 4px 12px rgba($primary-color, 0.25);
+      }
+    }
+
+    button[color="warn"] {
+      border: 1px solid $error-color;
+      color: $error-color;
+      background: white;
+
+      &:hover {
+        background: rgba($error-color, 0.08);
+        box-shadow: 0 4px 12px rgba($error-color, 0.15);
+      }
+    }
+  }
 }
 
-.form-group {
-  margin-bottom: 15px;
+// Table styling
+mat-table {
   width: 100%;
+  background: transparent;
+  box-shadow: none;
+
+  mat-header-row {
+    background-color: color.adjust($secondary-color, $lightness: 40%);
+    border-radius: $border-radius;
+    min-height: 48px;
+
+    mat-header-cell {
+      color: $text-color;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+  }
+
+  mat-row {
+    position: relative;
+    cursor: pointer;
+    border-bottom: 1px solid rgba($border-color, 0.5);
+    min-height: 52px;
+    transition: all 0.2s ease;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    &:hover {
+      background: rgba($primary-color, 0.04);
+
+      &::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 100%;
+        width: 3px;
+        background: $primary-color;
+        border-radius: 0 2px 2px 0;
+      }
+    }
+
+    &:active {
+      background: rgba($primary-color, 0.08);
+    }
+  }
+
+  mat-cell,
+  mat-header-cell {
+    padding: 0.75rem 1rem;
+
+    &:first-of-type {
+      padding-left: 1.5rem;
+    }
+
+    &:last-of-type {
+      padding-right: 1.5rem;
+    }
+
+    a {
+      color: $primary-color;
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.2s ease;
+
+      &:hover {
+        text-decoration: underline;
+        color: color.adjust($primary-color, $lightness: -10%);
+      }
+    }
+  }
 }
 
-input,
-select {
+// Action button styling
+.action-btn.delete-btn {
+  background: rgba($error-color, 0.08);
+  color: $error-color;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  transition: all 0.2s ease;
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+
+  &:hover {
+    background: $error-color;
+    color: white;
+    box-shadow: 0 2px 8px rgba($error-color, 0.3);
+  }
+}
+
+// Add new button styling
+div[style*="margin-top: 16px"] button[mat-raised-button] {
+  background: linear-gradient(
+    135deg,
+    $success-color,
+    color.adjust($success-color, $lightness: -10%)
+  );
+  color: white;
+  font-weight: 600;
+  border-radius: $button-radius;
+  padding: 0.6rem 1.2rem;
+  border: none;
+  box-shadow: 0 3px 12px rgba($success-color, 0.25);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  &::before {
+    content: "add";
+    font-family: "Material Icons";
+    font-size: 18px;
+  }
+
+  &:hover {
+    background: linear-gradient(
+      135deg,
+      color.adjust($success-color, $lightness: -5%),
+      color.adjust($success-color, $lightness: -15%)
+    );
+    box-shadow: 0 4px 15px rgba($success-color, 0.4);
+    transform: translateY(-2px);
+  }
+
+  &:active {
+    transform: translateY(1px);
+    box-shadow: 0 2px 8px rgba($success-color, 0.3);
+  }
+}
+
+// Add user/group row styling
+.add-user-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+
+  mat-form-field {
+    flex: 1;
+    min-width: 250px;
+  }
+
+  button[mat-flat-button] {
+    background: linear-gradient(
+      135deg,
+      $success-color,
+      color.adjust($success-color, $lightness: -10%)
+    );
+    color: white;
+    font-weight: 600;
+    border-radius: $button-radius;
+    padding: 0.6rem 1.2rem;
+    border: none;
+    box-shadow: 0 3px 12px rgba($success-color, 0.25);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    height: 42px;
+    min-width: 120px;
+
+    &:hover {
+      background: linear-gradient(
+        135deg,
+        color.adjust($success-color, $lightness: -5%),
+        color.adjust($success-color, $lightness: -15%)
+      );
+      box-shadow: 0 4px 15px rgba($success-color, 0.4);
+    }
+
+    &:disabled {
+      background: color.adjust($border-color, $lightness: 10%);
+      color: $subtext-color;
+      box-shadow: none;
+    }
+  }
+
+  button[mat-stroked-button] {
+    border: 1px solid $error-color;
+    color: $error-color;
+    background: white;
+    font-weight: 600;
+    border-radius: $button-radius;
+    padding: 0.6rem 1.2rem;
+    height: 42px;
+    min-width: 100px;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: rgba($error-color, 0.08);
+      box-shadow: 0 4px 12px rgba($error-color, 0.15);
+    }
+  }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: stretch;
+
+    button {
+      width: 100%;
+    }
+  }
+}
+
+// No data styling
+.no-data {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+  text-align: center;
+  color: $subtext-color;
+
+  .empty-icon {
+    color: rgba($subtext-color, 0.6);
+    font-size: 48px;
+    height: 48px;
+    width: 48px;
+    margin-bottom: 1rem;
+  }
+
+  .empty-title {
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: $text-color;
+  }
+
+  .empty-message {
+    font-size: 0.9rem;
+    max-width: 300px;
+    margin: 0;
+  }
+}
+
+// User quizzes section
+.user-quizzes {
   width: 100%;
-  padding: 8px;
-  margin-top: 5px;
+  background: white;
+  border-radius: $card-radius;
+  padding: 1.5rem;
+  box-shadow: 0 1px 10px rgba(0, 0, 0, 0.05);
+
+  h2 {
+    color: $primary-color;
+    font-weight: 700;
+    margin: 0 0 1.5rem 0;
+    font-size: 1.4rem;
+    position: relative;
+    display: flex;
+    align-items: center;
+
+    &::before {
+      content: "";
+      display: inline-block;
+      width: 4px;
+      height: 20px;
+      background: linear-gradient(to bottom, $primary-color, $secondary-color);
+      margin-right: 10px;
+      border-radius: 2px;
+    }
+  }
+
+  > button[mat-raised-button] {
+    background: linear-gradient(
+      135deg,
+      $success-color,
+      color.adjust($success-color, $lightness: -10%)
+    );
+    color: white;
+    font-weight: 600;
+    border-radius: $button-radius;
+    padding: 0.6rem 1.2rem;
+    border: none;
+    box-shadow: 0 3px 12px rgba($success-color, 0.25);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    &:hover {
+      background: linear-gradient(
+        135deg,
+        color.adjust($success-color, $lightness: -5%),
+        color.adjust($success-color, $lightness: -15%)
+      );
+      box-shadow: 0 4px 15px rgba($success-color, 0.4);
+      transform: translateY(-2px);
+    }
+
+    &:active {
+      transform: translateY(1px);
+      box-shadow: 0 2px 8px rgba($success-color, 0.3);
+    }
+
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+  }
 }
 
-.mat-table {
-  width: 100%;
+// Paginator styling
+mat-paginator {
+  border-top: 1px solid rgba($border-color, 0.3);
+  margin-top: 1rem;
+  padding-top: 0.5rem;
+
+  ::ng-deep {
+    .mat-mdc-paginator-page-size-label,
+    .mat-mdc-paginator-range-label {
+      font-weight: 500;
+    }
+
+    .mat-mdc-paginator-range-actions {
+      .mat-mdc-icon-button {
+        &:hover {
+          background: rgba($primary-color, 0.1);
+        }
+      }
+    }
+  }
 }
 
-.mat-header-cell,
-.mat-cell {
-  padding: 10px;
+// Responsive adjustments
+@media (max-width: 768px) {
+  .form-group {
+    margin-bottom: 1rem;
+  }
+
+  .add-user-row {
+    flex-direction: column;
+
+    mat-form-field {
+      width: 100%;
+    }
+
+    button {
+      width: 100%;
+    }
+  }
+
+  .filter-container {
+    .filter-buttons {
+      flex-direction: column;
+      width: 100%;
+
+      button {
+        width: 100%;
+      }
+    }
+  }
 }
 
-a {
-  text-decoration: none;
-  color: blue;
+@media print {
+  .container {
+    box-shadow: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .back-btn-container,
+  .filter-container,
+  div[style*="margin-top: 16px"],
+  .add-user-row,
+  mat-paginator,
+  .bottom-info button:first-child {
+    display: none;
+  }
+
+  .row {
+    display: block;
+  }
+
+  .col {
+    margin-bottom: 1.5rem;
+    box-shadow: none;
+    border: 1px solid #ddd;
+  }
+
+  mat-header-row {
+    background-color: #f0f0f0 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  mat-accordion {
+    mat-expansion-panel {
+      box-shadow: none !important;
+      border: 1px solid #ddd !important;
+    }
+  }
 }
 
-.mat-paginator {
-  margin-top: 20px;
+// High contrast mode support
+@media (prefers-contrast: high) {
+  .container {
+    border: 2px solid $border-color;
+  }
+
+  mat-table mat-row:hover {
+    background: rgba($primary-color, 0.2);
+  }
+}
+
+// Reduced motion support
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+.button-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+
+  mat-spinner {
+    ::ng-deep circle {
+      stroke: currentColor;
+    }
+  }
+
+  span {
+    white-space: nowrap;
+  }
+}
+
+.update-btn {
+  min-width: 180px;
+
+  .button-content {
+    justify-content: center;
+  }
+
+  &:disabled {
+    .button-content {
+      opacity: 0.6;
+    }
+  }
+}
+
+.confirm-add-btn {
+  min-width: 140px;
+
+  .button-content {
+    justify-content: center;
+  }
+}
+
+.export-btn {
+  min-width: 200px;
+
+  .button-content {
+    justify-content: center;
+  }
+
+  &:disabled {
+    background: color.adjust($border-color, $lightness: 10%) !important;
+    color: $subtext-color !important;
+
+    .button-content {
+      opacity: 0.8;
+    }
+  }
+}
+
+.cancel-quiz-btn {
+  min-width: 40px;
+  border: 1px solid $error-color;
+  color: $error-color;
+  background: rgba(255, 255, 255, 0.95);
+  font-weight: 500;
+  border-radius: 20px;
+  padding: 0.3rem 0.6rem;
+  transition: all 0.2s ease;
+  font-size: 0.875rem;
+
+  .button-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+
+    mat-icon {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+    }
+
+    span {
+      display: none; // Ẩn text, chỉ hiển thị icon
+    }
+  }
+
+  &:hover:not(:disabled) {
+    background: rgba($error-color, 0.95);
+    color: white;
+    box-shadow: 0 2px 8px rgba($error-color, 0.3);
+
+    .button-content span {
+      display: inline; // Hiển thị text khi hover
+      animation: fadeIn 0.2s ease;
+    }
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(1px);
+    box-shadow: 0 1px 4px rgba($error-color, 0.2);
+  }
+
+  &:disabled {
+    border-color: rgba($border-color, 0.5);
+    color: $subtext-color;
+    background: rgba($background-color, 0.8);
+    cursor: not-allowed;
+  }
+
+  mat-spinner {
+    ::ng-deep circle {
+      stroke: $error-color;
+    }
+  }
+
+  &:disabled mat-spinner {
+    ::ng-deep circle {
+      stroke: $subtext-color;
+    }
+  }
+}
+
+// Animation cho text khi hover
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+// Media query cho các thiết bị nhỏ hơn
+@media (max-width: 600px) {
+  .cancel-quiz-btn {
+    padding: 0.25rem;
+    min-width: 32px;
+    border-radius: 16px;
+
+    .button-content {
+      mat-icon {
+        font-size: 14px;
+        width: 14px;
+        height: 14px;
+      }
+    }
+  }
+}
+
+// High contrast mode
+@media (prefers-contrast: high) {
+  .cancel-quiz-btn {
+    border-width: 2px;
+
+    &:hover:not(:disabled) {
+      background: $error-color;
+    }
+  }
+}
+
+// Action button loading states
+.action-btn.delete-btn {
+  &:disabled {
+    background: rgba($border-color, 0.3);
+    color: $subtext-color;
+    cursor: not-allowed;
+
+    mat-spinner {
+      ::ng-deep circle {
+        stroke: $subtext-color;
+      }
+    }
+  }
+}
+
+// Form loading states
+.add-user-row {
+  mat-form-field {
+    &.mat-form-field-disabled {
+      opacity: 0.6;
+    }
+  }
+
+  button:disabled {
+    .button-content {
+      opacity: 0.7;
+    }
+  }
+}
+
+// Loading overlay for entire sections
+.loading-section {
+  position: relative;
+
+  &::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(1px);
+    z-index: 10;
+    border-radius: $border-radius;
+  }
+}
+
+// Spinner customization for different contexts
+.mat-mdc-progress-spinner {
+  &.small-spinner {
+    width: 18px !important;
+    height: 18px !important;
+  }
+
+  &.medium-spinner {
+    width: 20px !important;
+    height: 20px !important;
+  }
+}
+
+// Button hover effects with loading consideration
+button {
+  &:not(:disabled) {
+    cursor: pointer;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+
+    &.loading {
+      cursor: wait;
+    }
+  }
+}
+
+// Responsive adjustments for loading buttons
+@media (max-width: 768px) {
+  .cancel-quiz-btn {
+    min-width: 100px;
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+
+    .button-content {
+      font-size: 0.8rem;
+      gap: 4px;
+
+      mat-icon {
+        font-size: 14px;
+        width: 14px;
+        height: 14px;
+      }
+    }
+  }
+
+  .export-btn,
+  .update-btn,
+  .confirm-add-btn {
+    min-width: auto;
+    width: 100%;
+
+    .button-content {
+      gap: 6px;
+    }
+  }
+
+  .button-content {
+    span {
+      font-size: 0.85rem;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .cancel-quiz-btn {
+    .button-content {
+      flex-direction: column;
+      gap: 2px;
+
+      span {
+        font-size: 0.75rem;
+        line-height: 1;
+      }
+    }
+  }
+}
+
+// Animation for loading states
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.loading-text {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+// Focus states for accessibility
+.cancel-quiz-btn:focus-visible {
+  outline: 2px solid $primary-color;
+  outline-offset: 2px;
+}
+
+// Print styles - hide loading states
+@media print {
+  .button-content mat-spinner,
+  .loading-section::after {
+    display: none !important;
+  }
+
+  .cancel-quiz-btn {
+    border: 1px solid #666;
+    color: #666;
+  }
+}
+
+// High contrast mode support
+@media (prefers-contrast: high) {
+  .cancel-quiz-btn {
+    border-width: 2px;
+
+    &:hover:not(:disabled) {
+      background: rgba($error-color, 0.2);
+    }
+  }
+}
+
+// Reduced motion support
+@media (prefers-reduced-motion: reduce) {
+  .button-content,
+  .cancel-quiz-btn,
+  mat-spinner {
+    transition: none !important;
+    animation: none !important;
+  }
 }

@@ -1,0 +1,279 @@
+<div class="dialog-header">
+  <h2>
+    <mat-icon>{{ getHeaderIcon() }}</mat-icon>
+    {{ title }}
+  </h2>
+</div>
+
+<div class="dialog-content">
+  <!-- Loading overlay -->
+  <div class="loading-overlay" *ngIf="isLoading">
+    <mat-spinner diameter="40"></mat-spinner>
+  </div>
+
+  <form #mainForm="ngForm" (ngSubmit)="onSubmit(mainForm)">
+    <div *ngFor="let field of fields; trackBy: trackByFieldName">
+      <!-- text -->
+      <div *ngIf="field.type === 'text'">
+        <mat-form-field appearance="outline">
+          <mat-label>{{ field.label }}</mat-label>
+          <input
+            matInput
+            [(ngModel)]="formData[field.name]"
+            name="{{ field.name }}"
+            #ngModel="ngModel"
+            [required]="!!field.validators?.required"
+            [minlength]="field.validators?.minLength ?? null"
+            [maxlength]="field.validators?.maxLength ?? null"
+            [pattern]="field.validators?.pattern || ''"
+            [placeholder]="getPlaceholder(field)"
+            autocomplete="off"
+          />
+          <mat-icon matSuffix>{{ getFieldIcon(field) }}</mat-icon>
+          <mat-error
+            *ngIf="ngModel.invalid && (ngModel.touched || ngModel.dirty)"
+          >
+            {{ getFieldError(field, ngModel) }}
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <!-- textarea -->
+      <div *ngIf="field.type === 'textarea'">
+        <mat-form-field appearance="outline">
+          <mat-label>{{ field.label }}</mat-label>
+          <textarea
+            matInput
+            rows="4"
+            [(ngModel)]="formData[field.name]"
+            name="{{ field.name }}"
+            #ngModel="ngModel"
+            [required]="!!field.validators?.required"
+            [placeholder]="getPlaceholder(field)"
+            [minlength]="field.validators?.minLength ?? null"
+            [maxlength]="field.validators?.maxLength ?? null"
+          ></textarea>
+          <mat-icon matSuffix>{{ getFieldIcon(field) }}</mat-icon>
+          <mat-error
+            *ngIf="ngModel.invalid && (ngModel.touched || ngModel.dirty)"
+          >
+            {{ getFieldError(field, ngModel) }}
+          </mat-error>
+          <mat-hint *ngIf="field.validators?.maxLength">
+            {{ formData[field.name]?.length || 0 }}/{{
+              field.validators?.maxLength
+            }}
+            ký tự
+          </mat-hint>
+        </mat-form-field>
+      </div>
+
+      <!-- select -->
+      <div *ngIf="field.type === 'select'">
+        <mat-form-field appearance="outline">
+          <mat-label>{{ field.label }}</mat-label>
+          <mat-select
+            [(ngModel)]="formData[field.name]"
+            name="{{ field.name }}"
+            #ngModel="ngModel"
+            [required]="!!field.validators?.required"
+            (selectionChange)="ngModel.control.markAsDirty()"
+            [placeholder]="getPlaceholder(field)"
+          >
+            <mat-option [value]="null">
+              -- Chọn {{ field.label.toLowerCase() }} --
+            </mat-option>
+            <mat-option
+              *ngFor="let option of field.options; trackBy: trackByOptionValue"
+              [value]="option.value"
+            >
+              {{ option.label }}
+            </mat-option>
+          </mat-select>
+          <mat-icon matSuffix>{{ getFieldIcon(field) }}</mat-icon>
+          <mat-error
+            *ngIf="ngModel.invalid && (ngModel.touched || ngModel.dirty)"
+          >
+            {{ getFieldError(field, ngModel) }}
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <!-- select-search-api -->
+      <div *ngIf="field.type === 'select-search-api'">
+        <mat-form-field appearance="outline">
+          <mat-label>{{ field.label }}</mat-label>
+          <mat-select
+            [(ngModel)]="formData[field.name]"
+            name="{{ field.name }}"
+            #ngModel="ngModel"
+            [required]="!!field.validators?.required"
+            (selectionChange)="ngModel.control.markAsDirty()"
+            [placeholder]="getPlaceholder(field)"
+          >
+            <mat-option>
+              <ngx-mat-select-search
+                [formControl]="getSearchControl(field)"
+                [placeholderLabel]="
+                  'Tìm kiếm ' + field.label.toLowerCase() + '...'
+                "
+                noEntriesFoundLabel="Không tìm thấy kết quả"
+                (input)="onSearchFromInput($event, field)"
+              >
+              </ngx-mat-select-search>
+            </mat-option>
+            <mat-option [value]="null">
+              -- Chọn {{ field.label.toLowerCase() }} --
+            </mat-option>
+            <mat-option
+              *ngFor="let option of field.options; trackBy: trackByOptionValue"
+              [value]="option.value"
+            >
+              {{ option.label }}
+            </mat-option>
+          </mat-select>
+          <mat-icon matSuffix>{{ getFieldIcon(field) }}</mat-icon>
+          <mat-error
+            *ngIf="ngModel.invalid && (ngModel.touched || ngModel.dirty)"
+          >
+            {{ getFieldError(field, ngModel) }}
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <!-- date -->
+      <div *ngIf="field.type === 'date'">
+        <mat-form-field appearance="outline">
+          <mat-label>{{ field.label }}</mat-label>
+          <input
+            matInput
+            [matDatepicker]="picker"
+            [(ngModel)]="formData[field.name]"
+            name="{{ field.name }}"
+            #ngModel="ngModel"
+            [placeholder]="getPlaceholder(field)"
+            [required]="!!field.validators?.required"
+            readonly
+          />
+          <mat-datepicker-toggle
+            matIconSuffix
+            [for]="picker"
+          ></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+          <mat-error
+            *ngIf="ngModel.invalid && (ngModel.touched || ngModel.dirty)"
+          >
+            {{ getFieldError(field, ngModel) }}
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <!-- datetime field -->
+      <div *ngIf="field.type === 'datetime'" class="datetime-field">
+        <mat-form-field appearance="outline">
+          <mat-label>{{ field.label }}</mat-label>
+          <input
+            matInput
+            [matDatepicker]="datetimePicker"
+            [(ngModel)]="formData[field.name]"
+            name="{{ field.name }}_date"
+            #ngModel="ngModel"
+            [required]="!!field.validators?.required"
+            readonly
+            placeholder="Chọn ngày"
+          />
+          <mat-datepicker-toggle
+            matIconSuffix
+            [for]="datetimePicker"
+          ></mat-datepicker-toggle>
+          <mat-datepicker #datetimePicker></mat-datepicker>
+          <mat-error
+            *ngIf="ngModel.invalid && (ngModel.touched || ngModel.dirty)"
+          >
+            {{ getFieldError(field, ngModel) }}
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Thời gian</mat-label>
+          <input
+            matInput
+            type="time"
+            [(ngModel)]="formData[field.name + '_time']"
+            name="{{ field.name }}_time"
+            #timeModel="ngModel"
+            [required]="!!field.validators?.required"
+            placeholder="HH:MM"
+          />
+          <mat-icon matSuffix>schedule</mat-icon>
+          <mat-hint>Định dạng 24 giờ (HH:MM)</mat-hint>
+          <mat-error
+            *ngIf="timeModel.invalid && (timeModel.touched || timeModel.dirty)"
+          >
+            Vui lòng chọn thời gian
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <!-- autocomplete-api -->
+      <div *ngIf="field.type === 'autocomplete-api'">
+        <mat-form-field appearance="outline">
+          <mat-label>{{ field.label }}</mat-label>
+          <input
+            type="text"
+            matInput
+            [matAutocomplete]="auto"
+            [ngModel]="getOptionLabel(field, formData[field.name])"
+            (ngModelChange)="onSearch(field, $event)"
+            name="{{ field.name }}"
+            #ngModel="ngModel"
+            [placeholder]="getPlaceholder(field)"
+            [required]="!!field.validators?.required"
+            autocomplete="off"
+          />
+          <mat-autocomplete
+            #auto="matAutocomplete"
+            (optionSelected)="onOptionSelected(field, $event)"
+          >
+            <mat-option
+              *ngFor="let option of field.options; trackBy: trackByOptionValue"
+              [value]="option.value"
+            >
+              {{ option.label }}
+            </mat-option>
+            <mat-option *ngIf="!field.options?.length" disabled>
+              Không tìm thấy kết quả
+            </mat-option>
+          </mat-autocomplete>
+          <mat-icon matSuffix>{{ getFieldIcon(field) }}</mat-icon>
+          <mat-error
+            *ngIf="ngModel.invalid && (ngModel.touched || ngModel.dirty)"
+          >
+            {{ getFieldError(field, ngModel) }}
+          </mat-error>
+        </mat-form-field>
+      </div>
+    </div>
+  </form>
+</div>
+
+<div class="dialog-actions">
+  <button
+    mat-button
+    type="button"
+    (click)="closeModal()"
+    [disabled]="isLoading"
+  >
+    Hủy bỏ
+  </button>
+  <button
+    mat-raised-button
+    color="primary"
+    type="submit"
+    [disabled]="mainForm.invalid || isLoading"
+    (click)="onSubmit(mainForm)"
+  >
+    <mat-icon>{{ getSubmitIcon() }}</mat-icon>
+    {{ isLoading ? "Đang xử lý..." : submitButtonText }}
+  </button>
+</div>

@@ -7,5 +7,7 @@ namespace OnlineTestSystem.BLL.Services.AnswerService
 { 
     public interface IAnswerService : IBaseService<Answer>
     {
+        Task<int> RemoveAnswerAndReorderAsync(Guid answerId);
     }
+
 }

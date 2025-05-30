@@ -1,12 +1,24 @@
-@use "./app/shared/styles/snackbar.scss";
+@use "@angular/material" as mat;
+@use "../src/app/shared/styles/snackbar.scss";
+@use "../src/app/shared/styles/dialog.scss";
+@use "sass:color";
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
 html,
 body {
   height: 100%;
 }
+
 body {
   margin: 0;
   font-family: Roboto, "Helvetica Neue", sans-serif;
+  background-color: var(--color-bg);
+  color: var(--color-text);
 }
 
 $background-color: #f9fafb !default;
@@ -16,12 +28,24 @@ $secondary-color: #56cc9d !default;
 $error-color: #eb5757 !default;
 $border-color: #e0e0e0 !default;
 $subtext-color: #828282 !default;
+$warn-color: #f44336;
+$success-color: #43a047;
+$success-light: #e8f5e9;
+$danger-color: #e53935;
+$danger-light: #ffebee;
+$border-radius: 8px;
+$input-radius: 8px;
 
-body {
-  font-family: "Roboto", sans-serif;
-  background-color: var(--color-bg);
-  color: var(--color-text);
-}
+$modal-radius: 16px;
+$shadow: 0 4px 20px rgba(0, 0, 0, 0.09);
+$font-family: "Roboto", Arial, sans-serif;
+$card-radius: 12px;
+
+$button-radius: 8px;
+$button-font-size: 1.08rem;
+$button-font-weight: 600;
+$button-padding: 0.7em 2.2em;
+$button-padding-sm: 0.7em 1.3em;
 
 h1,
 h2,
@@ -36,4 +60,17 @@ h3 {
 
 button {
   cursor: pointer;
+}
+
+/* Ẩn icon mắt mặc định trên Chrome, Edge, Safari */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-webkit-credentials-auto-fill-button,
+input[type="password"]::-webkit-input-decoration,
+input[type="password"]::-webkit-textfield-decoration-container {
+  display: none !important;
+}
+
+/* Dành cho Chrome mới */
+input[type="password"]::-webkit-input-decoration {
+  display: none !important;
 }

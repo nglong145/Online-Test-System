@@ -1,0 +1,73 @@
+<div class="exam-page-container" *ngIf="quiz && quiz.questions">
+  <div class="sidebar">
+    <div class="timer">Thời gian còn lại: {{ timeLeft | date : "mm:ss" }}</div>
+    <div class="question-list">
+      <div
+        *ngFor="let q of quiz.questions; let i = index"
+        class="question-circle"
+        [class.answered]="isAnswered(i)"
+        [class.active]="i === currentQuestionIndex"
+        (click)="goToQuestion(i)"
+      >
+        {{ i + 1 }}
+      </div>
+    </div>
+    <button mat-raised-button color="primary" (click)="submitExam()">
+      Nộp bài
+    </button>
+  </div>
+
+  <div class="main-content" *ngIf="currentQuestion">
+    <h2>Câu hỏi {{ currentQuestionIndex + 1 }}</h2>
+    <p>{{ currentQuestion.content }}</p>
+
+    <div class="answers">
+      <div *ngIf="currentQuestion.questionType === 'MultipleChoice'">
+        <mat-checkbox
+          *ngFor="let answer of currentQuestion.answers"
+          [(ngModel)]="selectedAnswers[currentQuestionIndex][answer.id]"
+          (change)="onMultiChoiceChange(currentQuestion.id)"
+        >
+          {{ answer.content }}
+        </mat-checkbox>
+      </div>
+
+      <mat-radio-group
+        *ngIf="currentQuestion.questionType !== 'MultipleChoice'"
+        [(ngModel)]="selectedAnswers[currentQuestionIndex]"
+        (change)="
+          recordAnswer(
+            currentQuestion.id,
+            selectedAnswers[currentQuestionIndex]
+          )
+        "
+      >
+        <mat-radio-button
+          *ngFor="let answer of currentQuestion.answers"
+          [value]="answer.id"
+        >
+          {{ answer.content }}
+        </mat-radio-button>
+      </mat-radio-group>
+    </div>
+
+    <div class="navigation-buttons">
+      <button
+        mat-stroked-button
+        (click)="prevQuestion()"
+        [disabled]="currentQuestionIndex === 0"
+      >
+        <mat-icon>arrow_back</mat-icon>
+        Câu trước
+      </button>
+      <button
+        mat-stroked-button
+        (click)="nextQuestion()"
+        [disabled]="currentQuestionIndex === quiz.questions.length - 1"
+      >
+        Câu sau
+        <mat-icon>arrow_forward</mat-icon>
+      </button>
+    </div>
+  </div>
+</div>

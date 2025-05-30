@@ -14,5 +14,8 @@ namespace OnlineTestSystem.BLL.Services.QuestionService
     public interface IQuestionService : IBaseService<Question>
     {
         Task<PaginatedResult<QuestionVm>> GetQuestionListPaginationAsync(int pageIndex, int pageSize);
+
+        Task<int> RemoveQuestionAndReorderAsync(Guid questionId);
+
     }
 }

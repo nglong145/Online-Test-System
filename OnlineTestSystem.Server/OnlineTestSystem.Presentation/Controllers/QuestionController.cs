@@ -19,7 +19,7 @@ namespace OnlineTestSystem.Presentation.Controllers
             _questionService = questionService;
         }
 
-        [HttpGet("get-all-question")]
+        [HttpGet]
         public async Task<IActionResult> GetAllQuestion()
         {
             var questions = await _questionService.GetAllAsync();
@@ -30,6 +30,7 @@ namespace OnlineTestSystem.Presentation.Controllers
                 {
                     Id = question.Id,
                     Content = question.Content,
+                    Order = question.Order,
                     QuestionType = question.QuestionType.ToString(),
                     AudioUrl = question.AudioUrl,
                     IsActive = question.IsActive,
@@ -41,7 +42,7 @@ namespace OnlineTestSystem.Presentation.Controllers
             return Ok(questionsVm);
         }
 
-        [HttpGet("get-question-by-id/{id}")]
+        [HttpGet("{id}")]
         public async Task<IActionResult> GetQuestionById(Guid id)
         {
             var question = await _questionService.GetByIdAsync(id);
@@ -51,12 +52,13 @@ namespace OnlineTestSystem.Presentation.Controllers
                 {
                     Id = question.Id,
                     Content = question.Content,
+                    Order = question.Order,
                     QuestionType = question.QuestionType.ToString(),
                     AudioUrl = question.AudioUrl,
                     IsActive = question.IsActive,
                     CreatedAt = question.CreatedAt,
                     Level = question.Level.ToString(),
-                    BankId = question.BankId
+                    BankId = question.BankId,
                 };
                 return Ok(questionVm);
             }
@@ -76,13 +78,14 @@ namespace OnlineTestSystem.Presentation.Controllers
 
         }
 
-        [HttpPost("add-new-question")]
+        [HttpPost]
         public async Task<IActionResult> AddNewQuestion([FromBody] AddQuestionVm addQuestionVm)
         {
             var question = new Question()
             {
                 Id = Guid.NewGuid(),
                 Content = addQuestionVm.Content,
+                Order = addQuestionVm.Order,
                 QuestionType = Enum.Parse<QuestionType>(addQuestionVm.QuestionType),
                 AudioUrl = addQuestionVm.AudioUrl,
                 IsActive = addQuestionVm.IsActive,
@@ -94,13 +97,14 @@ namespace OnlineTestSystem.Presentation.Controllers
             return Ok(question);
         }
 
-        [HttpPut("update-question/{id}")]
+        [HttpPut("{id}")]
         public async Task<IActionResult> UpdateQuestion(Guid id, [FromBody] AddQuestionVm addQuestionVm)
         {
             var question = await _questionService.GetByIdAsync(id);
             if (question != null)
             {
                 question.Content = addQuestionVm.Content;
+                question.Order = addQuestionVm.Order;
                 question.QuestionType = Enum.Parse<QuestionType>(addQuestionVm.QuestionType);
                 question.AudioUrl = addQuestionVm.AudioUrl;
                 question.IsActive = addQuestionVm.IsActive;
@@ -113,13 +117,13 @@ namespace OnlineTestSystem.Presentation.Controllers
             return BadRequest("The quiz does not exist!");
         }
 
-        [HttpDelete("delete-question/{id}")]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteQuestion(Guid id)
         {
             var question = await _questionService.GetByIdAsync(id);
             if (question != null)
             {
-                await _questionService.DeleteAsync(question);
+                await _questionService.RemoveQuestionAndReorderAsync(id);
                 return Ok("Delete Successful");
             }
             return BadRequest("Delete Faild!");

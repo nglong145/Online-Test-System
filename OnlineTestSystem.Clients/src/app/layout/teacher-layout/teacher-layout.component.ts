@@ -12,21 +12,24 @@ import { AuthService } from '../../core/auth/services/auth.service';
 })
 export class TeacherLayoutComponent implements OnInit {
   navItems: any[] = [];
+  isMobileMenuOpen: boolean = false;
+
   constructor(private authService: AuthService) {}
+
   ngOnInit(): void {
     const role = this.authService.getUserRole();
-    // const role = 'Teacher';
     if (role === 'Teacher') {
-      // This would typically come from a user service
-
       this.navItems = [
         { name: 'Dashboard', icon: 'dashboard', route: 'dashboard' },
-        { name: 'Category', icon: 'school', route: 'category' },
-        { name: 'Question Bank', icon: 'people', route: 'bank' },
-        { name: 'Quiz', icon: 'assignment', route: 'quiz' },
-        { name: 'Question', icon: 'group', route: 'question' },
-        // Add more admin-related items
+        { name: 'Nhóm', icon: 'groups', route: 'group' },
+        { name: 'Ngân hàng câu hỏi', icon: 'quiz', route: 'bank' },
+        { name: 'Đề thi', icon: 'description', route: 'quiz' },
+        { name: 'Kỳ thi', icon: 'event', route: 'exam' },
       ];
     }
+  }
+
+  toggleMobileMenu(): void {
+    this.isMobileMenuOpen = !this.isMobileMenuOpen;
   }
 }

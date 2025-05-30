@@ -1,0 +1,15 @@
+<h2 mat-dialog-title>Nhập mã truy cập kỳ thi</h2>
+<mat-dialog-content>
+  <p>Kỳ thi: {{ data.exam.examName }}</p>
+  <mat-form-field>
+    <mat-label>Mã truy cập</mat-label>
+    <input matInput [(ngModel)]="accessCode" />
+  </mat-form-field>
+  <div *ngIf="error" class="error-message">{{ error }}</div>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-button (click)="onCancel()" class="cancel-button">Hủy</button>
+  <button mat-raised-button color="primary" (click)="onSubmit()">
+    Vào thi
+  </button>
+</mat-dialog-actions>

@@ -17,6 +17,15 @@ import { CategoryDetailComponent } from './teacher/category/category-detail/cate
 import { BankListComponent } from './teacher/bank/bank-list/bank-list.component';
 import { BankDetailComponent } from './teacher/bank/bank-detail/bank-detail.component';
 import { AccessDeniedComponent } from './shared/access-denied/access-denied.component';
+import { unsavedChangesGuard } from './core/guard/unsaved-changes.guard';
+import { QuizListComponent } from './teacher/quiz/quiz-list/quiz-list.component';
+import { QuizDetailComponent } from './teacher/quiz/quiz-detail/quiz-detail.component';
+import { AddQuizExamComponent } from './admin/exam/add-quiz-exam/add-quiz-exam.component';
+import { HomePageComponent } from './student/home-page/home-page.component';
+import { ExamPageComponent } from './student/exam-page/exam-page.component';
+import { UserQuizDetailComponent } from './student/user-quiz-detail/user-quiz-detail.component';
+import { NotFoundComponent } from './shared/not-found/not-found.component';
+import { DashboardComponent } from './admin/dashboard/dashboard.component';
 
 export const routes: Routes = [
   {
@@ -31,9 +40,13 @@ export const routes: Routes = [
   {
     path: 'admin',
     component: AdminLayoutComponent,
-    // canActivate: [authGuard],
-    // data: { roles: ['Admin'] },
+    canActivate: [authGuard],
+    data: { roles: ['Admin'] },
     children: [
+      {
+        path: 'dashboard',
+        component: DashboardComponent,
+      },
       {
         path: 'teacher',
         component: TeacherListComponent,
@@ -57,6 +70,12 @@ export const routes: Routes = [
       {
         path: 'exam/:id',
         component: ExamDetailComponent,
+        canDeactivate: [unsavedChangesGuard],
+      },
+
+      {
+        path: 'exam/:id/add-quiz',
+        component: AddQuizExamComponent,
       },
       {
         path: 'group',
@@ -66,19 +85,7 @@ export const routes: Routes = [
         path: 'group/:id',
         component: GroupDetailComponent,
       },
-      {
-        path: 'groups/:id',
-        component: GroupDetailComponent,
-      },
-    ],
-  },
 
-  {
-    path: 'teacher',
-    component: TeacherLayoutComponent,
-    // canActivate: [authGuard],
-    // data: { roles: ['Teacher'] },
-    children: [
       {
         path: 'category',
         component: CategoryListComponent,
@@ -86,6 +93,7 @@ export const routes: Routes = [
       {
         path: 'category/:id',
         component: CategoryDetailComponent,
+        canDeactivate: [unsavedChangesGuard],
       },
 
       {
@@ -95,6 +103,74 @@ export const routes: Routes = [
       {
         path: 'bank/:id',
         component: BankDetailComponent,
+        canDeactivate: [unsavedChangesGuard],
+      },
+
+      {
+        path: 'quiz',
+        component: QuizListComponent,
+      },
+      {
+        path: 'quiz/:id',
+        component: QuizDetailComponent,
+        canDeactivate: [unsavedChangesGuard],
+      },
+    ],
+  },
+
+  {
+    path: 'teacher',
+    component: TeacherLayoutComponent,
+    canActivate: [authGuard],
+    data: { roles: ['Teacher'] },
+    children: [
+      {
+        path: 'dashboard',
+        component: DashboardComponent,
+      },
+      {
+        path: 'group',
+        component: GroupListComponent,
+      },
+      {
+        path: 'group/:id',
+        component: GroupDetailComponent,
+        canDeactivate: [unsavedChangesGuard],
+      },
+
+      {
+        path: 'bank',
+        component: BankListComponent,
+      },
+      {
+        path: 'bank/:id',
+        component: BankDetailComponent,
+        canDeactivate: [unsavedChangesGuard],
+      },
+
+      {
+        path: 'quiz',
+        component: QuizListComponent,
+      },
+      {
+        path: 'quiz/:id',
+        component: QuizDetailComponent,
+        canDeactivate: [unsavedChangesGuard],
+      },
+
+      {
+        path: 'exam',
+        component: ExamListComponent,
+      },
+      {
+        path: 'exam/:id',
+        component: ExamDetailComponent,
+        canDeactivate: [unsavedChangesGuard],
+      },
+
+      {
+        path: 'exam/:id/add-quiz',
+        component: AddQuizExamComponent,
       },
     ],
   },
@@ -104,7 +180,20 @@ export const routes: Routes = [
     component: StudentLayoutComponent,
     canActivate: [authGuard],
     data: { roles: ['Student'] },
-    children: [],
+    children: [
+      {
+        path: 'home',
+        component: HomePageComponent,
+      },
+      {
+        path: 'exam/:id/start',
+        component: ExamPageComponent,
+      },
+      {
+        path: 'user-quiz/:id',
+        component: UserQuizDetailComponent,
+      },
+    ],
   },
 
   {
@@ -114,6 +203,10 @@ export const routes: Routes = [
 
   {
     path: '**',
-    redirectTo: 'not-found', // hoặc /home, /dashboard, tùy bạn
+    redirectTo: 'not-found',
+  },
+  {
+    path: 'not-found',
+    component: NotFoundComponent,
   },
 ];

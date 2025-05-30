@@ -4,6 +4,7 @@
     {
         public string Option { get; set; }
         public string Content { get; set; }
+        public int Order { get; set; }
         public bool IsCorrect { get; set; }
     }
 }

@@ -9,6 +9,7 @@ export interface FilterUserQuiz {
   startDate?: string;
   endDate?: string;
   score?: number;
+  isCompleted?: boolean;
 }
 
 export interface UserQuiz {

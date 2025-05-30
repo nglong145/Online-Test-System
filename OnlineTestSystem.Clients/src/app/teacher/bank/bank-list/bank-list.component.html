@@ -1,57 +1,202 @@
 <div class="container">
   <div class="header">
-    <h2>Bank List</h2>
-    <!-- Add New Button -->
+    <div class="title-section">
+      <h1>Danh sách ngân hàng câu hỏi</h1>
+      <p class="subtitle">Quản lý ngân hàng câu hỏi và nội dung</p>
+    </div>
     <button
+      *ngIf="role === 'Teacher'"
       mat-raised-button
       color="primary"
       class="add-new-btn"
       (click)="openAddModal()"
     >
-      + Add New
+      <mat-icon>add</mat-icon>
+      <span>Thêm mới</span>
     </button>
   </div>
 
-  <!-- User List Table for Teachers -->
-  <mat-table [dataSource]="bankDataSource" matSort>
-    <ng-container matColumnDef="name">
-      <mat-header-cell *matHeaderCellDef mat-sort-header>
-        Name
-      </mat-header-cell>
-      <mat-cell *matCellDef="let bank">
-        <a [routerLink]="['/teacher/bank', bank.id]">{{ bank.name }}</a>
-      </mat-cell>
-    </ng-container>
+  <!-- Filter Inputs -->
+  <div class="filter-section">
+    <h2 class="filter-title">Bộ lọc tìm kiếm</h2>
+    <div class="filter-container">
+      <mat-form-field appearance="outline" class="filter-input">
+        <mat-label>Tên ngân hàng câu hỏi</mat-label>
+        <input
+          matInput
+          placeholder="Nhập tên ngân hàng câu hỏi"
+          [(ngModel)]="filter.name"
+          (keyup.enter)="applyFilter()"
+        />
+        <mat-icon matSuffix>description</mat-icon>
+      </mat-form-field>
 
-    <ng-container matColumnDef="owner">
-      <mat-header-cell *matHeaderCellDef mat-sort-header>
-        Nguoi tao
-      </mat-header-cell>
-      <mat-cell *matCellDef="let bank">{{
-        bank.ownerFullName || "khoong cos"
-      }}</mat-cell>
-    </ng-container>
+      <mat-form-field appearance="outline" class="filter-input">
+        <mat-label>Tên danh mục</mat-label>
+        <input
+          matInput
+          placeholder="Nhập tên danh mục"
+          [(ngModel)]="filter.quizCategoryName"
+          (keyup.enter)="applyFilter()"
+        />
+        <mat-icon matSuffix>category</mat-icon>
+      </mat-form-field>
 
-    <ng-container matColumnDef="category">
-      <mat-header-cell *matHeaderCellDef> Danh muc</mat-header-cell>
-      <mat-cell *matCellDef="let bank">{{ bank.categoryName }}</mat-cell>
-    </ng-container>
+      <!-- Nút tìm kiếm và xóa bộ lọc -->
+      <div class="filter-buttons">
+        <button mat-raised-button color="primary" (click)="applyFilter()">
+          <mat-icon>search</mat-icon>
+          Tìm kiếm
+        </button>
+        <button mat-stroked-button color="warn" (click)="clearFilter()">
+          <mat-icon>filter_alt_off</mat-icon>
+          Xóa bộ lọc
+        </button>
+      </div>
+    </div>
+  </div>
 
-    <ng-container matColumnDef="total">
-      <mat-header-cell *matHeaderCellDef> Cau hoi</mat-header-cell>
-      <mat-cell *matCellDef="let bank">{{ bank.totalQuestion }}</mat-cell>
-    </ng-container>
+  <div class="table-container">
+    <!-- Loading overlay -->
+    <div class="loading-overlay" *ngIf="isLoading">
+      <mat-spinner diameter="40"></mat-spinner>
+      <span>Đang tải dữ liệu...</span>
+    </div>
 
-    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
-    <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
-  </mat-table>
+    <!-- Bank List Table -->
+    <mat-table
+      [dataSource]="bankDataSource"
+      matSort
+      [class.blur-on-loading]="isLoading"
+    >
+      <ng-container matColumnDef="name">
+        <mat-header-cell *matHeaderCellDef mat-sort-header>
+          Tên ngân hàng câu hỏi
+        </mat-header-cell>
+        <mat-cell *matCellDef="let bank">
+          <div class="ellipsis" matTooltip="{{ bank.name }}">
+            <a
+              [routerLink]="
+                role === 'Admin'
+                  ? ['/admin/bank', bank.id]
+                  : ['/teacher/bank', bank.id]
+              "
+              >{{ bank.name }}</a
+            >
+          </div>
+        </mat-cell>
+      </ng-container>
 
-  <!-- Pagination -->
-  <mat-paginator
-    [length]="totalBanks"
-    [pageSize]="pageSize"
-    [pageSizeOptions]="[5, 10, 25, 100]"
-    (page)="pageChanged($event)"
-  >
-  </mat-paginator>
+      <ng-container matColumnDef="owner">
+        <mat-header-cell *matHeaderCellDef> Người tạo </mat-header-cell>
+        <mat-cell *matCellDef="let bank">
+          <div class="ellipsis" matTooltip="{{ bank.ownerFullName }}">
+            {{ bank.ownerFullName || "Không có dữ liệu" }}
+          </div>
+        </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="category">
+        <mat-header-cell *matHeaderCellDef> Danh mục </mat-header-cell>
+        <mat-cell *matCellDef="let bank">
+          <div class="ellipsis" matTooltip="{{ bank.categoryName }}">
+            {{ bank.categoryName }}
+          </div>
+        </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="total">
+        <mat-header-cell *matHeaderCellDef> Số lượng câu hỏi </mat-header-cell>
+        <mat-cell *matCellDef="let bank">{{
+          bank.totalQuestion || 0
+        }}</mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="actions">
+        <mat-header-cell *matHeaderCellDef>Thao tác</mat-header-cell>
+        <mat-cell *matCellDef="let bank">
+          <button
+            mat-icon-button
+            color="warn"
+            class="action-btn delete-btn"
+            (click)="openDeleteConfirmDialog(bank); $event.stopPropagation()"
+            [attr.aria-label]="'Xóa ' + bank.name"
+            matTooltip="Xóa ngân hàng câu hỏi"
+          >
+            <mat-icon>delete</mat-icon>
+          </button>
+        </mat-cell>
+      </ng-container>
+
+      <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+      <mat-row
+        *matRowDef="let row; columns: displayedColumns"
+        (click)="goToBankDetail(row)"
+      ></mat-row>
+    </mat-table>
+
+    <!-- Empty state -->
+    <div class="no-data" *ngIf="bankDataSource?.length === 0 && !isLoading">
+      <mat-icon>folder_off</mat-icon>
+      <h3>Không tìm thấy ngân hàng câu hỏi</h3>
+      <p>Không có dữ liệu phù hợp với tiêu chí tìm kiếm</p>
+      <button mat-stroked-button color="primary" (click)="clearFilter()">
+        <mat-icon>refresh</mat-icon>
+        Làm mới tìm kiếm
+      </button>
+    </div>
+
+    <!-- Pagination -->
+    <mat-paginator
+      class="paginator"
+      [length]="totalBanks"
+      [pageSize]="pageSize"
+      [pageSizeOptions]="[5, 10, 25, 100]"
+      (page)="pageChanged($event)"
+      [showFirstLastButtons]="true"
+      aria-label="Chọn trang kết quả"
+    >
+    </mat-paginator>
+  </div>
 </div>
+
+<!-- Delete Confirmation Dialog Template -->
+<ng-template #deleteConfirmDialog let-data>
+  <div class="dialog-header">
+    <h2>Xác nhận xóa</h2>
+  </div>
+  <div class="dialog-content">
+    <p>
+      Bạn có chắc chắn muốn xóa ngân hàng câu hỏi
+      <strong>{{ data.bank.name }}</strong
+      >?
+    </p>
+    <p>
+      Hành động này không thể hoàn tác và tất cả câu hỏi trong ngân hàng sẽ bị
+      xóa.
+    </p>
+
+    <div class="countdown-container">
+      <div class="countdown">{{ countdownValue$ | async }}</div>
+      <p class="countdown-text" *ngIf="(countdownValue$ | async) !== 0">
+        Vui lòng đợi {{ countdownValue$ | async }} giây để xác nhận
+      </p>
+      <p class="countdown-text" *ngIf="(countdownValue$ | async) === 0">
+        Bạn có thể xác nhận bây giờ
+      </p>
+    </div>
+  </div>
+  <div class="dialog-actions">
+    <button mat-button class="cancel-btn" (click)="data.cancelAction()">
+      Hủy
+    </button>
+    <button
+      mat-raised-button
+      class="confirm-btn"
+      [disabled]="(countdownValue$ | async) !== 0"
+      (click)="data.confirmAction()"
+    >
+      Xác nhận xóa
+    </button>
+  </div>
+</ng-template>

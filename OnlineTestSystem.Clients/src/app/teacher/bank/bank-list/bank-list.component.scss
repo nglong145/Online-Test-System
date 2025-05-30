@@ -1,0 +1,623 @@
+@use "../../../../styles.scss" as *;
+@use "sass:color";
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0;
+  color: $text-color;
+}
+
+// Header styling
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.9),
+    rgba(255, 255, 255, 1)
+  );
+  border-radius: $card-radius;
+  padding: 1.5rem;
+  box-shadow: $shadow;
+
+  .title-section {
+    h1 {
+      font-weight: 700;
+      font-size: 1.8rem;
+      margin: 0 0 0.5rem 0;
+      color: $primary-color;
+      background: linear-gradient(
+        135deg,
+        $primary-color,
+        color.adjust($primary-color, $lightness: -15%)
+      );
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: $subtext-color;
+      font-size: 1rem;
+    }
+  }
+
+  .add-new-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(
+      135deg,
+      $primary-color,
+      color.adjust($primary-color, $lightness: -10%)
+    );
+    color: white;
+    font-weight: 600;
+    padding: 0.6rem 1.2rem;
+    border-radius: $button-radius;
+    box-shadow: 0 3px 12px rgba($primary-color, 0.25);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: none;
+
+    mat-icon {
+      margin-right: 4px;
+    }
+
+    &:hover {
+      background: linear-gradient(
+        135deg,
+        color.adjust($primary-color, $lightness: -5%),
+        color.adjust($primary-color, $lightness: -15%)
+      );
+      box-shadow: 0 4px 15px rgba($primary-color, 0.4);
+      transform: translateY(-2px);
+    }
+
+    &:active {
+      transform: translateY(1px);
+      box-shadow: 0 2px 8px rgba($primary-color, 0.3);
+    }
+  }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+
+    .add-new-btn {
+      align-self: stretch;
+      justify-content: center;
+    }
+  }
+}
+
+// Filter section styling
+.filter-section {
+  background: white;
+  border-radius: $card-radius;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: $shadow;
+
+  .filter-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: $primary-color;
+    margin-top: 0;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+
+    &::before {
+      content: "";
+      display: inline-block;
+      width: 4px;
+      height: 18px;
+      background: linear-gradient(to bottom, $primary-color, $secondary-color);
+      margin-right: 8px;
+      border-radius: 2px;
+    }
+  }
+}
+
+.filter-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+
+  .filter-input {
+    flex: 1 1 250px;
+    min-width: 0;
+
+    ::ng-deep .mat-mdc-form-field-subscript-wrapper {
+      display: none;
+    }
+  }
+
+  .filter-buttons {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    margin-top: 4px;
+
+    button {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 600;
+      border-radius: $button-radius;
+      padding: 0.6rem 1rem;
+      height: 42px;
+      min-width: 120px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      transition: all 0.2s ease;
+    }
+
+    button[color="primary"] {
+      background: linear-gradient(
+        135deg,
+        $primary-color,
+        color.adjust($primary-color, $lightness: -10%)
+      );
+      border: none;
+
+      &:hover {
+        background: linear-gradient(
+          135deg,
+          color.adjust($primary-color, $lightness: -5%),
+          color.adjust($primary-color, $lightness: -15%)
+        );
+        box-shadow: 0 4px 12px rgba($primary-color, 0.25);
+      }
+    }
+
+    button[color="warn"] {
+      border: 1px solid $error-color;
+      color: $error-color;
+      background: white;
+
+      &:hover {
+        background: rgba($error-color, 0.08);
+        box-shadow: 0 4px 12px rgba($error-color, 0.15);
+      }
+    }
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+      width: 100%;
+
+      button {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    .filter-input {
+      flex: 1 1 100%;
+    }
+  }
+}
+
+// Table container styling
+.table-container {
+  background: white;
+  border-radius: $card-radius;
+  padding: 1.5rem;
+  box-shadow: $shadow;
+  position: relative;
+  overflow: hidden;
+
+  .table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+
+    h2 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: $text-color;
+      margin: 0;
+      display: flex;
+      align-items: center;
+
+      &::before {
+        content: "";
+        display: inline-block;
+        width: 4px;
+        height: 18px;
+        background: linear-gradient(
+          to bottom,
+          $secondary-color,
+          color.adjust($secondary-color, $lightness: -20%)
+        );
+        margin-right: 8px;
+        border-radius: 2px;
+      }
+    }
+
+    .result-count {
+      color: $subtext-color;
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+  }
+
+  // Loading state
+  .loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.7);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+    gap: 16px;
+    backdrop-filter: blur(2px);
+
+    span {
+      color: $primary-color;
+      font-weight: 500;
+      margin-top: 8px;
+    }
+  }
+
+  .blur-on-loading {
+    filter: blur(1px);
+  }
+}
+
+// Table styling
+mat-table {
+  width: 100%;
+  box-shadow: none;
+  background: transparent;
+
+  mat-header-row {
+    background-color: color.adjust($secondary-color, $lightness: 40%);
+    border-radius: $border-radius;
+    min-height: 48px;
+
+    mat-header-cell {
+      color: $text-color;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+  }
+
+  mat-row {
+    position: relative;
+    cursor: pointer;
+    border-bottom: 1px solid rgba($border-color, 0.5);
+    min-height: 52px;
+    transition: all 0.2s ease;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    &:hover {
+      background: rgba($primary-color, 0.04);
+
+      &::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 100%;
+        width: 3px;
+        background: $primary-color;
+        border-radius: 0 2px 2px 0;
+      }
+
+      mat-cell {
+        color: $primary-color;
+      }
+    }
+
+    &:active {
+      background: rgba($primary-color, 0.08);
+    }
+  }
+
+  mat-cell,
+  mat-header-cell {
+    padding: 0.5rem 1rem;
+
+    &:first-of-type {
+      padding-left: 1.5rem;
+    }
+
+    &:last-of-type {
+      padding-right: 1.5rem;
+    }
+
+    .ellipsis {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 200px;
+
+      @media (max-width: 768px) {
+        max-width: 120px;
+      }
+
+      a {
+        color: $primary-color;
+        text-decoration: none;
+        font-weight: 500;
+        position: relative;
+        padding-bottom: 2px;
+
+        &:hover {
+          &::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            height: 1px;
+            background: $primary-color;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Action button styling
+.action-btn.delete-btn {
+  background: rgba($error-color, 0.08);
+  color: $error-color;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  transition: all 0.2s ease;
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+
+  &:hover {
+    background: $error-color;
+    color: white;
+    box-shadow: 0 2px 8px rgba($error-color, 0.3);
+  }
+}
+
+// Empty state styling
+.no-data {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1rem;
+  text-align: center;
+
+  mat-icon {
+    font-size: 48px;
+    height: 48px;
+    width: 48px;
+    color: rgba($subtext-color, 0.5);
+    margin-bottom: 1rem;
+  }
+
+  h3 {
+    color: $text-color;
+    font-weight: 600;
+    margin: 0 0 0.5rem 0;
+  }
+
+  p {
+    color: $subtext-color;
+    margin: 0 0 1.5rem 0;
+  }
+
+  button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+}
+
+// Paginator styling
+mat-paginator {
+  border-top: 1px solid rgba($border-color, 0.3);
+  margin-top: 1rem;
+  padding-top: 0.5rem;
+
+  ::ng-deep {
+    .mat-mdc-paginator-page-size-label,
+    .mat-mdc-paginator-range-label {
+      font-weight: 500;
+    }
+
+    .mat-mdc-paginator-range-actions {
+      .mat-mdc-icon-button {
+        &:hover {
+          background: rgba($primary-color, 0.1);
+        }
+      }
+    }
+  }
+}
+
+// Delete Confirmation Dialog
+::ng-deep .delete-confirm-dialog {
+  .mat-mdc-dialog-container {
+    padding: 0;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .dialog-header {
+    background: linear-gradient(
+      to right,
+      $error-color,
+      color.adjust($error-color, $lightness: -15%)
+    );
+    color: white;
+    padding: 1.25rem 1.5rem;
+
+    h2 {
+      margin: 0;
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+  }
+
+  .dialog-content {
+    padding: 1.5rem;
+
+    p {
+      margin-top: 0;
+      font-size: 1rem;
+      line-height: 1.5;
+    }
+
+    .countdown-container {
+      margin: 1.5rem 0;
+      text-align: center;
+
+      .countdown {
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        width: 64px;
+        height: 64px;
+        background: rgba($error-color, 0.1);
+        border-radius: 50%;
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: $error-color;
+        margin-bottom: 0.5rem;
+      }
+
+      .countdown-text {
+        font-size: 0.9rem;
+        color: $subtext-color;
+        margin: 0;
+      }
+    }
+  }
+
+  .dialog-actions {
+    padding: 1rem 1.5rem;
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    border-top: 1px solid rgba($border-color, 0.5);
+
+    button {
+      min-width: 100px;
+
+      &.cancel-btn {
+        background: transparent;
+        color: $text-color;
+        border: 1px solid rgba($border-color, 0.7);
+
+        &:hover {
+          background: rgba($border-color, 0.1);
+        }
+      }
+
+      &.confirm-btn {
+        background: $error-color;
+        color: white;
+
+        &:disabled {
+          background: rgba($error-color, 0.5);
+          color: rgba(white, 0.7);
+        }
+
+        &:not(:disabled):hover {
+          background: color.adjust($error-color, $lightness: -10%);
+        }
+      }
+    }
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .container {
+    padding: 0 16px;
+    margin: 1rem 0;
+  }
+
+  .header,
+  .filter-section,
+  .table-container {
+    padding: 1rem;
+  }
+
+  mat-header-row {
+    padding: 0 8px;
+  }
+
+  .mat-column-description {
+    display: none !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .header {
+    .title-section {
+      h1 {
+        font-size: 1.5rem;
+      }
+    }
+  }
+
+  .filter-section .filter-title,
+  .table-container .table-header h2 {
+    font-size: 1.1rem;
+  }
+}
+
+// Print-friendly styles
+@media print {
+  .container {
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  .header .add-new-btn,
+  .filter-section,
+  .paginator {
+    display: none;
+  }
+
+  .table-container {
+    box-shadow: none;
+    padding: 0;
+  }
+
+  mat-row,
+  mat-header-row {
+    page-break-inside: avoid;
+  }
+
+  mat-header-row {
+    background-color: #f0f0f0 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}

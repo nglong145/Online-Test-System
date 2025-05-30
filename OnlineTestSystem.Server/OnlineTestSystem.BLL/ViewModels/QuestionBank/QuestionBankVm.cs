@@ -10,5 +10,6 @@ namespace OnlineTestSystem.BLL.ViewModels.QuestionBank
         public Guid? QuizCategoryId { get; set; }
         public string CategoryName { get; set; }
         public int TotalQuestion {  get; set; }
+        public bool IsActive { get; set; }
     }
 }

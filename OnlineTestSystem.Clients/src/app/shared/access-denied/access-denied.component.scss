@@ -1,19 +1,158 @@
+@use "../../../styles.scss" as *;
+@use "sass:color";
+
 .access-denied-container {
-  text-align: center;
-  margin-top: 100px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 64px);
+  padding: 40px 20px;
+  background: linear-gradient(
+    135deg,
+    rgba($background-color, 0.8),
+    rgba($background-color, 0.95)
+  );
+  animation: fadeIn 0.7s ease;
+
+  @media (max-width: 768px) {
+    min-height: calc(100vh - 56px);
+    padding: 30px 16px;
+  }
+
+  .error-illustration {
+    width: 280px;
+    height: 200px;
+    margin-bottom: 32px;
+    object-fit: contain;
+    animation: float 3s ease-in-out infinite alternate;
+
+    @media (max-width: 576px) {
+      width: 220px;
+      height: 160px;
+      margin-bottom: 24px;
+    }
+  }
+
+  .error-code {
+    font-size: 72px;
+    font-weight: 700;
+    margin: 0 0 16px 0;
+    background: linear-gradient(
+      135deg,
+      $error-color,
+      color.adjust($error-color, $lightness: 15%)
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: -1px;
+    animation: pulse403 2s infinite alternate;
+    text-align: center;
+
+    @media (max-width: 576px) {
+      font-size: 56px;
+    }
+  }
+
+  .error-title {
+    font-size: 28px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: $text-color;
+    text-align: center;
+
+    @media (max-width: 576px) {
+      font-size: 24px;
+    }
+  }
+
+  .error-desc {
+    color: $subtext-color;
+    text-align: center;
+    margin-bottom: 32px;
+    font-size: 18px;
+    line-height: 1.6;
+    max-width: 500px;
+
+    @media (max-width: 576px) {
+      font-size: 16px;
+      margin-bottom: 28px;
+    }
+  }
+
+  .go-back-btn {
+    background: linear-gradient(
+      135deg,
+      $secondary-color,
+      color.adjust($secondary-color, $lightness: -8%)
+    );
+    color: white;
+    border: none;
+    outline: none;
+    border-radius: $button-radius;
+    padding: $button-padding;
+    font-size: $button-font-size;
+    font-weight: $button-font-weight;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 15px rgba($secondary-color, 0.15);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba($secondary-color, 0.25);
+      background: linear-gradient(
+        135deg,
+        color.adjust($secondary-color, $lightness: 5%),
+        $secondary-color
+      );
+    }
+
+    &:active {
+      transform: translateY(1px);
+      box-shadow: 0 2px 10px rgba($secondary-color, 0.15);
+    }
+
+    @media (max-width: 576px) {
+      padding: $button-padding-sm;
+      font-size: 1rem;
+    }
+  }
 }
-h1 {
-  color: red;
-  font-size: 3rem;
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
-p {
-  font-size: 1.5rem;
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-15px);
+  }
 }
-a {
-  margin-top: 20px;
-  display: inline-block;
-  font-size: 1.2rem;
-  color: #007bff;
-  text-decoration: underline;
-  cursor: pointer;
+
+@keyframes pulse403 {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 1;
+  }
 }

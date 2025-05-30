@@ -179,46 +179,6 @@ namespace OnlineTestSystem.BLL.Services.AuthenticationService
             };
         }
 
-        //public async Task<bool> UpdateUserInfoAsync(Guid userId, UpdateUserVm updateUserVm)
-        //{
-        //    var user = await _userManager.FindByIdAsync(userId.ToString());
-        //    if (user == null)
-        //    {
-        //        throw new Exception("User not found.");
-        //    }
-
-        //    user.FullName = updateUserVm.FullName;
-        //    user.PhoneNumber = updateUserVm.PhoneNumber;
-        //    user.Address = updateUserVm.Address;
-        //    user.Avatar = updateUserVm.Avatar;
-
-        //    var result = await _userManager.UpdateAsync(user);
-        //    return result.Succeeded;
-        //}
-
-
-        //public async Task<bool> ChangePasswordAsync(Guid userId, ChangePasswordVm passwordVm)
-        //{
-        //    var user = await _userManager.FindByIdAsync(userId.ToString());
-        //    if (user == null)
-        //    {
-        //        throw new Exception("User not found.");
-        //    }
-
-        //    var isOldPasswordValid = await _userManager.CheckPasswordAsync(user, passwordVm.OldPassword);
-        //    if (!isOldPasswordValid)
-        //    {
-        //        throw new Exception("Old password is incorrect.");
-        //    }
-
-        //    var result = await _userManager.ChangePasswordAsync(user, passwordVm.OldPassword, passwordVm.NewPassword);
-        //    if (!result.Succeeded)
-        //    {
-        //        var errors = string.Join(", ", result.Errors.Select(e => e.Description));
-        //        throw new Exception($"Failed to change password: {errors}");
-        //    }
-
-        //    return result.Succeeded;
-        //}
+     
     }
 }

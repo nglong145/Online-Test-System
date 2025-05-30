@@ -12,5 +12,7 @@
         public DateTime? StartDate { get; set; }  // Ngày bắt đầu
         public DateTime? EndDate { get; set; }    // Ngày kết thúc
         public float? Score { get; set; }
+
+        public bool IsCompleted { get; set; } 
     }
 }

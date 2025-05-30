@@ -24,6 +24,9 @@ namespace OnlineTestSystem.DAL.Configurations
             builder.Property(q => q.ParentId)
                    .IsRequired(false);
 
+            builder.Property(q => q.CreatedAt)
+               .HasDefaultValueSql("GETDATE()");
+
             builder.HasOne(q => q.Parent)
                    .WithMany(q => q.Children)
                    .HasForeignKey(q => q.ParentId)

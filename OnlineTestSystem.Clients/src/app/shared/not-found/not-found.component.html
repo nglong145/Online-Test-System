@@ -1,0 +1,18 @@
+<app-header></app-header>
+<div class="not-found-container">
+  <img
+    src="assets/images/404-illustration.svg"
+    alt="Page not found"
+    class="error-illustration"
+    onerror="this.style.display='none'"
+  />
+  <h1 class="error-code">404</h1>
+  <h2 class="error-title">Không tìm thấy trang</h2>
+  <p class="error-desc">
+    Trang bạn đang tìm kiếm không tồn tại hoặc đã được di chuyển.<br />
+    Vui lòng kiểm tra lại đường dẫn hoặc trở về trang chủ.
+  </p>
+  <button class="go-home-btn" (click)="goHome()">
+    <span>Về trang chủ</span>
+  </button>
+</div>

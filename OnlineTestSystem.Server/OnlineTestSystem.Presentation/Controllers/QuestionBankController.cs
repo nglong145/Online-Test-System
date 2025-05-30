@@ -59,6 +59,16 @@ namespace OnlineTestSystem.Presentation.Controllers
             return BadRequest("The question bank does not exist!");
         }
 
+        [HttpGet("{id}/full-detail")]
+        public async Task<IActionResult> GetFullBankDetail(Guid id)
+        {
+            var result = await _bankService.GetBankFullDetailAsync(id);
+            if (result == null)
+                return NotFound(new { message = "Không tìm thấy ngân hàng câu hỏi." });
+
+            return Ok(result);
+        }
+
 
         [HttpPost("Filter")]
         public async Task<IActionResult> FilteQuestionBank([FromQuery] int pageIndex, int pageSize,
@@ -102,7 +112,7 @@ namespace OnlineTestSystem.Presentation.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateQuestionBank(Guid id, [FromBody] AddQuestionBankVm addBankVm)
+        public async Task<IActionResult> UpdateQuestionBank(Guid id, [FromBody] UpdateQuestionBankVm addBankVm)
         {
             var bank = await _bankService.GetByIdAsync(id);
             if (bank != null)
@@ -110,6 +120,7 @@ namespace OnlineTestSystem.Presentation.Controllers
                 bank.Name = addBankVm.Name;
                 bank.OwnerId = addBankVm.OwnerId;
                 bank.QuizCategoryId = addBankVm.QuizCategoryId;
+                bank.IsActive = addBankVm.IsActive; 
 
                 var result = await _bankService.UpdateAsync(bank);
                 if (result > 0)

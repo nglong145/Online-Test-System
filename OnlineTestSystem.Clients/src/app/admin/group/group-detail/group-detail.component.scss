@@ -1,0 +1,635 @@
+@use "../../../../styles.scss" as *;
+@use "sass:color";
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.5rem;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.9),
+    rgba(255, 255, 255, 1)
+  );
+  border-radius: $card-radius;
+  box-shadow: $shadow;
+  color: $text-color;
+
+  @media (max-width: 768px) {
+    margin: 0;
+    padding: 1rem;
+  }
+}
+
+.back-btn-container {
+  margin-bottom: 1.5rem;
+
+  button {
+    display: flex;
+    align-items: center;
+    font-weight: 600;
+    font-size: 0.95rem;
+    border-radius: $button-radius;
+    padding: 0.5rem 1.25rem;
+    background: rgba($primary-color, 0.08);
+    color: $primary-color;
+    border: 1px solid rgba($primary-color, 0.3);
+    box-shadow: 0 1px 8px rgba($primary-color, 0.08);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+
+    mat-icon {
+      margin-right: 0.5rem;
+      color: inherit;
+      transition: transform 0.2s ease;
+    }
+
+    &:hover {
+      background: $primary-color;
+      color: white;
+      box-shadow: 0 4px 12px rgba($primary-color, 0.25);
+
+      mat-icon {
+        transform: translateX(-2px);
+      }
+    }
+
+    &:active {
+      transform: translateY(1px);
+      box-shadow: 0 2px 8px rgba($primary-color, 0.2);
+    }
+  }
+}
+
+.header {
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid rgba($border-color, 0.5);
+  padding-bottom: 1rem;
+
+  h1 {
+    font-weight: 700;
+    font-size: 1.8rem;
+    margin: 0;
+    background: linear-gradient(
+      135deg,
+      $primary-color,
+      color.adjust($primary-color, $lightness: -15%)
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+
+    @media (max-width: 768px) {
+      font-size: 1.5rem;
+    }
+  }
+}
+
+.row {
+  display: flex;
+  gap: 1.5rem;
+
+  @media (max-width: 992px) {
+    flex-direction: column;
+  }
+
+  .col {
+    flex: 1;
+    background: white;
+    border-radius: $card-radius;
+    padding: 1.5rem;
+    box-shadow: 0 1px 10px rgba(0, 0, 0, 0.05);
+  }
+}
+
+// Common styles for both info sections
+.group-info,
+.user-groups {
+  h3 {
+    color: $primary-color;
+    font-weight: 700;
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    font-size: 1.3rem;
+    position: relative;
+    display: flex;
+    align-items: center;
+
+    &::before {
+      content: "";
+      display: inline-block;
+      width: 4px;
+      height: 18px;
+      background: linear-gradient(to bottom, $primary-color, $secondary-color);
+      margin-right: 10px;
+      border-radius: 2px;
+    }
+  }
+}
+
+// Form styles
+.group-info {
+  form {
+    .form-group {
+      margin-bottom: 1.25rem;
+      position: relative;
+
+      label {
+        font-weight: 600;
+        color: $text-color;
+        margin-bottom: 0.5rem;
+        display: block;
+      }
+
+      .error {
+        color: $error-color;
+        font-size: 0.85rem;
+        font-weight: 500;
+        margin-top: 0.25rem;
+        display: block;
+      }
+
+      input.form-control,
+      select.form-control,
+      textarea.form-control {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 1px solid rgba($border-color, 0.7);
+        border-radius: $input-radius;
+        font-size: 0.95rem;
+        color: $text-color;
+        background-color: white;
+        transition: all 0.25s ease;
+        font-family: inherit;
+        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+
+        &:hover {
+          border-color: rgba($primary-color, 0.5);
+        }
+
+        &:focus {
+          outline: none;
+          border-color: $primary-color;
+          box-shadow: 0 0 0 3px rgba($primary-color, 0.15);
+        }
+
+        &[readonly] {
+          background-color: rgba($background-color, 0.8);
+          cursor: not-allowed;
+        }
+
+        &.ng-invalid.ng-touched {
+          border-color: $error-color;
+
+          &:focus {
+            box-shadow: 0 0 0 3px rgba($error-color, 0.15);
+          }
+        }
+      }
+    }
+
+    // Style for mat-form-field
+    .full-width {
+      width: 100%;
+      margin-bottom: 0.5rem;
+    }
+
+    button[mat-raised-button] {
+      background: linear-gradient(
+        135deg,
+        $primary-color,
+        color.adjust($primary-color, $lightness: -10%)
+      );
+      color: white;
+      font-weight: 600;
+      border-radius: $button-radius;
+      padding: 0.75rem 1.5rem;
+      border: none;
+      box-shadow: 0 3px 12px rgba($primary-color, 0.25);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      margin-top: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+
+      &:hover {
+        background: linear-gradient(
+          135deg,
+          color.adjust($primary-color, $lightness: -5%),
+          color.adjust($primary-color, $lightness: -15%)
+        );
+        box-shadow: 0 4px 15px rgba($primary-color, 0.4);
+        transform: translateY(-2px);
+      }
+
+      &:active {
+        transform: translateY(1px);
+        box-shadow: 0 2px 8px rgba($primary-color, 0.3);
+      }
+
+      &:disabled {
+        background: color.adjust($border-color, $lightness: 10%);
+        color: $subtext-color;
+        box-shadow: none;
+        transform: none;
+        cursor: not-allowed;
+      }
+    }
+  }
+}
+
+// Filter section styles
+.filter-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  align-items: flex-start;
+
+  .filter-input {
+    flex: 1 1 200px;
+    min-width: 0;
+
+    ::ng-deep .mat-mdc-form-field-subscript-wrapper {
+      display: none;
+    }
+  }
+
+  .filter-buttons {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+    margin-top: 0.25rem;
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+      width: 100%;
+
+      button {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+
+    button {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 600;
+      border-radius: $button-radius;
+      padding: 0.6rem 1rem;
+      height: 42px;
+      min-width: 120px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      transition: all 0.2s ease;
+
+      mat-icon {
+        font-size: 18px;
+        height: 18px;
+        width: 18px;
+      }
+    }
+
+    button[color="primary"] {
+      background: linear-gradient(
+        135deg,
+        $primary-color,
+        color.adjust($primary-color, $lightness: -10%)
+      );
+      border: none;
+
+      &:hover {
+        background: linear-gradient(
+          135deg,
+          color.adjust($primary-color, $lightness: -5%),
+          color.adjust($primary-color, $lightness: -15%)
+        );
+        box-shadow: 0 4px 12px rgba($primary-color, 0.25);
+      }
+    }
+
+    button[color="warn"] {
+      border: 1px solid $error-color;
+      color: $error-color;
+      background: white;
+
+      &:hover {
+        background: rgba($error-color, 0.08);
+        box-shadow: 0 4px 12px rgba($error-color, 0.15);
+      }
+    }
+  }
+}
+
+// Table styles
+mat-table {
+  width: 100%;
+  box-shadow: none;
+  background: transparent;
+
+  mat-header-row {
+    background-color: color.adjust($secondary-color, $lightness: 40%);
+    border-radius: $border-radius;
+    min-height: 48px;
+
+    mat-header-cell {
+      color: $text-color;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+  }
+
+  mat-row {
+    position: relative;
+    cursor: pointer;
+    border-bottom: 1px solid rgba($border-color, 0.5);
+    min-height: 52px;
+    transition: all 0.2s ease;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    &:hover {
+      background: rgba($primary-color, 0.04);
+
+      &::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 100%;
+        width: 3px;
+        background: $primary-color;
+        border-radius: 0 2px 2px 0;
+      }
+    }
+
+    &:active {
+      background: rgba($primary-color, 0.08);
+    }
+  }
+
+  mat-cell,
+  mat-header-cell {
+    padding: 0.75rem 1rem;
+
+    &:first-of-type {
+      padding-left: 1.5rem;
+    }
+
+    &:last-of-type {
+      padding-right: 1.5rem;
+    }
+  }
+}
+
+// Empty state styling
+.no-data {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+  text-align: center;
+  color: $subtext-color;
+
+  .empty-icon {
+    color: rgba($subtext-color, 0.6);
+    font-size: 48px;
+    height: 48px;
+    width: 48px;
+    margin-bottom: 1rem;
+  }
+
+  .empty-title {
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: $text-color;
+  }
+
+  .empty-message {
+    font-size: 0.9rem;
+    max-width: 300px;
+    margin: 0;
+  }
+}
+
+// Add user button
+div[style*="margin-top: 16px"] button[mat-raised-button] {
+  background: linear-gradient(
+    135deg,
+    $success-color,
+    color.adjust($success-color, $lightness: -10%)
+  );
+  color: white;
+  font-weight: 600;
+  border-radius: $button-radius;
+  padding: 0.6rem 1.2rem;
+  border: none;
+  box-shadow: 0 3px 12px rgba($success-color, 0.25);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  &::before {
+    content: "add";
+    font-family: "Material Icons";
+    font-size: 18px;
+  }
+
+  &:hover {
+    background: linear-gradient(
+      135deg,
+      color.adjust($success-color, $lightness: -5%),
+      color.adjust($success-color, $lightness: -15%)
+    );
+    box-shadow: 0 4px 15px rgba($success-color, 0.4);
+    transform: translateY(-2px);
+  }
+
+  &:active {
+    transform: translateY(1px);
+    box-shadow: 0 2px 8px rgba($success-color, 0.3);
+  }
+}
+
+// Add user row styling
+.add-user-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+
+  mat-form-field {
+    flex: 1;
+    min-width: 250px;
+  }
+
+  button[mat-flat-button] {
+    background: linear-gradient(
+      135deg,
+      $success-color,
+      color.adjust($success-color, $lightness: -10%)
+    );
+    color: white;
+    font-weight: 600;
+    border-radius: $button-radius;
+    padding: 0.6rem 1.2rem;
+    border: none;
+    box-shadow: 0 3px 12px rgba($success-color, 0.25);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    height: 42px;
+    min-width: 120px;
+
+    &:hover {
+      background: linear-gradient(
+        135deg,
+        color.adjust($success-color, $lightness: -5%),
+        color.adjust($success-color, $lightness: -15%)
+      );
+      box-shadow: 0 4px 15px rgba($success-color, 0.4);
+    }
+
+    &:disabled {
+      background: color.adjust($border-color, $lightness: 10%);
+      color: $subtext-color;
+      box-shadow: none;
+    }
+  }
+
+  button[mat-stroked-button] {
+    border: 1px solid $error-color;
+    color: $error-color;
+    background: white;
+    font-weight: 600;
+    border-radius: $button-radius;
+    padding: 0.6rem 1.2rem;
+    height: 42px;
+    min-width: 100px;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: rgba($error-color, 0.08);
+      box-shadow: 0 4px 12px rgba($error-color, 0.15);
+    }
+  }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: stretch;
+
+    button {
+      width: 100%;
+    }
+  }
+}
+
+// Action button styling
+.action-btn.delete-btn {
+  background: rgba($error-color, 0.08);
+  color: $error-color;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  transition: all 0.2s ease;
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+
+  &:hover {
+    background: $error-color;
+    color: white;
+    box-shadow: 0 2px 8px rgba($error-color, 0.3);
+  }
+}
+
+// Paginator styling
+mat-paginator {
+  border-top: 1px solid rgba($border-color, 0.3);
+  margin-top: 1rem;
+  padding-top: 0.5rem;
+
+  ::ng-deep {
+    .mat-mdc-paginator-page-size-label,
+    .mat-mdc-paginator-range-label {
+      font-weight: 500;
+    }
+
+    .mat-mdc-paginator-range-actions {
+      .mat-mdc-icon-button {
+        &:hover {
+          background: rgba($primary-color, 0.1);
+        }
+      }
+    }
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .row {
+    gap: 1rem;
+  }
+
+  .col {
+    padding: 1rem;
+  }
+
+  .form-group {
+    margin-bottom: 1rem;
+  }
+
+  .add-user-row {
+    flex-direction: column;
+
+    mat-form-field {
+      width: 100%;
+    }
+
+    button {
+      width: 100%;
+    }
+  }
+}
+
+@media print {
+  .container {
+    box-shadow: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .back-btn-container,
+  .filter-container,
+  div[style*="margin-top: 16px"],
+  .add-user-row,
+  mat-paginator {
+    display: none;
+  }
+
+  .row {
+    display: block;
+  }
+
+  .col {
+    margin-bottom: 1.5rem;
+    box-shadow: none;
+    border: 1px solid #ddd;
+  }
+
+  mat-header-row {
+    background-color: #f0f0f0 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}

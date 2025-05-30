@@ -1,6 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using DocumentFormat.OpenXml.Office2010.Excel;
+using Microsoft.AspNetCore.Mvc;
 using OnlineTestSystem.BLL.Services.DoQuizService;
+using OnlineTestSystem.BLL.Services.MailService;
 using OnlineTestSystem.BLL.Services.QuizService;
+using OnlineTestSystem.BLL.Services.UserService;
+using OnlineTestSystem.BLL.ViewModels.Exam;
 using OnlineTestSystem.BLL.ViewModels.Quiz;
 using OnlineTestSystem.BLL.ViewModels.QuizCategory;
 using OnlineTestSystem.BLL.ViewModels.UserQuiz;
@@ -13,14 +17,20 @@ namespace OnlineTestSystem.Presentation.Controllers
     public class QuizController : ControllerBase
     {
         private readonly IQuizService _quizService;
-        private readonly IUserQuizService _userQuizService;
+        private readonly IDoQuizService _userQuizService;
         private readonly IUserAnswerService _userAnswerService;
+        private readonly IEmailService _emailService;
+        private readonly IUserService _userService;
 
-        public QuizController(IQuizService quizService, IUserQuizService userQuizService, IUserAnswerService userAnswerService)
+
+        public QuizController(IQuizService quizService, IDoQuizService userQuizService, IUserAnswerService userAnswerService, 
+                              IEmailService emailService, IUserService userService)
         {
             _quizService = quizService;
             _userQuizService = userQuizService;
             _userAnswerService = userAnswerService;
+            _emailService = emailService;
+            _userService = userService;
         }
 
         [HttpGet("get-all-quiz")]
@@ -64,6 +74,18 @@ namespace OnlineTestSystem.Presentation.Controllers
             }
             return BadRequest("The quiz does not exist!");
         }
+
+        [HttpGet("{id}/full-detail")]
+        public async Task<IActionResult> GetFullBankDetail(Guid id)
+        {
+            var result = await _quizService.GetQuizFullDetailAsync(id);
+            if (result == null)
+                return NotFound(new { message = "Không tìm thấy đề thi." });
+
+            return Ok(result);
+        }
+
+
 
         [HttpPost("Filter")]
         public async Task<IActionResult> FilteQuiz([FromQuery] int pageIndex, int pageSize,
@@ -155,6 +177,39 @@ namespace OnlineTestSystem.Presentation.Controllers
                     request.QuestionBankId,
                     request.NumberOfQuestionsPerQuiz,
                     request.NumberOfQuizzes,
+                    request.Score,
+                    request.Duration);
+
+                return Ok(quizzes.Select(q => new
+                {
+                    q.Id,
+                    q.Title,
+                    q.Description,
+                    q.Duration,
+                    q.CreatedAt
+                }));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        // random generate quiz by level
+        [HttpPost("random-generate-by-level")]
+        public async Task<IActionResult> RandomGenerateByLevel([FromBody] RandomQuizLevelCreateRequest request)
+        {
+            if (request == null)
+                return BadRequest("Request không hợp lệ.");
+
+            try
+            {
+                var quizzes = await _quizService.GenerateRandomQuizzesByLevelAsync(
+                    request.QuestionBankId,
+                    request.EasyCount,
+                    request.MediumCount,
+                    request.HardCount,
+                    request.NumberOfQuizzes,
                     request.Duration);
 
                 return Ok(quizzes.Select(q => new
@@ -173,53 +228,68 @@ namespace OnlineTestSystem.Presentation.Controllers
         }
 
 
+        // check user participated in exam
+        [HttpGet("exam/{examId}/user/{userId}/check-participation")]
+        public async Task<IActionResult> CheckUserParticipation(Guid examId, Guid userId)
+        {
+            var participated = await _userQuizService.HasUserParticipatedInExamAsync(userId, examId);
+            return Ok(new { message = participated });
+        }
 
         // Do Quiz Exam
+
         [HttpPost("{quizId}/start")]
         public async Task<IActionResult> StartQuiz(Guid quizId,[FromBody] AddUserQuizVm startQuizVm)
         {
-            var userQuiz = new UserQuiz()
-            {
-                Id = Guid.NewGuid(),
-                UserId = startQuizVm.UserId,
-                QuizId = quizId,
-                ExamId = startQuizVm.ExamId,
-                FinishedAt = DateTime.Now,
-                Score = 0
-            };
-            await _userQuizService.AddAsync(userQuiz);
-            return Ok("Start Quiz");
+            var (success, error, userQuizId) = await _userQuizService.StartUserQuizAsync(quizId, startQuizVm);
+            if (!success)
+                return BadRequest(new { message = error });
+
+            return Ok(new { message = "Start Quiz", userQuizId});
         }
 
-        [HttpPut("userQuiz/{id}/submit")]
+        // Submit 
+        [HttpPut("UserQuiz/{id}/submit")]
         public async Task<IActionResult> SubmitQuiz(Guid id, [FromBody] AddUserQuizVm startQuizVm)
         {
-            var userQuiz = await _userQuizService.GetByIdAsync(id);
-            if (userQuiz != null)
-            {
-                userQuiz.FinishedAt = DateTime.Now;
-                userQuiz.IsComplete = true;
+            var success = await _userQuizService.SubmitUserQuizAndCalculateScoreAsync(id, startQuizVm.Score);
 
-                await _userQuizService.UpdateAsync(userQuiz);
-                return Ok("Submit Successful");
+            if (success)
+            {
+                return Ok(new { message = "Submit Successful" });
             }
-            return BadRequest("failed");
+            else
+                return BadRequest(new { message = "Submit failed" });
         }
 
         [HttpPost("{userQuizId}/record")]
         public async Task<IActionResult> RecordAnswer(Guid userQuizId, [FromBody] AddUserAnswerVm recordAnswerVm)
         {
-            var userAnswer = new UserAnswer()
-            {
-                Id = Guid.NewGuid(),
-                UserQuizId = userQuizId,
-                QuestionId = recordAnswerVm.QuestionId,
-                AnswerId = recordAnswerVm.AnswerId,
-                UserVoiceUrl = recordAnswerVm.UserVoiceUrl,
-                AnswerText = recordAnswerVm.AnswerText
-            };
-            await _userAnswerService.AddAsync(userAnswer);
-            return Ok("Record Answer");
+            bool result = await _userAnswerService.AddOrUpdateUserAnswerAsync(userQuizId, recordAnswerVm);
+            if (result)
+                return Ok(new { message = "Record Answer successful" });
+            else
+                return BadRequest(new { message = "Failed to record answer" });
         }
+
+
+        [HttpGet("UserQuiz/{userQuizId}/detail")]
+        public async Task<IActionResult> GetUserQuizDetail(Guid userQuizId)
+        {
+            var result = await _userQuizService.GetUserQuizDetailAsync(userQuizId);
+            if (result == null)
+                return NotFound(new { message = "Không tìm thấy lần làm bài này!" });
+            return Ok(result);
+        }
+
+        [HttpGet("doing/{examId}/{userId}")]
+        public async Task<IActionResult> GetDoingUserQuiz(Guid examId, Guid userId)
+        {
+            var result = await _userQuizService.GetDoingUserQuizAsync(examId, userId);
+            if (result == null)
+                return NotFound(new { message = "Không có bài thi đang làm hoặc đã hết giờ." });
+            return Ok(result);
+        }
+
     }
 }
