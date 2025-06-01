@@ -1,0 +1,32 @@
+﻿version: "3.8"
+
+services:
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sqlserver
+    environment:
+      SA_PASSWORD: "YourStrong!Passw0rdForApp"  
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: "Express"
+    ports:
+      - "1433:1433"
+    volumes:
+      - sql_data:/var/opt/mssql
+    restart: unless-stopped
+
+  api:
+    image: nguyengnol/moku-test-system:latest
+    container_name: online-test-api
+    depends_on:
+      - db
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__DefaultConnection=Server=db,1433;Database=OnlineTestSystem;User Id=sa;Password=YourStrong!Passw0rdForApp;TrustServerCertificate=True
+      - JWT__Secret=YourSuperSecretKey
+       - ASPNETCORE_URLS=http://+:8080
+    ports:
+      - "5000:8080"
+    restart: unless-stopped
+
+volumes:
+  sql_data:

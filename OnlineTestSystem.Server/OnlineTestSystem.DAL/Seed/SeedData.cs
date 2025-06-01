@@ -47,13 +47,6 @@ namespace OnlineTestSystem.DAL.Seed
 
             await context.Users.AddAsync(adminUser);
 
-            // Gán user vào role (IdentityUserRole)
-            await context.Set<IdentityUserRole<Guid>>().AddAsync(new IdentityUserRole<Guid>
-            {
-                RoleId = adminRoleId,
-                UserId = adminUserId
-            });
-
             await context.SaveChangesAsync();
         }
     }

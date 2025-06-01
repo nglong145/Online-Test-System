@@ -42,80 +42,82 @@ export const routes: Routes = [
     component: AdminLayoutComponent,
     canActivate: [authGuard],
     data: { roles: ['Admin'] },
-    children: [
-      {
-        path: 'dashboard',
-        component: DashboardComponent,
-      },
-      {
-        path: 'teacher',
-        component: TeacherListComponent,
-      },
-      {
-        path: 'teacher/:id',
-        component: TeacherDetailComponent,
-      },
-      {
-        path: 'student',
-        component: StudentListComponent,
-      },
-      {
-        path: 'student/:id',
-        component: StudentDetailComponent,
-      },
-      {
-        path: 'exam',
-        component: ExamListComponent,
-      },
-      {
-        path: 'exam/:id',
-        component: ExamDetailComponent,
-        canDeactivate: [unsavedChangesGuard],
-      },
+    // children: [
+    //   {
+    //     path: 'dashboard',
+    //     component: DashboardComponent,
+    //   },
+    //   {
+    //     path: 'teacher',
+    //     component: TeacherListComponent,
+    //   },
+    //   {
+    //     path: 'teacher/:id',
+    //     component: TeacherDetailComponent,
+    //   },
+    //   {
+    //     path: 'student',
+    //     component: StudentListComponent,
+    //   },
+    //   {
+    //     path: 'student/:id',
+    //     component: StudentDetailComponent,
+    //   },
+    //   {
+    //     path: 'exam',
+    //     component: ExamListComponent,
+    //   },
+    //   {
+    //     path: 'exam/:id',
+    //     component: ExamDetailComponent,
+    //     canDeactivate: [unsavedChangesGuard],
+    //   },
 
-      {
-        path: 'exam/:id/add-quiz',
-        component: AddQuizExamComponent,
-      },
-      {
-        path: 'group',
-        component: GroupListComponent,
-      },
-      {
-        path: 'group/:id',
-        component: GroupDetailComponent,
-      },
+    //   {
+    //     path: 'exam/:id/add-quiz',
+    //     component: AddQuizExamComponent,
+    //   },
+    //   {
+    //     path: 'group',
+    //     component: GroupListComponent,
+    //   },
+    //   {
+    //     path: 'group/:id',
+    //     component: GroupDetailComponent,
+    //   },
 
-      {
-        path: 'category',
-        component: CategoryListComponent,
-      },
-      {
-        path: 'category/:id',
-        component: CategoryDetailComponent,
-        canDeactivate: [unsavedChangesGuard],
-      },
+    //   {
+    //     path: 'category',
+    //     component: CategoryListComponent,
+    //   },
+    //   {
+    //     path: 'category/:id',
+    //     component: CategoryDetailComponent,
+    //     canDeactivate: [unsavedChangesGuard],
+    //   },
 
-      {
-        path: 'bank',
-        component: BankListComponent,
-      },
-      {
-        path: 'bank/:id',
-        component: BankDetailComponent,
-        canDeactivate: [unsavedChangesGuard],
-      },
+    //   {
+    //     path: 'bank',
+    //     component: BankListComponent,
+    //   },
+    //   {
+    //     path: 'bank/:id',
+    //     component: BankDetailComponent,
+    //     canDeactivate: [unsavedChangesGuard],
+    //   },
 
-      {
-        path: 'quiz',
-        component: QuizListComponent,
-      },
-      {
-        path: 'quiz/:id',
-        component: QuizDetailComponent,
-        canDeactivate: [unsavedChangesGuard],
-      },
-    ],
+    //   {
+    //     path: 'quiz',
+    //     component: QuizListComponent,
+    //   },
+    //   {
+    //     path: 'quiz/:id',
+    //     component: QuizDetailComponent,
+    //     canDeactivate: [unsavedChangesGuard],
+    //   },
+    // ],
+    loadChildren: () =>
+      import('./routes/admin.routes').then((m) => m.ADMIN_ROUTES),
   },
 
   {
@@ -123,56 +125,58 @@ export const routes: Routes = [
     component: TeacherLayoutComponent,
     canActivate: [authGuard],
     data: { roles: ['Teacher'] },
-    children: [
-      {
-        path: 'dashboard',
-        component: DashboardComponent,
-      },
-      {
-        path: 'group',
-        component: GroupListComponent,
-      },
-      {
-        path: 'group/:id',
-        component: GroupDetailComponent,
-        canDeactivate: [unsavedChangesGuard],
-      },
+    // children: [
+    //   {
+    //     path: 'dashboard',
+    //     component: DashboardComponent,
+    //   },
+    //   {
+    //     path: 'group',
+    //     component: GroupListComponent,
+    //   },
+    //   {
+    //     path: 'group/:id',
+    //     component: GroupDetailComponent,
+    //     canDeactivate: [unsavedChangesGuard],
+    //   },
 
-      {
-        path: 'bank',
-        component: BankListComponent,
-      },
-      {
-        path: 'bank/:id',
-        component: BankDetailComponent,
-        canDeactivate: [unsavedChangesGuard],
-      },
+    //   {
+    //     path: 'bank',
+    //     component: BankListComponent,
+    //   },
+    //   {
+    //     path: 'bank/:id',
+    //     component: BankDetailComponent,
+    //     canDeactivate: [unsavedChangesGuard],
+    //   },
 
-      {
-        path: 'quiz',
-        component: QuizListComponent,
-      },
-      {
-        path: 'quiz/:id',
-        component: QuizDetailComponent,
-        canDeactivate: [unsavedChangesGuard],
-      },
+    //   {
+    //     path: 'quiz',
+    //     component: QuizListComponent,
+    //   },
+    //   {
+    //     path: 'quiz/:id',
+    //     component: QuizDetailComponent,
+    //     canDeactivate: [unsavedChangesGuard],
+    //   },
 
-      {
-        path: 'exam',
-        component: ExamListComponent,
-      },
-      {
-        path: 'exam/:id',
-        component: ExamDetailComponent,
-        canDeactivate: [unsavedChangesGuard],
-      },
+    //   {
+    //     path: 'exam',
+    //     component: ExamListComponent,
+    //   },
+    //   {
+    //     path: 'exam/:id',
+    //     component: ExamDetailComponent,
+    //     canDeactivate: [unsavedChangesGuard],
+    //   },
 
-      {
-        path: 'exam/:id/add-quiz',
-        component: AddQuizExamComponent,
-      },
-    ],
+    //   {
+    //     path: 'exam/:id/add-quiz',
+    //     component: AddQuizExamComponent,
+    //   },
+    // ],
+    loadChildren: () =>
+      import('./routes/teacher.routes').then((m) => m.TEACHER_ROUTES),
   },
 
   {
@@ -180,20 +184,22 @@ export const routes: Routes = [
     component: StudentLayoutComponent,
     canActivate: [authGuard],
     data: { roles: ['Student'] },
-    children: [
-      {
-        path: 'home',
-        component: HomePageComponent,
-      },
-      {
-        path: 'exam/:id/start',
-        component: ExamPageComponent,
-      },
-      {
-        path: 'user-quiz/:id',
-        component: UserQuizDetailComponent,
-      },
-    ],
+    // children: [
+    //   {
+    //     path: 'home',
+    //     component: HomePageComponent,
+    //   },
+    //   {
+    //     path: 'exam/:id/start',
+    //     component: ExamPageComponent,
+    //   },
+    //   {
+    //     path: 'user-quiz/:id',
+    //     component: UserQuizDetailComponent,
+    //   },
+    // ],
+    loadChildren: () =>
+      import('./routes/student.routes').then((m) => m.STUDENT_ROUTES),
   },
 
   {
@@ -202,11 +208,11 @@ export const routes: Routes = [
   },
 
   {
-    path: '**',
-    redirectTo: 'not-found',
-  },
-  {
     path: 'not-found',
     component: NotFoundComponent,
+  },
+  {
+    path: '**',
+    redirectTo: 'not-found',
   },
 ];
