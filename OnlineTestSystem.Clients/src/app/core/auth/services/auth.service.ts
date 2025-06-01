@@ -67,13 +67,15 @@ export class AuthService {
   }
 
   getUserRole(): string | null {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      return null;
-    }
-
     try {
-      const decodedToken: any = jwtDecode(token); // Giải mã token
+      // Lấy token từ cookie thay vì localStorage
+      let token = this.cookieService.get('Authentication');
+      if (!token) return null;
+
+      // Xử lý đúng các dấu cách được mã hóa URL
+      token = token.replace(/^Bearer\s*/i, '').replace(/^Bearer%20/i, '');
+
+      const decodedToken: any = jwtDecode(token);
 
       return (
         decodedToken[

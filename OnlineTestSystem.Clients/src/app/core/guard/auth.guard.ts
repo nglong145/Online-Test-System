@@ -13,7 +13,8 @@ export const authGuard: CanActivateFn = (route, state) => {
   let token = cookieService.get('Authentication');
 
   if (user && token) {
-    token = token.replace('Bearer ', '');
+    // token = token.replace('Bearer ', '');
+    token = token.replace(/^Bearer\s*/i, '').replace(/^Bearer%20/i, '');
 
     try {
       const decodeToken: any = jwtDecode(token);
@@ -33,8 +34,12 @@ export const authGuard: CanActivateFn = (route, state) => {
       const userRole =
         decodeToken[
           'http://schemas.microsoft.com/ws/2008/06/identity/claims/role'
-        ];
-      const allowedRoles = route.data['roles'];
+        ]?.toLowerCase();
+      const allowedRoles = route.data['roles'].map((role: any) =>
+        role.toLowerCase()
+      );
+      console.log('User role:', userRole);
+      console.log('Allowed roles:', allowedRoles);
 
       if (!allowedRoles.includes(userRole)) {
         // Người dùng không có quyền truy cập => redirect Access Denied
