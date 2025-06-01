@@ -22,7 +22,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ConnectionStrings__DefaultConnection=Server=db,1433;Database=OnlineTestSystem;User Id=sa;Password=YourStrong!Passw0rdForApp;TrustServerCertificate=True
-      - JWT__Secret=YourSuperSecretKey
+      - JWT__Secret=this-is-a-our-project-secret-key
       - ASPNETCORE_URLS=https://+:443;http://+:8080
       - ASPNETCORE_Kestrel__Certificates__Default__Password=123456
       - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
